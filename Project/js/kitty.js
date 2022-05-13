@@ -63,22 +63,28 @@ function newPyramid() {
 	var defaultPyramidGeometry = new THREE.CylinderGeometry(0, radius, height, 4, 1);
 }
 
-function addObj(obj, geom, x, y, z) {
-	material = new THREE.MeshBasicMaterial({ color: 0x20b2aa, wireframe: true});
+function addObj(obj, geom, c, x, y, z) {
+	'use strict';
+
+	material = new THREE.MeshBasicMaterial({ color: c, wireframe: true});
 	mesh = new THREE.Mesh(geom, material);
-	mesh.position.set(0, 0, 0);
+	mesh.position.set(x, y, z);
 	obj.add(mesh);
 	scene.add(obj);
 
 	obj.position.x = x;
 	obj.position.y = y;
 	obj.position.z = z;
+
 }
+
 function createKitty() {
+	'use strict';
+
 	var defaultTorusGeometry = new THREE.TorusGeometry();
-	var defaultBoxGeometry = new THREE.BoxGeometry();
-	var defaultSphereGeometry = new THREE.SphereGeometry();
-	var defaultCylinderGeometry = new THREE.CylinderGeometry();
+	var defaultBoxGeometry = new THREE.BoxGeometry(8,8,8);
+	var defaultSphereGeometry = new THREE.SphereGeometry(18,18,18);
+	var defaultCylinderGeometry = new THREE.CylinderGeometry(10,10,40,10);
 	var defaultRingGeometry = new THREE.RingGeometry();
 	var defaultPyramidGeometry = new THREE.CylinderGeometry();
 
@@ -89,12 +95,19 @@ function createKitty() {
 	var ring = new THREE.Object3D();
 	var pyramid = new THREE.Object3D();
 	
-	addObj(torus, defaultTorusGeometry, 0, 0, 0);
-	addObj(pyramid, defaultPyramidGeometry, 10, 10, 10);
-	addObj(box, defaultBoxGeometry, 20, 20, 20);
-	addObj(sphere, defaultSphereGeometry, 30, 30, 30);
-	addObj(cylinder, defaultCylinderGeometry, 40, 40, 40);
-	addObj(ring, defaultRingGeometry, 50, 50, 50);
+	//addObj(torus, defaultTorusGeometry, 0, 0, 0);
+	//addObj(pyramid, defaultPyramidGeometry, 10, 10, 10);
+	addObj(box, defaultBoxGeometry, 0xFF0000,15, 10, -10);
+	addObj(sphere, defaultSphereGeometry, 0x20b2aa, 10, 7, -20);
+	addObj(cylinder, defaultCylinderGeometry, 0x2E8B57
+		, 14, 4, -10);
+	//addObj(ring, defaultRingGeometry, 50, 50, 50);
+
+	//trying to rotate the cylinder(body) but its not working
+	//cylinder.rotateZ(-Math.PI * 0.5);
+	//cylinder.rotateY(-Math.PI * 0.6);
+	//cylinder.rotateX(-Math.PI * 1);
+	
 }
 
 function render() {
@@ -182,5 +195,6 @@ function init() {
 	createCamera();
 
 	render();
+	window.addEventListener("keydown", onKeyDown);
 
 }
