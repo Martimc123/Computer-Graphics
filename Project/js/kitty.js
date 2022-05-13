@@ -83,8 +83,8 @@ function createKitty() {
 
 	var defaultTorusGeometry = new THREE.TorusGeometry();
 	var defaultBoxGeometry = new THREE.BoxGeometry(8,8,8);
-	var defaultSphereGeometry = new THREE.SphereGeometry(18,18,18);
-	var defaultCylinderGeometry = new THREE.CylinderGeometry(10,10,40,10);
+	var defaultSphereGeometry = new THREE.SphereGeometry(20,20,20);
+	var defaultCylinderGeometry = new THREE.CylinderGeometry(10,10,48,10);
 	var defaultRingGeometry = new THREE.RingGeometry();
 	var defaultPyramidGeometry = new THREE.CylinderGeometry();
 
@@ -100,13 +100,13 @@ function createKitty() {
 	addObj(box, defaultBoxGeometry, 0xFF0000,15, 10, -10);
 	addObj(sphere, defaultSphereGeometry, 0x20b2aa, 10, 7, -20);
 	addObj(cylinder, defaultCylinderGeometry, 0x2E8B57
-		, 14, 4, -10);
+		, 14, 6, -10);
 	//addObj(ring, defaultRingGeometry, 50, 50, 50);
 
 	//trying to rotate the cylinder(body) but its not working
-	//cylinder.rotateZ(-Math.PI * 0.5);
-	//cylinder.rotateY(-Math.PI * 0.6);
-	//cylinder.rotateX(-Math.PI * 1);
+	cylinder.rotateZ(50);
+	cylinder.rotateY(24);
+	cylinder.rotateX(40);
 	
 }
 
