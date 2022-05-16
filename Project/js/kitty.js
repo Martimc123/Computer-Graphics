@@ -100,12 +100,21 @@ function createKitty() {
 	addObj(box, defaultBoxGeometry, 0xFF0000,15, 10, -10);
 	addObj(sphere, defaultSphereGeometry, 0x20b2aa, 10, 7, -20);
 	addObj(cylinder, defaultCylinderGeometry, 0x2E8B57
-		, 14, 4, -10);
+		, 0, 0, 0);
 	//addObj(ring, defaultRingGeometry, 50, 50, 50);
+
+	// To know which axis is xyz
+	var spherex = new THREE.Object3D();
+	var spherey = new THREE.Object3D();
+	var spherez = new THREE.Object3D();
+	var tinySphereGeometry = new THREE.SphereGeometry(3,3,3);
+	addObj(spherex, tinySphereGeometry, 0xFF0000,5, 0, 0);
+	addObj(spherey, tinySphereGeometry, 0xFFFF00,0, 5, 0);
+	addObj(spherez, tinySphereGeometry, 0xFFFAFA,0, 0, 5);
 
 	//trying to rotate the cylinder(body) but its not working
 	//cylinder.rotateZ(-Math.PI * 0.5);
-	//cylinder.rotateY(-Math.PI * 0.6);
+	cylinder.rotateY(Math.PI * 0.5);
 	//cylinder.rotateX(-Math.PI * 1);
 	
 }
@@ -164,7 +173,7 @@ function animate() {
 function createScene() {
 	'use strict';
 	scene = new THREE.Scene();
-	scene.add(new THREE.AxesHelper(10));
+	scene.add(new THREE.AxesHelper(100));
 	createKitty();
 }
 
@@ -177,8 +186,8 @@ function createCamera() {
 																		window.innerWidth/window.innerHeight,
 																		1,
 																		1000);
-	camera.position.x = 50;
-	camera.position.y = 50;
+	camera.position.x = 0;
+	camera.position.y = 0;
 	camera.position.z = 50;
 	camera.lookAt(scene.position); // camera pointed at scene axis
 }
