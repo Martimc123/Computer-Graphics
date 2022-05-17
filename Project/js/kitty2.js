@@ -11,7 +11,6 @@ var geometry, material, mesh;
 var kitty;
 var wires;
 var defaultScale = 1;
-var wiredKittyParts = [];
 
 var qKey,wKey,aKey,sKey,dKey,cKey,zKey,xKey;
 
@@ -26,31 +25,30 @@ function createKitty(x, y, z, scale) {
 	kitty = new THREE.Object3D();
 
 	// change for positions to be based on cylinder height and angle
-	wiredKittyParts.length = 0;
-	wiredKittyParts.push(addKittyTorso(kitty, "torso", 0, 0, 0)); // based on kitty origin position
+	addKittyTorso(kitty, "torso", 0, 0, 0); // based on kitty origin position
 	var head = new THREE.Object3D();
-	wiredKittyParts.push(addKittyFace(head, "face", 5, 4, 0));
-	wiredKittyParts.push(addKittyEye(head, "eye1", 7, 3.5, -1));
-	wiredKittyParts.push(addKittyEye(head, "eye2", 7, 3.5, 1));
-	wiredKittyParts.push(addKittyEar(head, "ear1", 5, 6, 2, Math.PI / 180 * 45));
-	wiredKittyParts.push(addKittyEar(head, "ear2", 5, 6, -2, Math.PI / 180 * -45));
-	wiredKittyParts.push(addKittyNose(head, "nose", 7.5, 3, 0));
-	wiredKittyParts.push(addKittyWhisker(head, "whisker1", 8, 3, 1));
-	wiredKittyParts.push(addKittyWhisker(head, "whisker2", 8, 2.5, 1));
-	wiredKittyParts.push(addKittyWhisker(head, "whisker3", 8, 3, -1));
-	wiredKittyParts.push(addKittyWhisker(head, "whisker4", 8, 2.5, -1));
+	addKittyFace(head, "face", 5, 4, 0);
+	addKittyEye(head, "eye1", 7, 3.5, -1);
+	addKittyEye(head, "eye2", 7, 3.5, 1);
+	addKittyEar(head, "ear1", 5, 6, 2, Math.PI / 180 * 45);
+	addKittyEar(head, "ear2", 5, 6, -2, Math.PI / 180 * -45);
+	addKittyNose(head, "nose", 7.5, 3, 0);
+	addKittyWhisker(head, "whisker1", 8, 3, 1);
+	addKittyWhisker(head, "whisker2", 8, 2.5, 1);
+	addKittyWhisker(head, "whisker3", 8, 3, -1);
+	addKittyWhisker(head, "whisker4", 8, 2.5, -1);
 	head.name="head";
 	kitty.add(head);
 	
 	var legs = new THREE.Object3D();
-	wiredKittyParts.push(addKittyLeg(legs, "leg1", -3, -4, -1));
-	wiredKittyParts.push(addKittyLeg(legs, "leg2", -3, -4, 1));
-	wiredKittyParts.push(addKittyLeg(legs, "leg3", 1, -4, 1));
-	wiredKittyParts.push(addKittyLeg(legs, "leg4", 1, -4, -1));
+	addKittyLeg(legs, "leg1", -3, -4, -1);
+	addKittyLeg(legs, "leg2", -3, -4, 1);
+	addKittyLeg(legs, "leg3", 1, -4, 1);
+	addKittyLeg(legs, "leg4", 1, -4, -1);
 	legs.name="legs";
 	kitty.add(legs);
 		
-	wiredKittyParts.push(addKittyTail(kitty, "tail", -6, 3, 0));
+	addKittyTail(kitty, "tail", -6, 3, 0);
 	
 	kitty.position.set(x, y, z);
 	kitty.scale.set(scale,scale,scale);
@@ -73,42 +71,42 @@ function addKittyPart(obj, tag, geometry, hex, x, y, z, rotX, rotY, rotZ) {
 
 function addKittyWhisker(obj, tag, x, y, z) {
 	geometry = new THREE.BoxGeometry(0.25, 1, 0.25, 1, 1, 1);
-	return addKittyPart(obj, tag, geometry, 0x5b0001, x, y, z, Math.PI/180 * 90, 0, 0);
+	addKittyPart(obj, tag, geometry, 0x5b0001, x, y, z, Math.PI/180 * 90, 0, 0);
 }
 
 function addKittyNose(obj, tag, x, y, z) {
 	geometry = new THREE.BoxGeometry(0.5, 0.5, 0.5, 1, 1, 1);
-	return addKittyPart(obj, tag, geometry, 0xef64bc, x, y, z, 0, 0, 0);
+	addKittyPart(obj, tag, geometry, 0xef64bc, x, y, z, 0, 0, 0);
 }
 
 function addKittyTail(obj, tag, x, y, z) {
 	geometry = new THREE.CylinderGeometry(0.25, 0.25, 4, 20, 1);
-	return addKittyPart(obj, tag, geometry, 0x9B26B6, x, y, z, 0, 0, Math.PI / 180 * 45);
+	addKittyPart(obj, tag, geometry, 0x9B26B6, x, y, z, 0, 0, Math.PI / 180 * 45);
 }
 
 function addKittyTorso(obj, tag, x, y, z) {
 	geometry = new THREE.CylinderGeometry(2, 2, 8, 20, 1);
-	return addKittyPart(obj, tag, geometry, 0x35e8df, x, y, z, 0, 0, Math.PI / 180 * 90);
+	addKittyPart(obj, tag, geometry, 0x35e8df, x, y, z, 0, 0, Math.PI / 180 * 90);
 }
 
 function addKittyFace(obj, tag, x, y, z) {
 	geometry = new THREE.SphereGeometry(2);
-	return addKittyPart(obj, tag, geometry, 0xfde995, x, y, z, 0, 0, 0);
+	addKittyPart(obj, tag, geometry, 0xfde995, x, y, z, 0, 0, 0);
 }
 
 function addKittyEye(obj, tag, x, y, z) {
 	geometry = new THREE.SphereGeometry(0.25);
-	return addKittyPart(obj, tag, geometry, 0x49b517, x, y, z, 0, 0, 0);
+	addKittyPart(obj, tag, geometry, 0x49b517, x, y, z, 0, 0, 0);
 }
 
 function addKittyLeg(obj, tag, x, y, z) {
 	geometry = new THREE.CylinderGeometry(0.25, 0.25, 2, 8, 1);
-	return addKittyPart(obj, tag, geometry, 0xf2a007, x, y, z, 0, 0, 0);
+	addKittyPart(obj, tag, geometry, 0xf2a007, x, y, z, 0, 0, 0);
 }
 
 function addKittyEar(obj, tag, x, y, z, rotX) {
 	geometry = new THREE.CylinderGeometry(0, 0.5, 1, 4, 1);
-	return addKittyPart(obj, tag, geometry, 0xffffff, x, y, z, rotX, 0, 0);
+	addKittyPart(obj, tag, geometry, 0xffffff, x, y, z, rotX, 0, 0);
 }
 
 
@@ -188,7 +186,7 @@ function keys()
 
 
 function changeWires(wires)
-{/*
+{
 	kitty.getObjectByName("torso").material.wireframe = wires;
 	kitty.getObjectByName("head").getObjectByName("face").material.wireframe = wires;
 	kitty.getObjectByName("head").getObjectByName("nose").material.wireframe = wires;
@@ -205,16 +203,6 @@ function changeWires(wires)
 	kitty.getObjectByName("legs").getObjectByName("leg2").material.wireframe = wires;
 	kitty.getObjectByName("legs").getObjectByName("leg3").material.wireframe = wires;
 	kitty.getObjectByName("legs").getObjectByName("leg4").material.wireframe = wires;
-*/
-/*
-	kitty.traverse( function( node) {
-		if ( node instanceof THREE.Mesh )
-			node.material.wireframe = wires;
-	} );
-	*/
-	var nrKittyParts = wiredKittyParts.length;
-	for (var i = 0; i < nrKittyParts; i++) 
-		wiredKittyParts[i].material.wireframe = wires;
 }
 
 function arrow_up()
