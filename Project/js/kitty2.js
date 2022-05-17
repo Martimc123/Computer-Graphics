@@ -11,6 +11,7 @@ var geometry, material, mesh;
 var kitty;
 var head;
 var wires;
+var defaultScale = 1;
 
 var cat_torso;
 var cat_face;
@@ -21,7 +22,7 @@ var qKey,wKey,aKey,sKey,dKey,cKey,zKey,xKey;
 'use strict';
 
 // change to receive position, yes, but also body radius and height
-function createKitty(x, y, z) {
+function createKitty(x, y, z, scale) {
     
 	wires = true;
 	kitty = new THREE.Object3D();
@@ -54,6 +55,7 @@ function createKitty(x, y, z) {
   addKittyTail(kitty, -6, 3, 0);
 	
   kitty.position.set(x, y, z);
+	kitty.scale.set(scale,scale,scale);
 
 	scene.add(kitty);
 	return kitty;
@@ -289,7 +291,7 @@ function animate() {
 function createScene() {
 	scene = new THREE.Scene();
 	scene.add(new THREE.AxesHelper(100));
-	kitty = createKitty(4, 5, 2);
+	kitty = createKitty(4, 5, 2, defaultScale);
 }
 
 function createCamera(x, y, z) {
