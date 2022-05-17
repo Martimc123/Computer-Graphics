@@ -63,10 +63,10 @@ LEGS:  f2a007 / cff207 /f22a07
 "height": 2,
 "radialSegments": 8,
 "heightSegments": 1,
-.Cylinder: 1,1,1; 0º, 0º, 0º
-.Cylinder: 1,1,3; 0º, 0º, 0º
-.Cylinder: 5,1,3; 0º, 0º, 0º
-.Cylinder: 5,1,1; 0º, 0º, 0º
+.Cylinder: 1,1,1; 0º, 0º, 0º // back
+.Cylinder: 1,1,3; 0º, 0º, 0º //back
+.Cylinder: 5,1,3; 0º, 0º, 0º // front
+.Cylinder: 5,1,1; 0º, 0º, 0º // front
 
 {
 	"metadata": {

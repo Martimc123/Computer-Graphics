@@ -14,12 +14,13 @@ var wires;
 
 var cat_torso;
 var cat_face;
+var qKey,wKey;
 
 var controls;
 
 'use strict';
 
-// change to receive position, yes, but also torso radius and height
+// change to receive position, yes, but also body radius and height
 function createKitty(x, y, z) {
     
 	wires = true;
@@ -27,13 +28,12 @@ function createKitty(x, y, z) {
 
 	// change for positions to be based on cylinder height and angle
 	// current torso spot: 4,5,2
-	4, 5, 2
 	addKittyTorso(kitty, 0, 0, 0); // based on kitty origin position
 	addKittyFace(kitty, 5, 4, 0);
-	addKittyEye(kitty, 7, 3.5, -1);
-	addKittyEye(kitty, 7, 3.5, 1);
-	addKittyLeg(kitty, -4, -4, -1);
-	addKittyLeg(kitty, -4, -4, 1);
+	addKittyEye(kitty, 7, 3.5, -1, "eye1");
+	addKittyEye(kitty, 7, 3.5, 1, "eye2");
+	addKittyLeg(kitty, -3, -4, -1);
+	addKittyLeg(kitty, -3, -4, 1);
 	addKittyLeg(kitty, 1, -4, 1);
 	addKittyLeg(kitty, 1, -4, -1);
 	addKittyEar(kitty, 5, 6, 2,  Math.PI / 180 * 45);
@@ -64,12 +64,12 @@ function addKittyFace(obj, x, y, z) {
     obj.add(mesh);
 }
 
-function addKittyEye(obj, x, y, z) {
+function addKittyEye(obj, x, y, z,tag) {
 	geometry = new THREE.SphereGeometry(0.25);
 	material = new THREE.MeshBasicMaterial({ color: 0x49b517, wireframe: wires});
 	mesh = new THREE.Mesh(geometry, material);
 	mesh.position.set(x, y, z);
-	mesh.name="eye";
+	mesh.name=tag;
 	obj.add(mesh);
 }
 
@@ -136,6 +136,37 @@ function keys()
 				else
 					wires = true;
 				break;
+
+            case "Q": //q
+                if (qKey == false)
+                    qKey = true;
+                else
+                    qKey = false;
+				break;
+            
+                
+            case "q": //q
+                if (qKey == false)
+                    qKey = true;
+                else
+                    qKey = false;
+				break;
+
+            case "W": //w
+                if (wKey == false)
+                    wKey = true;
+                else
+                    wKey = false;
+				break;
+            
+                
+            case "w": //w
+                if (wKey == false)
+                    wKey = true;
+                else
+                    wKey = false;
+				break;
+                
 			default:
 				break;
 		}
@@ -146,6 +177,20 @@ function changeWires(flag)
 {
 	kitty.getObjectByName("torso").material = new THREE.MeshBasicMaterial({ color: 0x35e8df, wireframe: flag});
 	kitty.getObjectByName("face").material = new THREE.MeshBasicMaterial({ color: 0xfde995, wireframe: flag});
+	kitty.getObjectByName("eye1").material = new THREE.MeshBasicMaterial({ color: 0x49b517, wireframe: flag});
+	kitty.getObjectByName("eye2").material = new THREE.MeshBasicMaterial({ color: 0x49b517, wireframe: flag});
+}
+
+function update(){
+    document.addEventListener('keypress', (event) => {
+        var name = event.key;
+        if(qKey && name == "q"){
+		    pivot.rotation.y += 0.09;
+        }
+        else if(wKey && name == "w"){
+		    pivot.rotation.y += -0.09;
+        }
+      }, false);
 }
 
 function animate() {
@@ -181,16 +226,21 @@ function createCamera(x, y, z) {
 }
 
 function init() {
+    
+    renderer = new THREE.WebGLRenderer({antialias: true});
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+   
+    createScene();
+    camera[0] = createCamera(50, 0, 0);
+    camera[1] = createCamera(0, 50, 0);
+    camera[2] = createCamera(0, 0, 50);
+    pivot = new THREE.Group();
+	pivot.add(new THREE.AxesHelper(5));
 
-	renderer = new THREE.WebGLRenderer({antialias: true}); // antialias softens pixel transition when changing image size
-	renderer.setSize(window.innerWidth, window.innerHeight);
-	document.body.appendChild(renderer.domElement); // associates html to renderer
-	
-	createScene();
-	camera[0] = createCamera(50, 0, 0); // !! era 50
-	camera[1] = createCamera(0, 50, 0);
-	camera[2] = createCamera(0, 0, 50);
-//	controls = new THREE.OrbitControls( camera[0], renderer.domElement);
+	scene.add(pivot);
+	pivot.add(kitty);
 
-	window.addEventListener("resize", onResize);
+    //controls = new THREE.OrbitControls( camera[currentCamera], renderer.domElement );
+    window.addEventListener("resize", onResize);
 }
