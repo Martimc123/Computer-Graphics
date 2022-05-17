@@ -16,7 +16,7 @@ var wires;
 var cat_body;
 var cat_face;
 
-//const controls = new OrbitControls( camera[currentCamera], renderer.domElement );
+//var controls;
 
 // change to receive position, yes, but also body radius and height
 function createKitty(x, y, z) {
@@ -92,17 +92,9 @@ function keys()
 
 			case "4":
 				if (wires == true)
-				{
 					wires = false;
-					kitty.getObjectByName("body").material = new THREE.MeshBasicMaterial({ color: 0x35e8df, wireframe: wires});
-					kitty.getObjectByName("face").material = new THREE.MeshBasicMaterial({ color: 0xfde995, wireframe: wires});
-				}
 				else
-				{
-					wires = true;
-					kitty.getObjectByName("body").material = new THREE.MeshBasicMaterial({ color: 0x35e8df, wireframe: wires});
-					kitty.getObjectByName("face").material = new THREE.MeshBasicMaterial({ color: 0xfde995, wireframe: wires});
-				}		
+					wires = true;	
 				break;
 			default:
 				break;
@@ -110,10 +102,17 @@ function keys()
     });   
 }
 
+function changeWires(flag)
+{
+	kitty.getObjectByName("body").material = new THREE.MeshBasicMaterial({ color: 0x35e8df, wireframe: flag});
+	kitty.getObjectByName("face").material = new THREE.MeshBasicMaterial({ color: 0xfde995, wireframe: flag});
+}
+
 function animate() {
     
     render();
     requestAnimationFrame(animate);
+    changeWires(wires);
     //controls.update();
 }
 
@@ -135,6 +134,7 @@ function createCamera(x, y, z) {
     camera.position.x = x;
     camera.position.y = y;
     camera.position.z = z;
+    
     camera.lookAt(scene.position);
     
     return camera;
@@ -150,5 +150,6 @@ function init() {
     camera[0] = createCamera(50, 0, 0);
     camera[1] = createCamera(0, 50, 0);
     camera[2] = createCamera(0, 0, 50);
+    //controls = new THREE.OrbitControls( camera[currentCamera], renderer.domElement );
     window.addEventListener("resize", onResize);
 }
