@@ -206,38 +206,36 @@ function keys()
 				else
 						wKey = false;
 				break;					
-            case "Z": //Z
-            case "z": //z
-                if (zKey == false)
-                        zKey = true;
-                else
-                        zKey = false;
-                break;
-            case "X": //X
-            case "x": //x
-                if (xKey == false)
-                        xKey = true;
-                else
-                        xKey = false;
-                break;
-            case "D": //D
-            case "d": //d
-                if (dKey == false)
-                    dKey = true;
-                else
-                    dKey = false;
-                break;
-            
-            case "C": //C
-            case "c": //c
-                if (cKey == false)
-                    cKey = true;
-                else
-                    cKey = false;
-                break;
-    
-            default:
-                break;
+			case "Z": //Z
+			case "z": //z
+					if (zKey == false)
+						zKey = true;
+					else
+						zKey = false;
+					break;
+			case "X": //X
+			case "x": //x
+					if (xKey == false)
+						xKey = true;
+					else
+						xKey = false;
+					break;
+			case "D": //D
+			case "d": //d
+					if (dKey == false)
+						dKey = true;
+					else
+						dKey = false;
+					break;
+			case "C": //C
+			case "c": //c
+					if (cKey == false)
+						cKey = true;
+					else
+						cKey = false;
+					break;
+			default:
+					break;
 		}
 	});   
 }
@@ -274,12 +272,12 @@ function update(){
 			else if(wKey && name == "w"){
 				pivot.rotation.y += -0.2;
 			}
-            else if(aKey && name == "a"){
+     else if(aKey && name == "a"){
 				var head = kitty.getObjectByName("head");
 				if(head.rotation.z < max_rotation)
 					head.rotation.z += 0.02;
 			}
-            else if(sKey && name == "s"){
+      else if(sKey && name == "s"){
 				var head = kitty.getObjectByName("head");
 				if(head.rotation.z > min_rotation)
 					head.rotation.z += -0.02;
@@ -292,12 +290,12 @@ function update(){
 				var head = kitty.getObjectByName("head").getObjectByName("ear1");
 				head.rotation.z += -0.2;
 			}
-            else if(dKey && name == "d"){
-                pivot.translateX(0.2);
-            }
-            else if(cKey && name == "c"){
-                pivot.translateX(-0.2);
-            }
+			else if(dKey && name == "d"){
+					pivot.translateX(0.2);
+			}
+			else if(cKey && name == "c"){
+					pivot.translateX(-0.2);
+			}
     }, false);
 }
 
