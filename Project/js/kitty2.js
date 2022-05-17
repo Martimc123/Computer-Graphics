@@ -16,7 +16,7 @@ var cat_torso;
 var cat_face;
 var qKey,wKey;
 
-var controls;
+//var controls;
 
 'use strict';
 
@@ -231,7 +231,7 @@ function update(){
 function animate() {
 	requestAnimationFrame(animate);
 	changeWires(wires);
-	controls.update();
+//	controls.update();
 	render();
 }
 
@@ -276,6 +276,6 @@ function init() {
 	scene.add(pivot);
 	pivot.add(kitty);
 
-    controls = new THREE.OrbitControls( camera[currentCamera], renderer.domElement );
+  //  controls = new THREE.OrbitControls( camera[currentCamera], renderer.domElement );
     window.addEventListener("resize", onResize);
 }
