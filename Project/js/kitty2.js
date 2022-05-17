@@ -33,25 +33,25 @@ function createKitty(x, y, z) {
 	head.add(addKittyFace(5, 4, 0));
 	head.add(addKittyEye(7, 3.5, -1, "eye1"));
 	head.add(addKittyEye(7, 3.5, 1, "eye2"));
-    head.add(addKittyEar(5, 6, 2,  Math.PI / 180 * 45,"ear1"));
+  head.add(addKittyEar(5, 6, 2,  Math.PI / 180 * 45,"ear1"));
 	head.add(addKittyEar(5, 6, -2,  Math.PI / 180 * -45,"ear2"));
 	addKittyNose(head, 7.5, 3, 0);
-    addKittyWhisker(head, 8, 3, 1,"whisker1");
+  addKittyWhisker(head, 8, 3, 1,"whisker1");
 	addKittyWhisker(head, 8, 2.5, 1,"whisker2");
 	addKittyWhisker(head, 8, 3, -1,"whisker3");
 	addKittyWhisker(head, 8, 2.5, -1,"whisker4");
 
-    head.name="head";
-    kitty.add(head);
-    var legs = new THREE.Object3D();
-    legs.add(addKittyLeg(-3, -4, -1,"leg1"));
-    legs.add(addKittyLeg(-3, -4, 1,"leg2"));
-    legs.add(addKittyLeg(1, -4, 1,"leg3"));
-    legs.add(addKittyLeg(1, -4, -1,"leg4"));
+	head.name="head";
+	kitty.add(head);
+	var legs = new THREE.Object3D();
+	legs.add(addKittyLeg(-3, -4, -1,"leg1"));
+	legs.add(addKittyLeg(-3, -4, 1,"leg2"));
+	legs.add(addKittyLeg(1, -4, 1,"leg3"));
+	legs.add(addKittyLeg(1, -4, -1,"leg4"));
 	legs.name="legs";
-    kitty.add(legs);
+  kitty.add(legs);
     
-    addKittyTail(kitty, -6, 3, 0);
+  addKittyTail(kitty, -6, 3, 0);
 	
   kitty.position.set(x, y, z);
 
@@ -89,22 +89,22 @@ function addKittyTail(obj, x, y, z) {
 }
 
 function addKittyTorso(obj, x, y, z) {
-    geometry = new THREE.CylinderGeometry(2, 2, 8, 20, 1);
-    material = new THREE.MeshBasicMaterial({ color: 0x35e8df, wireframe: wires});
-    mesh = new THREE.Mesh(geometry, material);
-    mesh.position.set(x, y, z);
-    mesh.rotateZ( Math.PI / 180 * 90);
-    mesh.name="torso";
-    obj.add(mesh);
+	geometry = new THREE.CylinderGeometry(2, 2, 8, 20, 1);
+	material = new THREE.MeshBasicMaterial({ color: 0x35e8df, wireframe: wires});
+	mesh = new THREE.Mesh(geometry, material);
+	mesh.position.set(x, y, z);
+	mesh.rotateZ( Math.PI / 180 * 90);
+	mesh.name="torso";
+	obj.add(mesh);
 }
 
 function addKittyFace(x, y, z) {
-    geometry = new THREE.SphereGeometry(2);
-    material = new THREE.MeshBasicMaterial({ color: 0xfde995, wireframe: wires});
-    mesh = new THREE.Mesh(geometry, material);
-    mesh.position.set(x, y, z);
-    mesh.name="face";
-    return mesh;
+	geometry = new THREE.SphereGeometry(2);
+	material = new THREE.MeshBasicMaterial({ color: 0xfde995, wireframe: wires});
+	mesh = new THREE.Mesh(geometry, material);
+	mesh.position.set(x, y, z);
+	mesh.name="face";
+	return mesh;
 }
 
 function addKittyEye(x, y, z,tag) {
@@ -137,102 +137,91 @@ function addKittyEar(x, y, z, angle,tag) {
 
 
 function render() {
-    renderer.render(scene, camera[currentCamera]); // tells 3js renderer to draw scene visualization based on camera 
+  renderer.render(scene, camera[currentCamera]); // tells 3js renderer to draw scene visualization based on camera 
 }
 
 function onResize() {
 
-    var val = 2;
-    var newAspectRatio = window.innerWidth / window.innerHeight;
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    
-    camera[currentCamera].left = -viewSize * newAspectRatio / val;
-    camera[currentCamera].right = viewSize * newAspectRatio / val;
-    camera[currentCamera].top = viewSize / val;
-    camera[currentCamera].bottom = viewSize / -val;
-    camera[currentCamera].updateProjectionMatrix();
-       
-    aspectRatio = window.innerWidth / innerHeight;
+	var val = 2;
+	var newAspectRatio = window.innerWidth / window.innerHeight;
+	renderer.setSize(window.innerWidth, window.innerHeight);
+	
+	camera[currentCamera].left = -viewSize * newAspectRatio / val;
+	camera[currentCamera].right = viewSize * newAspectRatio / val;
+	camera[currentCamera].top = viewSize / val;
+	camera[currentCamera].bottom = viewSize / -val;
+	camera[currentCamera].updateProjectionMatrix();
+			
+	aspectRatio = window.innerWidth / innerHeight;
 
 }
 
 function keys()
 {
 	document.addEventListener ('keypress', (event) => {
-        const keyName = event.key;
-        switch (keyName) {
-            case "1":
-                currentCamera = 0;
-            break;
-
-            case "2":
-                currentCamera = 1;
-            break;
-
-            case "3":
-                currentCamera = 2;
-            break;
-
+		const keyName = event.key;
+		switch (keyName) {
+			case "1":
+				currentCamera = 0;
+				break;
+			case "2":
+				currentCamera = 1;
+				break;
+			case "3":
+				currentCamera = 2;
+				break;
 			case "4":
 				if (wires == true)
 					wires = false;
 				else
 					wires = true;	
 				break;
-
-            case "A": //A
-            case "a": //a
-                if (aKey == false)
-                    aKey = true;
-                else
-                    aKey = false;
+			case "A": //A
+			case "a": //a
+				if (aKey == false)
+						aKey = true;
+				else
+						aKey = false;
 				break;
-            
-            case "Z": //A
-            case "z": //a
-                if (zKey == false)
-                    zKey = true;
-                else
-                    zKey = false;
-                break;
-            
-            case "X": //A
-            case "x": //a
-                if (xKey == false)
-                    xKey = true;
-                else
-                    xKey = false;
-                break;
-            
-            case "S": //S
-            case "s": //s
-                if (sKey == false)
-                    sKey = true;
-                else
-                    sKey = false;
+			case "Z": //A
+			case "z": //a
+				if (zKey == false)
+						zKey = true;
+				else
+						zKey = false;
 				break;
-
-
-            case "Q": //q
-            case "q": //q
-                if (qKey == false)
-                    qKey = true;
-                else
-                    qKey = false;
+			case "X": //A
+			case "x": //a
+				if (xKey == false)
+						xKey = true;
+				else
+						xKey = false;
 				break;
-
-            case "W": //w
-            case "w": //w
-                if (wKey == false)
-                    wKey = true;
-                else
-                    wKey = false;
+			case "S": //S
+			case "s": //s
+				if (sKey == false)
+						sKey = true;
+				else
+						sKey = false;
 				break;
-                
+			case "Q": //q
+			case "q": //q
+					if (qKey == false)
+						qKey = true;
+					else
+						qKey = false;
+					break;
+			case "W": //w
+			case "w": //w
+				if (wKey == false)
+						wKey = true;
+				else
+						wKey = false;
+				break;					
 			default:
 				break;
 		}
-    });   
+	});   
 }
 
 
@@ -240,52 +229,52 @@ function changeWires(wires)
 {
 	kitty.getObjectByName("torso").material = new THREE.MeshBasicMaterial({ color: 0x35e8df, wireframe: wires});
 	kitty.getObjectByName("head").getObjectByName("face").material = new THREE.MeshBasicMaterial({ color: 0xfde995, wireframe: wires});
-    kitty.getObjectByName("head").getObjectByName("nose").material = new THREE.MeshBasicMaterial({ color: 0xef64bc, wireframe: wires});
+  kitty.getObjectByName("head").getObjectByName("nose").material = new THREE.MeshBasicMaterial({ color: 0xef64bc, wireframe: wires});
 	kitty.getObjectByName("head").getObjectByName("eye1").material = new THREE.MeshBasicMaterial({ color: 0x49b517, wireframe: wires});
 	kitty.getObjectByName("head").getObjectByName("eye2").material = new THREE.MeshBasicMaterial({ color: 0x49b517, wireframe: wires});
-    kitty.getObjectByName("head").getObjectByName("whisker1").material = new THREE.MeshBasicMaterial({ color: 0x5b0001, wireframe: wires});
-    kitty.getObjectByName("head").getObjectByName("whisker2").material = new THREE.MeshBasicMaterial({ color: 0x5b0001, wireframe: wires});
-    kitty.getObjectByName("head").getObjectByName("whisker3").material = new THREE.MeshBasicMaterial({ color: 0x5b0001, wireframe: wires});
-    kitty.getObjectByName("head").getObjectByName("whisker4").material = new THREE.MeshBasicMaterial({ color: 0x5b0001, wireframe: wires});
-    kitty.getObjectByName("head").getObjectByName("ear1").material = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: wires});
-    kitty.getObjectByName("head").getObjectByName("ear2").material = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: wires});
-    kitty.getObjectByName("tail").material = new THREE.MeshBasicMaterial({ color: 0x9B26B6, wireframe: wires});
-    kitty.getObjectByName("legs").getObjectByName("leg1").material = new THREE.MeshBasicMaterial({ color: 0xf2a007, wireframe: wires});
-    kitty.getObjectByName("legs").getObjectByName("leg2").material = new THREE.MeshBasicMaterial({ color: 0xf2a007, wireframe: wires});
-    kitty.getObjectByName("legs").getObjectByName("leg3").material = new THREE.MeshBasicMaterial({ color: 0xf2a007, wireframe: wires});
-    kitty.getObjectByName("legs").getObjectByName("leg4").material = new THREE.MeshBasicMaterial({ color: 0xf2a007, wireframe: wires});
+	kitty.getObjectByName("head").getObjectByName("whisker1").material = new THREE.MeshBasicMaterial({ color: 0x5b0001, wireframe: wires});
+	kitty.getObjectByName("head").getObjectByName("whisker2").material = new THREE.MeshBasicMaterial({ color: 0x5b0001, wireframe: wires});
+	kitty.getObjectByName("head").getObjectByName("whisker3").material = new THREE.MeshBasicMaterial({ color: 0x5b0001, wireframe: wires});
+	kitty.getObjectByName("head").getObjectByName("whisker4").material = new THREE.MeshBasicMaterial({ color: 0x5b0001, wireframe: wires});
+	kitty.getObjectByName("head").getObjectByName("ear1").material = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: wires});
+	kitty.getObjectByName("head").getObjectByName("ear2").material = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: wires});
+	kitty.getObjectByName("tail").material = new THREE.MeshBasicMaterial({ color: 0x9B26B6, wireframe: wires});
+	kitty.getObjectByName("legs").getObjectByName("leg1").material = new THREE.MeshBasicMaterial({ color: 0xf2a007, wireframe: wires});
+	kitty.getObjectByName("legs").getObjectByName("leg2").material = new THREE.MeshBasicMaterial({ color: 0xf2a007, wireframe: wires});
+	kitty.getObjectByName("legs").getObjectByName("leg3").material = new THREE.MeshBasicMaterial({ color: 0xf2a007, wireframe: wires});
+	kitty.getObjectByName("legs").getObjectByName("leg4").material = new THREE.MeshBasicMaterial({ color: 0xf2a007, wireframe: wires});
 }
 
 function update(){
     document.addEventListener('keypress', (event) => {
-        var name = event.key;
-        var max_rotation = Math.PI/35;
-        var min_rotation = -Math.PI/35;
-        if(qKey && name == "q"){
-		    pivot.rotation.y += 0.2;
-        }
-        else if(wKey && name == "w"){
-		    pivot.rotation.y += -0.2;
-        }
-        else if(aKey && name == "a"){
-            var head = kitty.getObjectByName("head");
-            if(head.rotation.z < max_rotation)
-                head.rotation.z += 0.02;
-        }
-        else if(zKey && name == "z"){
-            var head = kitty.getObjectByName("head").getObjectByName("ear1");
-            head.rotation.z += 0.2;
-        }
-        else if(xKey && name == "x"){
-            var head = kitty.getObjectByName("head").getObjectByName("ear1");
-            head.rotation.z += -0.2;
-        }
-        else if(sKey && name == "s"){
-            var head = kitty.getObjectByName("head");
-            if(head.rotation.z > min_rotation)
-                head.rotation.z += -0.02;
-        }
-      }, false);
+			var name = event.key;
+			var max_rotation = Math.PI/35;
+			var min_rotation = -Math.PI/35;
+			if(qKey && name == "q"){
+				pivot.rotation.y += 0.2;
+			}
+			else if(wKey && name == "w"){
+				pivot.rotation.y += -0.2;
+			}
+			else if(aKey && name == "a"){
+				var head = kitty.getObjectByName("head");
+				if(head.rotation.z < max_rotation)
+					head.rotation.z += 0.02;
+			}
+			else if(zKey && name == "z"){
+				var head = kitty.getObjectByName("head").getObjectByName("ear1");
+				head.rotation.z += 0.2;
+			}
+			else if(xKey && name == "x"){
+				var head = kitty.getObjectByName("head").getObjectByName("ear1");
+				head.rotation.z += -0.2;
+			}
+			else if(sKey && name == "s"){
+				var head = kitty.getObjectByName("head");
+				if(head.rotation.z > min_rotation)
+					head.rotation.z += -0.02;
+			}
+    }, false);
 }
 
 
@@ -298,9 +287,9 @@ function animate() {
 }
 
 function createScene() {
-    scene = new THREE.Scene();
-    scene.add(new THREE.AxesHelper(100));
-    kitty = createKitty(4, 5, 2);
+	scene = new THREE.Scene();
+	scene.add(new THREE.AxesHelper(100));
+	kitty = createKitty(4, 5, 2);
 }
 
 function createCamera(x, y, z) {
@@ -324,20 +313,20 @@ function createCamera(x, y, z) {
 
 function init() {
     
-    renderer = new THREE.WebGLRenderer({antialias: true});
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    document.body.appendChild(renderer.domElement);
-   
-    createScene();
-    camera[0] = createCamera(50, 0, 0);
-    camera[1] = createCamera(0, 50, 0);
-    camera[2] = createCamera(0, 0, 50);
-    pivot = new THREE.Group();
+	renderer = new THREE.WebGLRenderer({antialias: true});
+	renderer.setSize(window.innerWidth, window.innerHeight);
+	document.body.appendChild(renderer.domElement);
+	
+	createScene();
+	camera[0] = createCamera(50, 0, 0);
+	camera[1] = createCamera(0, 50, 0);
+	camera[2] = createCamera(0, 0, 50);
+	pivot = new THREE.Group();
 	pivot.add(new THREE.AxesHelper(5));
 
 	scene.add(pivot);
 	pivot.add(kitty);
 
   //  controls = new THREE.OrbitControls( camera[currentCamera], renderer.domElement );
-    window.addEventListener("resize", onResize);
+  window.addEventListener("resize", onResize);
 }
