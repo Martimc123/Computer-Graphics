@@ -14,7 +14,7 @@ var wires;
 
 var cat_torso;
 var cat_face;
-var qKey,wKey;
+var qKey,wKey,aKey,sKey,dKey,cKey,zKey,xKey;
 
 //var controls;
 
@@ -29,39 +29,47 @@ function createKitty(x, y, z) {
 	// change for positions to be based on cylinder height and angle
 	// current torso spot: 4,5,2
 	addKittyTorso(kitty, 0, 0, 0); // based on kitty origin position
-	addKittyFace(kitty, 5, 4, 0);
-	addKittyEye(kitty, 7, 3.5, -1, "eye1");
-	addKittyEye(kitty, 7, 3.5, 1, "eye2");
-	addKittyLeg(kitty, -3, -4, -1);
-	addKittyLeg(kitty, -3, -4, 1);
-	addKittyLeg(kitty, 1, -4, 1);
-	addKittyLeg(kitty, 1, -4, -1);
-	addKittyEar(kitty, 5, 6, 2,  Math.PI / 180 * 45);
-	addKittyEar(kitty, 5, 6, -2,  Math.PI / 180 * -45);
-	addKittyNose(kitty, 7.5, 3, 0);
-	addKittyTail(kitty, -6, 3, 0);
-	addKittyWhisker(kitty, 8, 3, 1);
-	addKittyWhisker(kitty, 8, 2.5, 1);
-	addKittyWhisker(kitty, 8, 3, -1);
-	addKittyWhisker(kitty, 8, 2.5, -1);
+	var head = new THREE.Object3D();
+	head.add(addKittyFace(5, 4, 0));
+	head.add(addKittyEye(7, 3.5, -1, "eye1"));
+	head.add(addKittyEye(7, 3.5, 1, "eye2"));
+    head.add(addKittyEar(5, 6, 2,  Math.PI / 180 * 45,"ear1"));
+	head.add(addKittyEar(5, 6, -2,  Math.PI / 180 * -45,"ear2"));
+	addKittyNose(head, 7.5, 3, 0);
+    addKittyWhisker(head, 8, 3, 1,"whisker1");
+	addKittyWhisker(head, 8, 2.5, 1,"whisker2");
+	addKittyWhisker(head, 8, 3, -1,"whisker3");
+	addKittyWhisker(head, 8, 2.5, -1,"whisker4");
 
+    head.name="head";
+    kitty.add(head);
+    var legs = new THREE.Object3D();
+    legs.add(addKittyLeg(-3, -4, -1,"leg1"));
+    legs.add(addKittyLeg(-3, -4, 1,"leg2"));
+    legs.add(addKittyLeg(1, -4, 1,"leg3"));
+    legs.add(addKittyLeg(1, -4, -1,"leg4"));
+	legs.name="legs";
+    kitty.add(legs);
+    
+    addKittyTail(kitty, -6, 3, 0);
+	
   kitty.position.set(x, y, z);
 
 	scene.add(kitty);
 	return kitty;
 }
 
-function addKittyWhisker(obj, x, y, z) {
+function addKittyWhisker(obj,x, y, z,tag) {
 	geometry = new THREE.BoxGeometry(0.25, 1, 0.25, 1, 1, 1);
 	material = new THREE.MeshBasicMaterial({ color: 0x5b0001, wireframe: wires});
 	mesh = new THREE.Mesh(geometry, material);
 	mesh.position.set(x, y, z);
 	mesh.rotateX(Math.PI/180 * 90);
-	mesh.name="whisker";
+	mesh.name=tag;
 	obj.add(mesh);
 }
 
-function addKittyNose(obj, x, y, z) {
+function addKittyNose(obj,x, y, z) {
 	geometry = new THREE.BoxGeometry(0.5, 0.5, 0.5, 1, 1, 1);
 	material = new THREE.MeshBasicMaterial({ color: 0xef64bc, wireframe: wires});
 	mesh = new THREE.Mesh(geometry, material);
@@ -90,41 +98,41 @@ function addKittyTorso(obj, x, y, z) {
     obj.add(mesh);
 }
 
-function addKittyFace(obj, x, y, z) {
+function addKittyFace(x, y, z) {
     geometry = new THREE.SphereGeometry(2);
     material = new THREE.MeshBasicMaterial({ color: 0xfde995, wireframe: wires});
     mesh = new THREE.Mesh(geometry, material);
     mesh.position.set(x, y, z);
     mesh.name="face";
-    obj.add(mesh);
+    return mesh;
 }
 
-function addKittyEye(obj, x, y, z,tag) {
+function addKittyEye(x, y, z,tag) {
 	geometry = new THREE.SphereGeometry(0.25);
 	material = new THREE.MeshBasicMaterial({ color: 0x49b517, wireframe: wires});
 	mesh = new THREE.Mesh(geometry, material);
 	mesh.position.set(x, y, z);
 	mesh.name=tag;
-	obj.add(mesh);
+	return mesh;
 }
 
-function addKittyLeg(obj, x, y, z) {
+function addKittyLeg(x, y, z,tag) {
 	geometry = new THREE.CylinderGeometry(0.25, 0.25, 2, 8, 1);
 	material = new THREE.MeshBasicMaterial({ color: 0xf2a007, wireframe: wires});
 	mesh = new THREE.Mesh(geometry, material);
 	mesh.position.set(x, y, z);
-	mesh.name="leg";
-	obj.add(mesh);
+	mesh.name=tag;
+	return mesh;
 }
 
-function addKittyEar(obj, x, y, z, angle) {
+function addKittyEar(x, y, z, angle,tag) {
 	geometry = new THREE.CylinderGeometry(0, 0.5, 1, 4, 1);
 	material = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: wires});
 	mesh = new THREE.Mesh(geometry, material);
 	mesh.position.set(x, y, z);
-	mesh.name="ear";
+	mesh.name=tag;
 	mesh.rotateX(angle);
-	obj.add(mesh);
+	return mesh;
 }
 
 
@@ -169,17 +177,43 @@ function keys()
 				if (wires == true)
 					wires = false;
 				else
-					wires = true;
+					wires = true;	
 				break;
 
-            case "Q": //q
-                if (qKey == false)
-                    qKey = true;
+            case "A": //A
+            case "a": //a
+                if (aKey == false)
+                    aKey = true;
                 else
-                    qKey = false;
+                    aKey = false;
 				break;
             
-                
+            case "Z": //A
+            case "z": //a
+                if (zKey == false)
+                    zKey = true;
+                else
+                    zKey = false;
+                break;
+            
+            case "X": //A
+            case "x": //a
+                if (xKey == false)
+                    xKey = true;
+                else
+                    xKey = false;
+                break;
+            
+            case "S": //S
+            case "s": //s
+                if (sKey == false)
+                    sKey = true;
+                else
+                    sKey = false;
+				break;
+
+
+            case "Q": //q
             case "q": //q
                 if (qKey == false)
                     qKey = true;
@@ -188,13 +222,6 @@ function keys()
 				break;
 
             case "W": //w
-                if (wKey == false)
-                    wKey = true;
-                else
-                    wKey = false;
-				break;
-            
-                
             case "w": //w
                 if (wKey == false)
                     wKey = true;
@@ -208,25 +235,60 @@ function keys()
     });   
 }
 
-function changeWires(flag)
+
+function changeWires(wires)
 {
-	kitty.getObjectByName("torso").material = new THREE.MeshBasicMaterial({ color: 0x35e8df, wireframe: flag});
-	kitty.getObjectByName("face").material = new THREE.MeshBasicMaterial({ color: 0xfde995, wireframe: flag});
-	kitty.getObjectByName("eye1").material = new THREE.MeshBasicMaterial({ color: 0x49b517, wireframe: flag});
-	kitty.getObjectByName("eye2").material = new THREE.MeshBasicMaterial({ color: 0x49b517, wireframe: flag});
+	kitty.getObjectByName("torso").material = new THREE.MeshBasicMaterial({ color: 0x35e8df, wireframe: wires});
+	kitty.getObjectByName("head").getObjectByName("face").material = new THREE.MeshBasicMaterial({ color: 0xfde995, wireframe: wires});
+    kitty.getObjectByName("head").getObjectByName("nose").material = new THREE.MeshBasicMaterial({ color: 0xef64bc, wireframe: wires});
+	kitty.getObjectByName("head").getObjectByName("eye1").material = new THREE.MeshBasicMaterial({ color: 0x49b517, wireframe: wires});
+	kitty.getObjectByName("head").getObjectByName("eye2").material = new THREE.MeshBasicMaterial({ color: 0x49b517, wireframe: wires});
+    kitty.getObjectByName("head").getObjectByName("whisker1").material = new THREE.MeshBasicMaterial({ color: 0x5b0001, wireframe: wires});
+    kitty.getObjectByName("head").getObjectByName("whisker2").material = new THREE.MeshBasicMaterial({ color: 0x5b0001, wireframe: wires});
+    kitty.getObjectByName("head").getObjectByName("whisker3").material = new THREE.MeshBasicMaterial({ color: 0x5b0001, wireframe: wires});
+    kitty.getObjectByName("head").getObjectByName("whisker4").material = new THREE.MeshBasicMaterial({ color: 0x5b0001, wireframe: wires});
+    kitty.getObjectByName("head").getObjectByName("ear1").material = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: wires});
+    kitty.getObjectByName("head").getObjectByName("ear2").material = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: wires});
+    kitty.getObjectByName("tail").material = new THREE.MeshBasicMaterial({ color: 0x9B26B6, wireframe: wires});
+    kitty.getObjectByName("legs").getObjectByName("leg1").material = new THREE.MeshBasicMaterial({ color: 0xf2a007, wireframe: wires});
+    kitty.getObjectByName("legs").getObjectByName("leg2").material = new THREE.MeshBasicMaterial({ color: 0xf2a007, wireframe: wires});
+    kitty.getObjectByName("legs").getObjectByName("leg3").material = new THREE.MeshBasicMaterial({ color: 0xf2a007, wireframe: wires});
+    kitty.getObjectByName("legs").getObjectByName("leg4").material = new THREE.MeshBasicMaterial({ color: 0xf2a007, wireframe: wires});
 }
 
 function update(){
     document.addEventListener('keypress', (event) => {
         var name = event.key;
+        var max_rotation = Math.PI/35;
+        var min_rotation = -Math.PI/35;
         if(qKey && name == "q"){
-		    pivot.rotation.y += 0.09;
+		    pivot.rotation.y += 0.2;
         }
         else if(wKey && name == "w"){
-		    pivot.rotation.y += -0.09;
+		    pivot.rotation.y += -0.2;
+        }
+        else if(aKey && name == "a"){
+            var head = kitty.getObjectByName("head");
+            if(head.rotation.z < max_rotation)
+                head.rotation.z += 0.02;
+        }
+        else if(zKey && name == "z"){
+            var head = kitty.getObjectByName("head").getObjectByName("ear1");
+            head.rotation.z += 0.2;
+        }
+        else if(xKey && name == "x"){
+            var head = kitty.getObjectByName("head").getObjectByName("ear1");
+            head.rotation.z += -0.2;
+        }
+        else if(sKey && name == "s"){
+            var head = kitty.getObjectByName("head");
+            if(head.rotation.z > min_rotation)
+                head.rotation.z += -0.02;
         }
       }, false);
 }
+
+
 
 function animate() {
 	requestAnimationFrame(animate);
