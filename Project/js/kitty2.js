@@ -1,27 +1,10 @@
 /*global THREE*/
 
 var camera, scene, renderer;
-
 var geometry, material, mesh;
 
-var kitty;
-var head;
 
-var body;
-var tail;
-var face;
-var ear_left;
-var ear_right;
-var nose;
-var wisker_left_top;
-var wisker_left_bottom;
-var wisker_right_top;
-var wisker_right_bottom;
-var leg_front_right;
-var leg_front_left;
-var leg_back_right;
-var leg_back_left;
-
+var controls;
 
 // change to receive position, yes, but also body radius and height
 function createKitty(x, y, z) {
@@ -31,7 +14,9 @@ function createKitty(x, y, z) {
 
 	// change for positions to be based on cylinder height and angle
 	addBody(kitty, 0, 0, 0); // based on kitty origin position
-	addFace(kitty, 6.5, 3, 0);
+	addFace(kitty, 7.5, 3, 0);
+	addEye(kitty, 7, 3.5, 2);
+	addEye(kitty, 7, 3.5, 1);
 
 	kitty.position.set(x, y, z);
 
@@ -105,9 +90,9 @@ function onKeyDown(e) {
 
 function animate() {
 	'use strict';
-	render();
-
 	requestAnimationFrame(animate);
+	controls.update();
+	render();
 }
 
 function createScene() {
@@ -126,10 +111,10 @@ function createCamera() {
 																		window.innerWidth/window.innerHeight,
 																		1,
 																		1000);
-	camera.position.x = 0;
-	camera.position.y = 0;
-	camera.position.z = 50;
-	camera.lookAt(scene.position); // camera pointed at scene axis
+	camera.position.x = 20;
+	camera.position.y = 20;
+	camera.position.z = 20;
+	//camera.lookAt(scene.position); // camera pointed at scene axis
 }
 
 function init() {
@@ -142,8 +127,8 @@ function init() {
 	document.body.appendChild(renderer.domElement); // associates html to renderer
 	createScene();
 	createCamera();
+	controls = new THREE.OrbitControls( camera, renderer.domElement);
 
-	render();
 	window.addEventListener("resize", onResize);
 
 }

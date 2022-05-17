@@ -1,0 +1,31 @@
+TORSO(x1):
+.Size:
+.Pos:
+
+TAIL(x1) - based on torso:
+.Size:
+.Pos:
+
+LEGS(x4) - based on torso:
+.Size:
+.Pos:
+
+HEAD(x1) - based on torso:
+.Size:
+.Pos:
+
+EYES(x2) - based on torso+head:
+.Size:
+.Pos:
+
+WHISKERS(x4) - based on torso+head+nose:
+.Size:
+.Pos:
+
+EARS(x2) - based on torso+head:
+.Size:
+.Pos:
+
+NOSE(x1) - based on torso+head:
+.Size:
+.Pos:
