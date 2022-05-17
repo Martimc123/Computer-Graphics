@@ -1,5 +1,11 @@
 TORSO(x1):
 .Size:
+Normal:
+	- 2 bottom radius
+	- 2 top radius
+	- 
+  
+
 .Pos:
 
 TAIL(x1) - based on torso:

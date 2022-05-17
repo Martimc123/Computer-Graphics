@@ -10,7 +10,7 @@ FACE: 2b1517/2b1e15
 "radius": 2,
 "widthSegments": 32,
 "heightSegments": 16,
-.Sphere:11.5,8,2; 0º,0º,0º
+.Sphere:9,9,2; 0º,0º,0º
 
 EYES: 49b517 /17b534
 "radius": 0.25,
@@ -26,7 +26,7 @@ NOSE:ef64bc /ef6477
 "widthSegments": 1,
 "heightSegments": 1,
 "depthSegments": 1
-.Box: 4, 5, 2; 0º,0º,0º
+.Box: 11.5, 8, 2; 0º,0º,0º
 
 WHISKERS: 5b0001 / 5b2c00 /5b002f
 "width": 0.25,

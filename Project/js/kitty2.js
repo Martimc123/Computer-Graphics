@@ -12,24 +12,32 @@ var kitty;
 var head;
 var wires;
 
-var cat_body;
+var cat_torso;
 var cat_face;
 
-//var controls;
+var controls;
 
 'use strict';
 
-// change to receive position, yes, but also body radius and height
+// change to receive position, yes, but also torso radius and height
 function createKitty(x, y, z) {
     
 	wires = true;
 	kitty = new THREE.Object3D();
 
 	// change for positions to be based on cylinder height and angle
-	addBody(kitty, 0, 0, 0); // based on kitty origin position
-	addFace(kitty, 7.5, 3, 0);
-	addEye(kitty, 7, 3.5, 2);
-	addEye(kitty, 7, 3.5, 1);
+	// current torso spot: 4,5,2
+	4, 5, 2
+	addKittyTorso(kitty, 0, 0, 0); // based on kitty origin position
+	addKittyFace(kitty, 5, 4, 0);
+	addKittyEye(kitty, 7, 3.5, -1);
+	addKittyEye(kitty, 7, 3.5, 1);
+	addKittyLeg(kitty, -4, -4, -1);
+	addKittyLeg(kitty, -4, -4, 1);
+	addKittyLeg(kitty, 1, -4, 1);
+	addKittyLeg(kitty, 1, -4, -1);
+	addKittyEar(kitty, 5, 6, 2,  Math.PI / 180 * 45);
+	addKittyEar(kitty, 5, 6, -2,  Math.PI / 180 * -45);
 
   kitty.position.set(x, y, z);
 
@@ -37,17 +45,17 @@ function createKitty(x, y, z) {
 	return kitty;
 }
 
-function addBody(obj, x, y, z) {
+function addKittyTorso(obj, x, y, z) {
     geometry = new THREE.CylinderGeometry(2, 2, 8, 20, 1);
     material = new THREE.MeshBasicMaterial({ color: 0x35e8df, wireframe: wires});
     mesh = new THREE.Mesh(geometry, material);
     mesh.position.set(x, y, z);
     mesh.rotateZ( Math.PI / 180 * 90);
-    mesh.name="body";
+    mesh.name="torso";
     obj.add(mesh);
 }
 
-function addFace(obj, x, y, z) {
+function addKittyFace(obj, x, y, z) {
     geometry = new THREE.SphereGeometry(2);
     material = new THREE.MeshBasicMaterial({ color: 0xfde995, wireframe: wires});
     mesh = new THREE.Mesh(geometry, material);
@@ -56,7 +64,7 @@ function addFace(obj, x, y, z) {
     obj.add(mesh);
 }
 
-function addEye(obj, x, y, z) {
+function addKittyEye(obj, x, y, z) {
 	geometry = new THREE.SphereGeometry(0.25);
 	material = new THREE.MeshBasicMaterial({ color: 0x49b517, wireframe: wires});
 	mesh = new THREE.Mesh(geometry, material);
@@ -64,6 +72,26 @@ function addEye(obj, x, y, z) {
 	mesh.name="eye";
 	obj.add(mesh);
 }
+
+function addKittyLeg(obj, x, y, z) {
+	geometry = new THREE.CylinderGeometry(0.25, 0.25, 2, 8, 1);
+	material = new THREE.MeshBasicMaterial({ color: 0xf2a007, wireframe: wires});
+	mesh = new THREE.Mesh(geometry, material);
+	mesh.position.set(x, y, z);
+	mesh.name="leg";
+	obj.add(mesh);
+}
+
+function addKittyEar(obj, x, y, z, angle) {
+	geometry = new THREE.CylinderGeometry(0, 0.5, 1, 4, 1);
+	material = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: wires});
+	mesh = new THREE.Mesh(geometry, material);
+	mesh.position.set(x, y, z);
+	mesh.name="ear";
+	mesh.rotateX(angle);
+	obj.add(mesh);
+}
+
 
 function render() {
     renderer.render(scene, camera[currentCamera]); // tells 3js renderer to draw scene visualization based on camera 
@@ -106,7 +134,7 @@ function keys()
 				if (wires == true)
 					wires = false;
 				else
-					wires = true;	
+					wires = true;
 				break;
 			default:
 				break;
@@ -116,7 +144,7 @@ function keys()
 
 function changeWires(flag)
 {
-	kitty.getObjectByName("body").material = new THREE.MeshBasicMaterial({ color: 0x35e8df, wireframe: flag});
+	kitty.getObjectByName("torso").material = new THREE.MeshBasicMaterial({ color: 0x35e8df, wireframe: flag});
 	kitty.getObjectByName("face").material = new THREE.MeshBasicMaterial({ color: 0xfde995, wireframe: flag});
 }
 
@@ -159,7 +187,7 @@ function init() {
 	document.body.appendChild(renderer.domElement); // associates html to renderer
 	
 	createScene();
-	camera[0] = createCamera(50, 0, 0);
+	camera[0] = createCamera(50, 0, 0); // !! era 50
 	camera[1] = createCamera(0, 50, 0);
 	camera[2] = createCamera(0, 0, 50);
 //	controls = new THREE.OrbitControls( camera[0], renderer.domElement);
