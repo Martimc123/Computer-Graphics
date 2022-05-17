@@ -17,6 +17,8 @@ var cat_face;
 
 //var controls;
 
+'use strict';
+
 // change to receive position, yes, but also body radius and height
 function createKitty(x, y, z) {
     
@@ -119,7 +121,6 @@ function changeWires(flag)
 }
 
 function animate() {
-	'use strict';
 	requestAnimationFrame(animate);
 	changeWires(wires);
 //	controls.update();
@@ -133,7 +134,6 @@ function createScene() {
 }
 
 function createCamera(x, y, z) {
-	'use strict';
 
 	var val = 2;
 	aspectRatio = window.innerWidth / window.innerHeight;
@@ -153,7 +153,6 @@ function createCamera(x, y, z) {
 }
 
 function init() {
-	'use strict';
 
 	renderer = new THREE.WebGLRenderer({antialias: true}); // antialias softens pixel transition when changing image size
 	renderer.setSize(window.innerWidth, window.innerHeight);
