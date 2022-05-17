@@ -26,9 +26,9 @@ function createKitty(x, y, z) {
 
 	// change for positions to be based on cylinder height and angle
 	addBody(kitty, 0, 0, 0); // based on kitty origin position
-	addFace(kitty, 7.5, 3, 0);
-	addEye(kitty, 10, 3.5, -1,"eye1");
-	addEye(kitty, 10, 3.5, 1,"eye2");
+	addFace(kitty, 6, 3, 0);
+	addEye(kitty, 8, 3.5, -1,"eye1");
+	addEye(kitty, 8, 3.5, 1,"eye2");
 
   kitty.position.set(x, y, z);
 
