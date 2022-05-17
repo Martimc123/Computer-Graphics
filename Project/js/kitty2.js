@@ -263,6 +263,26 @@ function changeWires(wires)
 	kitty.getObjectByName("legs").getObjectByName("leg4").material = new THREE.MeshBasicMaterial({ color: 0xf2a007, wireframe: wires});
 }
 
+function arrow_up()
+{
+    pivot.translateY(0.2);
+}
+
+function arrow_down()
+{
+    pivot.translateY(-0.2);
+}
+
+function arrow_left()
+{
+    pivot.translateZ(0.2);
+}
+
+function arrow_right()
+{
+    pivot.translateZ(-0.2);
+}
+
 function update(){
     document.addEventListener('keypress', (event) => {
 			var name = event.key;
