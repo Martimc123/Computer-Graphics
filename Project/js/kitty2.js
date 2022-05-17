@@ -163,16 +163,16 @@ function keys()
 	document.addEventListener ('keypress', (event) => {
 		const keyName = event.key;
 		switch (keyName) {
-			case "1":
+			case "1"://1
 				currentCamera = 0;
 				break;
-			case "2":
+			case "2"://2
 				currentCamera = 1;
 				break;
-			case "3":
+			case "3"://3
 				currentCamera = 2;
 				break;
-			case "4":
+			case "4"://4
 				if (wires == true)
 					wires = false;
 				else
@@ -185,20 +185,6 @@ function keys()
 				else
 						aKey = false;
 				break;
-			case "Z": //A
-			case "z": //a
-				if (zKey == false)
-						zKey = true;
-				else
-						zKey = false;
-				break;
-			case "X": //A
-			case "x": //a
-				if (xKey == false)
-						xKey = true;
-				else
-						xKey = false;
-				break;
 			case "S": //S
 			case "s": //s
 				if (sKey == false)
@@ -206,22 +192,52 @@ function keys()
 				else
 						sKey = false;
 				break;
-			case "Q": //q
+			case "Q": //Q
 			case "q": //q
 					if (qKey == false)
 						qKey = true;
 					else
 						qKey = false;
 					break;
-			case "W": //w
+			case "W": //W
 			case "w": //w
 				if (wKey == false)
 						wKey = true;
 				else
 						wKey = false;
 				break;					
-			default:
-				break;
+            case "Z": //Z
+            case "z": //z
+                if (zKey == false)
+                        zKey = true;
+                else
+                        zKey = false;
+                break;
+            case "X": //X
+            case "x": //x
+                if (xKey == false)
+                        xKey = true;
+                else
+                        xKey = false;
+                break;
+            case "D": //D
+            case "d": //d
+                if (dKey == false)
+                    dKey = true;
+                else
+                    dKey = false;
+                break;
+            
+            case "C": //C
+            case "c": //c
+                if (cKey == false)
+                    cKey = true;
+                else
+                    cKey = false;
+                break;
+    
+            default:
+                break;
 		}
 	});   
 }
@@ -258,10 +274,15 @@ function update(){
 			else if(wKey && name == "w"){
 				pivot.rotation.y += -0.2;
 			}
-			else if(aKey && name == "a"){
+            else if(aKey && name == "a"){
 				var head = kitty.getObjectByName("head");
 				if(head.rotation.z < max_rotation)
 					head.rotation.z += 0.02;
+			}
+            else if(sKey && name == "s"){
+				var head = kitty.getObjectByName("head");
+				if(head.rotation.z > min_rotation)
+					head.rotation.z += -0.02;
 			}
 			else if(zKey && name == "z"){
 				var head = kitty.getObjectByName("head").getObjectByName("ear1");
@@ -271,11 +292,12 @@ function update(){
 				var head = kitty.getObjectByName("head").getObjectByName("ear1");
 				head.rotation.z += -0.2;
 			}
-			else if(sKey && name == "s"){
-				var head = kitty.getObjectByName("head");
-				if(head.rotation.z > min_rotation)
-					head.rotation.z += -0.02;
-			}
+            else if(dKey && name == "d"){
+                pivot.translateX(0.2);
+            }
+            else if(cKey && name == "c"){
+                pivot.translateX(-0.2);
+            }
     }, false);
 }
 
@@ -324,7 +346,6 @@ function init() {
 	camera[1] = createCamera(0, 50, 0);
 	camera[2] = createCamera(0, 0, 50);
 	pivot = new THREE.Group();
-	pivot.add(new THREE.AxesHelper(5));
 
 	scene.add(pivot);
 	pivot.add(kitty);
