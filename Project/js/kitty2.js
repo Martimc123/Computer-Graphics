@@ -1,6 +1,6 @@
 /*global THREE*/
 
-var camera = []
+var camera = [];
 var scene, renderer, currentCamera = 0;
 
 var viewSize = 50;
@@ -23,7 +23,7 @@ var qKey,wKey,aKey,sKey,dKey,cKey,zKey,xKey;
 
 // change to receive position, yes, but also body radius and height
 function createKitty(x, y, z, scale) {
-    
+		
 	wires = true;
 	kitty = new THREE.Object3D();
 
@@ -34,10 +34,10 @@ function createKitty(x, y, z, scale) {
 	head.add(addKittyFace(5, 4, 0));
 	head.add(addKittyEye(7, 3.5, -1, "eye1"));
 	head.add(addKittyEye(7, 3.5, 1, "eye2"));
-  head.add(addKittyEar(5, 6, 2,  Math.PI / 180 * 45,"ear1"));
+	head.add(addKittyEar(5, 6, 2,  Math.PI / 180 * 45,"ear1"));
 	head.add(addKittyEar(5, 6, -2,  Math.PI / 180 * -45,"ear2"));
 	addKittyNose(head, 7.5, 3, 0);
-  addKittyWhisker(head, 8, 3, 1,"whisker1");
+	addKittyWhisker(head, 8, 3, 1,"whisker1");
 	addKittyWhisker(head, 8, 2.5, 1,"whisker2");
 	addKittyWhisker(head, 8, 3, -1,"whisker3");
 	addKittyWhisker(head, 8, 2.5, -1,"whisker4");
@@ -50,11 +50,11 @@ function createKitty(x, y, z, scale) {
 	legs.add(addKittyLeg(1, -4, 1,"leg3"));
 	legs.add(addKittyLeg(1, -4, -1,"leg4"));
 	legs.name="legs";
-  kitty.add(legs);
-    
-  addKittyTail(kitty, -6, 3, 0);
+	kitty.add(legs);
+		
+	addKittyTail(kitty, -6, 3, 0);
 	
-  kitty.position.set(x, y, z);
+	kitty.position.set(x, y, z);
 	kitty.scale.set(scale,scale,scale);
 
 	scene.add(kitty);
@@ -139,7 +139,7 @@ function addKittyEar(x, y, z, angle,tag) {
 
 
 function render() {
-  renderer.render(scene, camera[currentCamera]); // tells 3js renderer to draw scene visualization based on camera 
+	renderer.render(scene, camera[currentCamera]); // tells 3js renderer to draw scene visualization based on camera 
 }
 
 function onResize() {
@@ -173,69 +173,42 @@ function keys()
 				currentCamera = 2;
 				break;
 			case "4"://4
-				if (wires == true)
-					wires = false;
-				else
-					wires = true;	
+				wires = !wires;
 				break;
 			case "A": //A
 			case "a": //a
-				if (aKey == false)
-						aKey = true;
-				else
-						aKey = false;
+				aKey = !aKey;
 				break;
 			case "S": //S
 			case "s": //s
-				if (sKey == false)
-						sKey = true;
-				else
-						sKey = false;
+				sKey = !sKey;
 				break;
 			case "Q": //Q
 			case "q": //q
-					if (qKey == false)
-						qKey = true;
-					else
-						qKey = false;
-					break;
+				qKey = !qKey;
+				break;
 			case "W": //W
 			case "w": //w
-				if (wKey == false)
-						wKey = true;
-				else
-						wKey = false;
+				wKey = !wKey;
 				break;					
 			case "Z": //Z
 			case "z": //z
-					if (zKey == false)
-						zKey = true;
-					else
-						zKey = false;
-					break;
+				zKey = !zKey;
+				break;
 			case "X": //X
 			case "x": //x
-					if (xKey == false)
-						xKey = true;
-					else
-						xKey = false;
-					break;
+				xKey = !xKey;
+				break;
 			case "D": //D
 			case "d": //d
-					if (dKey == false)
-						dKey = true;
-					else
-						dKey = false;
-					break;
+				dKey = !dKey;
+				break;
 			case "C": //C
 			case "c": //c
-					if (cKey == false)
-						cKey = true;
-					else
-						cKey = false;
-					break;
+				cKey = !cKey;
+				break;
 			default:
-					break;
+				break;
 		}
 	});   
 }
@@ -243,46 +216,46 @@ function keys()
 
 function changeWires(wires)
 {
-	kitty.getObjectByName("torso").material = new THREE.MeshBasicMaterial({ color: 0x35e8df, wireframe: wires});
-	kitty.getObjectByName("head").getObjectByName("face").material = new THREE.MeshBasicMaterial({ color: 0xfde995, wireframe: wires});
-  kitty.getObjectByName("head").getObjectByName("nose").material = new THREE.MeshBasicMaterial({ color: 0xef64bc, wireframe: wires});
-	kitty.getObjectByName("head").getObjectByName("eye1").material = new THREE.MeshBasicMaterial({ color: 0x49b517, wireframe: wires});
-	kitty.getObjectByName("head").getObjectByName("eye2").material = new THREE.MeshBasicMaterial({ color: 0x49b517, wireframe: wires});
-	kitty.getObjectByName("head").getObjectByName("whisker1").material = new THREE.MeshBasicMaterial({ color: 0x5b0001, wireframe: wires});
-	kitty.getObjectByName("head").getObjectByName("whisker2").material = new THREE.MeshBasicMaterial({ color: 0x5b0001, wireframe: wires});
-	kitty.getObjectByName("head").getObjectByName("whisker3").material = new THREE.MeshBasicMaterial({ color: 0x5b0001, wireframe: wires});
-	kitty.getObjectByName("head").getObjectByName("whisker4").material = new THREE.MeshBasicMaterial({ color: 0x5b0001, wireframe: wires});
-	kitty.getObjectByName("head").getObjectByName("ear1").material = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: wires});
-	kitty.getObjectByName("head").getObjectByName("ear2").material = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: wires});
-	kitty.getObjectByName("tail").material = new THREE.MeshBasicMaterial({ color: 0x9B26B6, wireframe: wires});
-	kitty.getObjectByName("legs").getObjectByName("leg1").material = new THREE.MeshBasicMaterial({ color: 0xf2a007, wireframe: wires});
-	kitty.getObjectByName("legs").getObjectByName("leg2").material = new THREE.MeshBasicMaterial({ color: 0xf2a007, wireframe: wires});
-	kitty.getObjectByName("legs").getObjectByName("leg3").material = new THREE.MeshBasicMaterial({ color: 0xf2a007, wireframe: wires});
-	kitty.getObjectByName("legs").getObjectByName("leg4").material = new THREE.MeshBasicMaterial({ color: 0xf2a007, wireframe: wires});
+	kitty.getObjectByName("torso").material.wireframe = wires;
+	kitty.getObjectByName("head").getObjectByName("face").material.wireframe = wires;
+	kitty.getObjectByName("head").getObjectByName("nose").material.wireframe = wires;
+	kitty.getObjectByName("head").getObjectByName("eye1").material.wireframe = wires;
+	kitty.getObjectByName("head").getObjectByName("eye2").material.wireframe = wires;
+	kitty.getObjectByName("head").getObjectByName("whisker1").material.wireframe = wires;
+	kitty.getObjectByName("head").getObjectByName("whisker2").material.wireframe = wires;
+	kitty.getObjectByName("head").getObjectByName("whisker3").material.wireframe = wires;
+	kitty.getObjectByName("head").getObjectByName("whisker4").material.wireframe = wires;
+	kitty.getObjectByName("head").getObjectByName("ear1").material.wireframe = wires;
+	kitty.getObjectByName("head").getObjectByName("ear2").material.wireframe = wires;
+	kitty.getObjectByName("tail").material.wireframe = wires;
+	kitty.getObjectByName("legs").getObjectByName("leg1").material.wireframe = wires;
+	kitty.getObjectByName("legs").getObjectByName("leg2").material.wireframe = wires;
+	kitty.getObjectByName("legs").getObjectByName("leg3").material.wireframe = wires;
+	kitty.getObjectByName("legs").getObjectByName("leg4").material.wireframe = wires;
 }
 
 function arrow_up()
 {
-    pivot.translateY(0.2);
+		pivot.translateY(0.2);
 }
 
 function arrow_down()
 {
-    pivot.translateY(-0.2);
+		pivot.translateY(-0.2);
 }
 
 function arrow_left()
 {
-    pivot.translateZ(0.2);
+		pivot.translateZ(0.2);
 }
 
 function arrow_right()
 {
-    pivot.translateZ(-0.2);
+		pivot.translateZ(-0.2);
 }
 
 function update(){
-    document.addEventListener('keypress', (event) => {
+		document.addEventListener('keypress', (event) => {
 			var name = event.key;
 			var max_rotation = Math.PI/35;
 			var min_rotation = -Math.PI/35;
@@ -292,12 +265,12 @@ function update(){
 			else if(wKey && name == "w"){
 				pivot.rotation.y += -0.2;
 			}
-     else if(aKey && name == "a"){
+		 else if(aKey && name == "a"){
 				var head = kitty.getObjectByName("head");
 				if(head.rotation.z < max_rotation)
 					head.rotation.z += 0.02;
 			}
-      else if(sKey && name == "s"){
+			else if(sKey && name == "s"){
 				var head = kitty.getObjectByName("head");
 				if(head.rotation.z > min_rotation)
 					head.rotation.z += -0.02;
@@ -316,7 +289,7 @@ function update(){
 			else if(cKey && name == "c"){
 					pivot.translateX(-0.2);
 			}
-    }, false);
+		}, false);
 }
 
 
@@ -354,7 +327,7 @@ function createCamera(x, y, z) {
 }
 
 function init() {
-    
+		
 	renderer = new THREE.WebGLRenderer({antialias: true});
 	renderer.setSize(window.innerWidth, window.innerHeight);
 	document.body.appendChild(renderer.domElement);
@@ -368,6 +341,6 @@ function init() {
 	scene.add(pivot);
 	pivot.add(kitty);
 
-  //  controls = new THREE.OrbitControls( camera[currentCamera], renderer.domElement );
-  window.addEventListener("resize", onResize);
+	//  controls = new THREE.OrbitControls( camera[currentCamera], renderer.domElement );
+	window.addEventListener("resize", onResize);
 }
