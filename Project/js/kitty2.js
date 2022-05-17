@@ -9,12 +9,9 @@ var aspectRatio;
 var geometry, material, mesh;
 
 var kitty;
-var head;
 var wires;
 var defaultScale = 1;
 
-var cat_torso;
-var cat_face;
 var qKey,wKey,aKey,sKey,dKey,cKey,zKey,xKey;
 
 //var controls;
@@ -120,17 +117,16 @@ function render() {
 function onResize() {
 
 	var val = 2;
-	var newAspectRatio = window.innerWidth / window.innerHeight;
+	aspectRatio = window.innerWidth / window.innerHeight;
 	renderer.setSize(window.innerWidth, window.innerHeight);
-	
-	camera[currentCamera].left = -viewSize * newAspectRatio / val;
-	camera[currentCamera].right = viewSize * newAspectRatio / val;
-	camera[currentCamera].top = viewSize / val;
-	camera[currentCamera].bottom = viewSize / -val;
-	camera[currentCamera].updateProjectionMatrix();
-			
-	aspectRatio = window.innerWidth / innerHeight;
-
+	var nrCameras = camera.length;
+	for (var i = 0; i < nrCameras; i++) {
+		camera[i].left = -viewSize * aspectRatio / val;
+		camera[i].right = viewSize * aspectRatio / val;
+		camera[i].top = viewSize / val;
+		camera[i].bottom = viewSize / -val;
+		camera[i].updateProjectionMatrix();
+	}
 }
 
 function keys()
@@ -211,60 +207,60 @@ function changeWires(wires)
 
 function arrow_up()
 {
-		kitty.translateY(0.2);
+	kitty.translateY(0.2);
 }
 
 function arrow_down()
 {
-		kitty.translateY(-0.2);
+	kitty.translateY(-0.2);
 }
 
 function arrow_left()
 {
-		kitty.translateZ(0.2);
+	kitty.translateZ(0.2);
 }
 
 function arrow_right()
 {
-		kitty.translateZ(-0.2);
+	kitty.translateZ(-0.2);
 }
 
 function update(){
-		document.addEventListener('keypress', (event) => {
-			var name = event.key;
-			var max_rotation = Math.PI/35;
-			var min_rotation = -Math.PI/35;
-			if(qKey && name == "q"){
-				pivot.rotation.y += 0.2;
-			}
-			else if(wKey && name == "w"){
-				pivot.rotation.y += -0.2;
-			}
-			else if(aKey && name == "a"){
-				var head = kitty.getObjectByName("head");
-				if(head.rotation.z < max_rotation)
-					head.rotation.z += 0.02;
-			}
-			else if(sKey && name == "s"){
-				var head = kitty.getObjectByName("head");
-				if(head.rotation.z > min_rotation)
-					head.rotation.z += -0.02;
-			}
-			else if(zKey && name == "z"){
-				var ear1 = kitty.getObjectByName("head").getObjectByName("ear1");
-				ear1.rotation.z += 0.2;
-			}
-			else if(xKey && name == "x"){
-				var ear1 = kitty.getObjectByName("head").getObjectByName("ear1");
-				ear1.rotation.z += -0.2;
-			}
-			else if(dKey && name == "d"){
-				kitty.translateX(0.2);
-			}
-			else if(cKey && name == "c"){
-				kitty.translateX(-0.2);
-			}
-		}, false);
+	document.addEventListener('keypress', (event) => {
+		var name = event.key;
+		var max_rotation = Math.PI/35;
+		var min_rotation = -Math.PI/35;
+		if(qKey && name == "q"){
+			pivot.rotation.y += 0.2;
+		}
+		else if(wKey && name == "w"){
+			pivot.rotation.y += -0.2;
+		}
+		else if(aKey && name == "a"){
+			var head = kitty.getObjectByName("head");
+			if(head.rotation.z < max_rotation)
+				head.rotation.z += 0.02;
+		}
+		else if(sKey && name == "s"){
+			var head = kitty.getObjectByName("head");
+			if(head.rotation.z > min_rotation)
+				head.rotation.z += -0.02;
+		}
+		else if(zKey && name == "z"){
+			var ear1 = kitty.getObjectByName("head").getObjectByName("ear1");
+			ear1.rotation.z += 0.2;
+		}
+		else if(xKey && name == "x"){
+			var ear1 = kitty.getObjectByName("head").getObjectByName("ear1");
+			ear1.rotation.z += -0.2;
+		}
+		else if(dKey && name == "d"){
+			kitty.translateX(0.2);
+		}
+		else if(cKey && name == "c"){
+			kitty.translateX(-0.2);
+		}
+	}, false);
 }
 
 

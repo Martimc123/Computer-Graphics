@@ -1,24 +1,61 @@
 TORSO(x1):
 .Size:
-Normal:
-	- 2 bottom radius
-	- 2 top radius
-	- 
-  
+ - Default:
+	- RadiusTop:2
+	- RadiusBottom:2
+	- Height: 8
+
+	- Scale k:
+		- RadiusTop=RadiusBottom = sqrt( radiusDefault^2 / k)
+		- Height = HeightOG*k
 
 .Pos:
+	- X: height/2
+	- Y: Radius*2.5
+	- Z: Radius
+
 
 TAIL(x1) - based on torso:
 .Size:
+	- Default:
+		- RadiusTop:0.25
+		- RadiusBottom:0.25
+		- Height: 4
+	
+	- Scale k:
+		- RadiusTop=RadiusBottom = 1/4 radiusTorso
+		- Height = 1/2 heightTorso;
+
 .Pos:
+	- X: -1.5*heightTorso
+	- Y: radiusTorso+radiusHead
+	- Z: 0
 
 LEGS(x4) - based on torso:
 .Size:
+	- Default:
+		- RadiusTop = RadiusBottom = 0.25
+		- Height = 4;
+
+	- Scale k:
+		- RadiusTop = RadiusBottom = sqrt( radiusDefault^2 /4 / k)
+		- Height = 1/4 heightTorso
 .Pos:
+	FLR:
+		- X:
+		- Y:
+		- Z:
 
 HEAD(x1) - based on torso:
 .Size:
+	- Default:
+		- Radius = radiusTorso;
+	
+	- Scale k:
+		- Radius = radiusTorso;
+
 .Pos:
+
 
 EYES(x2) - based on torso+head:
 .Size:
