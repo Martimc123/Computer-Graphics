@@ -38,11 +38,46 @@ function createKitty(x, y, z) {
 	addKittyLeg(kitty, 1, -4, -1);
 	addKittyEar(kitty, 5, 6, 2,  Math.PI / 180 * 45);
 	addKittyEar(kitty, 5, 6, -2,  Math.PI / 180 * -45);
+	addKittyNose(kitty, 7.5, 3, 0);
+	addKittyTail(kitty, -6, 3, 0);
+	addKittyWhisker(kitty, 8, 3, 1);
+	addKittyWhisker(kitty, 8, 2.5, 1);
+	addKittyWhisker(kitty, 8, 3, -1);
+	addKittyWhisker(kitty, 8, 2.5, -1);
 
   kitty.position.set(x, y, z);
 
 	scene.add(kitty);
 	return kitty;
+}
+
+function addKittyWhisker(obj, x, y, z) {
+	geometry = new THREE.BoxGeometry(0.25, 1, 0.25, 1, 1, 1);
+	material = new THREE.MeshBasicMaterial({ color: 0x5b0001, wireframe: wires});
+	mesh = new THREE.Mesh(geometry, material);
+	mesh.position.set(x, y, z);
+	mesh.rotateX(Math.PI/180 * 90);
+	mesh.name="whisker";
+	obj.add(mesh);
+}
+
+function addKittyNose(obj, x, y, z) {
+	geometry = new THREE.BoxGeometry(0.5, 0.5, 0.5, 1, 1, 1);
+	material = new THREE.MeshBasicMaterial({ color: 0xef64bc, wireframe: wires});
+	mesh = new THREE.Mesh(geometry, material);
+	mesh.position.set(x, y, z);
+	mesh.name="nose";
+	obj.add(mesh);
+}
+
+function addKittyTail(obj, x, y, z) {
+	geometry = new THREE.CylinderGeometry(0.25, 0.25, 4, 20, 1);
+	material = new THREE.MeshBasicMaterial({ color: 0x9B26B6, wireframe: wires});
+	mesh = new THREE.Mesh(geometry, material);
+	mesh.position.set(x, y, z);
+	mesh.rotateZ( Math.PI / 180 * 45);
+	mesh.name="tail";
+	obj.add(mesh);
 }
 
 function addKittyTorso(obj, x, y, z) {
@@ -196,7 +231,7 @@ function update(){
 function animate() {
 	requestAnimationFrame(animate);
 	changeWires(wires);
-//	controls.update();
+	controls.update();
 	render();
 }
 
@@ -241,6 +276,6 @@ function init() {
 	scene.add(pivot);
 	pivot.add(kitty);
 
-    //controls = new THREE.OrbitControls( camera[currentCamera], renderer.domElement );
+    controls = new THREE.OrbitControls( camera[currentCamera], renderer.domElement );
     window.addEventListener("resize", onResize);
 }
