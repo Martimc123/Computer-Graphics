@@ -28,31 +28,30 @@ function createKitty(x, y, z, scale) {
 	kitty = new THREE.Object3D();
 
 	// change for positions to be based on cylinder height and angle
-	// current torso spot: 4,5,2
-	addKittyTorso(kitty, 0, 0, 0); // based on kitty origin position
+	addKittyTorso(kitty, "torso", 0, 0, 0); // based on kitty origin position
 	var head = new THREE.Object3D();
-	head.add(addKittyFace(5, 4, 0));
-	head.add(addKittyEye(7, 3.5, -1, "eye1"));
-	head.add(addKittyEye(7, 3.5, 1, "eye2"));
-	head.add(addKittyEar(5, 6, 2,  Math.PI / 180 * 45,"ear1"));
-	head.add(addKittyEar(5, 6, -2,  Math.PI / 180 * -45,"ear2"));
-	addKittyNose(head, 7.5, 3, 0);
-	addKittyWhisker(head, 8, 3, 1,"whisker1");
-	addKittyWhisker(head, 8, 2.5, 1,"whisker2");
-	addKittyWhisker(head, 8, 3, -1,"whisker3");
-	addKittyWhisker(head, 8, 2.5, -1,"whisker4");
-
+	addKittyFace(head, "face", 5, 4, 0);
+	addKittyEye(head, "eye1", 7, 3.5, -1);
+	addKittyEye(head, "eye2", 7, 3.5, 1);
+	addKittyEar(head, "ear1", 5, 6, 2, Math.PI / 180 * 45);
+	addKittyEar(head, "ear2", 5, 6, -2, Math.PI / 180 * -45);
+	addKittyNose(head, "nose", 7.5, 3, 0);
+	addKittyWhisker(head, "whisker1", 8, 3, 1);
+	addKittyWhisker(head, "whisker2", 8, 2.5, 1);
+	addKittyWhisker(head, "whisker3", 8, 3, -1);
+	addKittyWhisker(head, "whisker4", 8, 2.5, -1);
 	head.name="head";
 	kitty.add(head);
+	
 	var legs = new THREE.Object3D();
-	legs.add(addKittyLeg(-3, -4, -1,"leg1"));
-	legs.add(addKittyLeg(-3, -4, 1,"leg2"));
-	legs.add(addKittyLeg(1, -4, 1,"leg3"));
-	legs.add(addKittyLeg(1, -4, -1,"leg4"));
+	addKittyLeg(legs, "leg1", -3, -4, -1);
+	addKittyLeg(legs, "leg2", -3, -4, 1);
+	addKittyLeg(legs, "leg3", 1, -4, 1);
+	addKittyLeg(legs, "leg4", 1, -4, -1);
 	legs.name="legs";
 	kitty.add(legs);
 		
-	addKittyTail(kitty, -6, 3, 0);
+	addKittyTail(kitty, "tail", -6, 3, 0);
 	
 	kitty.position.set(x, y, z);
 	kitty.scale.set(scale,scale,scale);
@@ -61,80 +60,56 @@ function createKitty(x, y, z, scale) {
 	return kitty;
 }
 
-function addKittyWhisker(obj,x, y, z,tag) {
+function addKittyPart(obj, tag, geometry, hex, x, y, z, rotX, rotY, rotZ) {
+	material = new THREE.MeshBasicMaterial({ color: hex, wireframe: wires});
+	mesh = new THREE.Mesh(geometry, material);
+	mesh.position.set(x, y, z);
+	mesh.rotateX(rotX);
+	mesh.rotateY(rotY);
+	mesh.rotateZ(rotZ);
+	mesh.name=tag;
+	obj.add(mesh);
+	return mesh;
+}
+
+function addKittyWhisker(obj, tag, x, y, z) {
 	geometry = new THREE.BoxGeometry(0.25, 1, 0.25, 1, 1, 1);
-	material = new THREE.MeshBasicMaterial({ color: 0x5b0001, wireframe: wires});
-	mesh = new THREE.Mesh(geometry, material);
-	mesh.position.set(x, y, z);
-	mesh.rotateX(Math.PI/180 * 90);
-	mesh.name=tag;
-	obj.add(mesh);
+	addKittyPart(obj, tag, geometry, 0x5b0001, x, y, z, Math.PI/180 * 90, 0, 0);
 }
 
-function addKittyNose(obj,x, y, z) {
+function addKittyNose(obj, tag, x, y, z) {
 	geometry = new THREE.BoxGeometry(0.5, 0.5, 0.5, 1, 1, 1);
-	material = new THREE.MeshBasicMaterial({ color: 0xef64bc, wireframe: wires});
-	mesh = new THREE.Mesh(geometry, material);
-	mesh.position.set(x, y, z);
-	mesh.name="nose";
-	obj.add(mesh);
+	addKittyPart(obj, tag, geometry, 0xef64bc, x, y, z, 0, 0, 0);
 }
 
-function addKittyTail(obj, x, y, z) {
+function addKittyTail(obj, tag, x, y, z) {
 	geometry = new THREE.CylinderGeometry(0.25, 0.25, 4, 20, 1);
-	material = new THREE.MeshBasicMaterial({ color: 0x9B26B6, wireframe: wires});
-	mesh = new THREE.Mesh(geometry, material);
-	mesh.position.set(x, y, z);
-	mesh.rotateZ( Math.PI / 180 * 45);
-	mesh.name="tail";
-	obj.add(mesh);
+	addKittyPart(obj, tag, geometry, 0x9B26B6, x, y, z, 0, 0, Math.PI / 180 * 45);
 }
 
-function addKittyTorso(obj, x, y, z) {
+function addKittyTorso(obj, tag, x, y, z) {
 	geometry = new THREE.CylinderGeometry(2, 2, 8, 20, 1);
-	material = new THREE.MeshBasicMaterial({ color: 0x35e8df, wireframe: wires});
-	mesh = new THREE.Mesh(geometry, material);
-	mesh.position.set(x, y, z);
-	mesh.rotateZ( Math.PI / 180 * 90);
-	mesh.name="torso";
-	obj.add(mesh);
+	addKittyPart(obj, tag, geometry, 0x35e8df, x, y, z, 0, 0, Math.PI / 180 * 90);
 }
 
-function addKittyFace(x, y, z) {
+function addKittyFace(obj, tag, x, y, z) {
 	geometry = new THREE.SphereGeometry(2);
-	material = new THREE.MeshBasicMaterial({ color: 0xfde995, wireframe: wires});
-	mesh = new THREE.Mesh(geometry, material);
-	mesh.position.set(x, y, z);
-	mesh.name="face";
-	return mesh;
+	addKittyPart(obj, tag, geometry, 0xfde995, x, y, z, 0, 0, 0);
 }
 
-function addKittyEye(x, y, z,tag) {
+function addKittyEye(obj, tag, x, y, z) {
 	geometry = new THREE.SphereGeometry(0.25);
-	material = new THREE.MeshBasicMaterial({ color: 0x49b517, wireframe: wires});
-	mesh = new THREE.Mesh(geometry, material);
-	mesh.position.set(x, y, z);
-	mesh.name=tag;
-	return mesh;
+	addKittyPart(obj, tag, geometry, 0x49b517, x, y, z, 0, 0, 0);
 }
 
-function addKittyLeg(x, y, z,tag) {
+function addKittyLeg(obj, tag, x, y, z) {
 	geometry = new THREE.CylinderGeometry(0.25, 0.25, 2, 8, 1);
-	material = new THREE.MeshBasicMaterial({ color: 0xf2a007, wireframe: wires});
-	mesh = new THREE.Mesh(geometry, material);
-	mesh.position.set(x, y, z);
-	mesh.name=tag;
-	return mesh;
+	addKittyPart(obj, tag, geometry, 0xf2a007, x, y, z, 0, 0, 0);
 }
 
-function addKittyEar(x, y, z, angle,tag) {
+function addKittyEar(obj, tag, x, y, z, rotX) {
 	geometry = new THREE.CylinderGeometry(0, 0.5, 1, 4, 1);
-	material = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: wires});
-	mesh = new THREE.Mesh(geometry, material);
-	mesh.position.set(x, y, z);
-	mesh.name=tag;
-	mesh.rotateX(angle);
-	return mesh;
+	addKittyPart(obj, tag, geometry, 0xffffff, x, y, z, rotX, 0, 0);
 }
 
 
@@ -265,7 +240,7 @@ function update(){
 			else if(wKey && name == "w"){
 				pivot.rotation.y += -0.2;
 			}
-		 else if(aKey && name == "a"){
+			else if(aKey && name == "a"){
 				var head = kitty.getObjectByName("head");
 				if(head.rotation.z < max_rotation)
 					head.rotation.z += 0.02;
@@ -276,18 +251,18 @@ function update(){
 					head.rotation.z += -0.02;
 			}
 			else if(zKey && name == "z"){
-				var head = kitty.getObjectByName("head").getObjectByName("ear1");
-				head.rotation.z += 0.2;
+				var ear1 = kitty.getObjectByName("head").getObjectByName("ear1");
+				ear1.rotation.z += 0.2;
 			}
 			else if(xKey && name == "x"){
-				var head = kitty.getObjectByName("head").getObjectByName("ear1");
-				head.rotation.z += -0.2;
+				var ear1 = kitty.getObjectByName("head").getObjectByName("ear1");
+				ear1.rotation.z += -0.2;
 			}
 			else if(dKey && name == "d"){
-					pivot.translateX(0.2);
+				pivot.translateX(0.2);
 			}
 			else if(cKey && name == "c"){
-					pivot.translateX(-0.2);
+				pivot.translateX(-0.2);
 			}
 		}, false);
 }
