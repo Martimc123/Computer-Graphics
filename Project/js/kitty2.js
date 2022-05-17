@@ -211,22 +211,22 @@ function changeWires(wires)
 
 function arrow_up()
 {
-		pivot.translateY(0.2);
+		kitty.translateY(0.2);
 }
 
 function arrow_down()
 {
-		pivot.translateY(-0.2);
+		kitty.translateY(-0.2);
 }
 
 function arrow_left()
 {
-		pivot.translateZ(0.2);
+		kitty.translateZ(0.2);
 }
 
 function arrow_right()
 {
-		pivot.translateZ(-0.2);
+		kitty.translateZ(-0.2);
 }
 
 function update(){
@@ -259,10 +259,10 @@ function update(){
 				ear1.rotation.z += -0.2;
 			}
 			else if(dKey && name == "d"){
-				pivot.translateX(0.2);
+				kitty.translateX(0.2);
 			}
 			else if(cKey && name == "c"){
-				pivot.translateX(-0.2);
+				kitty.translateX(-0.2);
 			}
 		}, false);
 }
