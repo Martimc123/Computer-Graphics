@@ -331,7 +331,7 @@ function animate() {
 function createScene() {
 	scene = new THREE.Scene();
 	scene.add(new THREE.AxesHelper(100));
-	kitty = createKitty(4, 5, 2, defaultScale);
+	kitty = createKitty(0, 0, 0, defaultScale);
 }
 
 function createCamera(x, y, z) {
