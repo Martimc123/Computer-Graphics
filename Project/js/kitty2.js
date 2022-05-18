@@ -25,7 +25,7 @@ function createKitty(x, y, z, scale) {
 		
 	wires = true;
 	kitty = new THREE.Object3D();
-
+	kitty.scale.set(scale,scale,scale);
 	// change for positions to be based on cylinder height and angle
 	addKittyTorso(kitty, "torso", 0, 0, 0); // based on kitty origin position
 	var head = new THREE.Object3D();
@@ -53,7 +53,6 @@ function createKitty(x, y, z, scale) {
 	addKittyTail(kitty, "tail", -6, 3, 0);
 	
 	kitty.position.set(x, y, z);
-	kitty.scale.set(scale,scale,scale);
 
 	scene.add(kitty);
 	return kitty;
@@ -82,7 +81,7 @@ function addKittyNose(obj, tag, x, y, z) {
 }
 
 function addKittyTail(obj, tag, x, y, z) {
-	geometry = new THREE.CylinderGeometry(0.25, 0.25, 4, 20, 1);
+	geometry = new THREE.CylinderGeometry(0.25, 0.25, 4, 4, 1);
 	addKittyPart(obj, tag, geometry, 0x9B26B6, x, y, z, 0, 0, Math.PI / 180 * 45);
 }
 
@@ -97,7 +96,7 @@ function addKittyFace(obj, tag, x, y, z) {
 }
 
 function addKittyEye(obj, tag, x, y, z) {
-	geometry = new THREE.SphereGeometry(0.25);
+	geometry = new THREE.SphereGeometry(0.25, 4, 4);
 	addKittyPart(obj, tag, geometry, 0x49b517, x, y, z, 0, 0, 0);
 }
 
@@ -118,6 +117,7 @@ function render() {
 
 function onResize() {
 
+	var i;
 	var val = 2;
 	aspectRatio = window.innerWidth / window.innerHeight;
 	renderer.setSize(window.innerWidth, window.innerHeight);
@@ -360,9 +360,9 @@ function init() {
 	document.body.appendChild(renderer.domElement);
 	
 	createScene();
-	camera[0] = createCamera(50, 0, 0);
-	camera[1] = createCamera(0, 50, 0);
-	camera[2] = createCamera(0, 0, 50);
+	camera[0] = createCamera(20, 0, 0);
+	camera[1] = createCamera(0, 20, 0);
+	camera[2] = createCamera(0, 0, 20);
 	pivot = new THREE.Group();
 
 	scene.add(pivot);
