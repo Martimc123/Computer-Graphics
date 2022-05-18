@@ -202,7 +202,6 @@ function update(){
 
 function onKeyDown(e) {
 	var keyName = e.keyCode;
-	console.log(keyName);
 	switch (keyName) {
 		case 49://1
 			currentCamera = 0;
@@ -287,8 +286,6 @@ function onKeyUp(e) {
 		case 65: //A
 		case 97: //a
 			aKey = false;
-			console.log("hi A bitch");
-			console.log(aKey);
 			break;
 		case 83: //S
 		case 115: //s
