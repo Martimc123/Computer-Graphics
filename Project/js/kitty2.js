@@ -163,9 +163,9 @@ function update(){
 	var earRotSpeed = 1.5;
 	
 	if (qKey)
-		pivot.rotation.y += bodyRotSpeed * timeOccurred;
+		kitty.rotation.y += bodyRotSpeed * timeOccurred;
 	if (wKey)
-		pivot.rotation.y += - bodyRotSpeed * timeOccurred;
+		kitty.rotation.y += - bodyRotSpeed * timeOccurred;
 	if (aKey){
 		var head = kitty.getObjectByName("head");
 		if (head.rotation.z < maxHeadRotation)
@@ -196,6 +196,8 @@ function update(){
 		kitty.translateZ(bodyMovSpeed * timeOccurred);
 	if (rightArrow)
 		kitty.translateZ(- bodyMovSpeed * timeOccurred);
+
+	console.log(kitty.position.x, kitty.position.y, kitty.position.z);
 }
 
 function onKeyDown(e) {
