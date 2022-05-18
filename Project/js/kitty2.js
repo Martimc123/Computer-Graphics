@@ -13,6 +13,8 @@ var wires;
 var defaultScale = 1;
 
 var qKey,wKey,aKey,sKey,dKey,cKey,zKey,xKey;
+var leftArrow, rightArrow, upArrow, downArrow;
+var clock = new THREE.Clock();
 
 //var controls;
 
@@ -60,10 +62,10 @@ function createKitty(x, y, z, scale) {
 function addKittyPart(obj, tag, geometry, hex, x, y, z, rotX, rotY, rotZ) {
 	material = new THREE.MeshBasicMaterial({ color: hex, wireframe: wires});
 	mesh = new THREE.Mesh(geometry, material);
-	mesh.position.set(x, y, z);
 	mesh.rotateX(rotX);
 	mesh.rotateY(rotY);
 	mesh.rotateZ(rotZ);
+	mesh.position.set(x, y, z);
 	mesh.name=tag;
 	obj.add(mesh);
 	return mesh;
@@ -129,61 +131,6 @@ function onResize() {
 	}
 }
 
-function keys()
-{
-	document.addEventListener ('keypress', (event) => {
-		const keyName = event.key;
-		switch (keyName) {
-			case "1"://1
-				currentCamera = 0;
-				break;
-			case "2"://2
-				currentCamera = 1;
-				break;
-			case "3"://3
-				currentCamera = 2;
-				break;
-			case "4"://4
-				wires = !wires;
-				break;
-			case "A": //A
-			case "a": //a
-				aKey = !aKey;
-				break;
-			case "S": //S
-			case "s": //s
-				sKey = !sKey;
-				break;
-			case "Q": //Q
-			case "q": //q
-				qKey = !qKey;
-				break;
-			case "W": //W
-			case "w": //w
-				wKey = !wKey;
-				break;					
-			case "Z": //Z
-			case "z": //z
-				zKey = !zKey;
-				break;
-			case "X": //X
-			case "x": //x
-				xKey = !xKey;
-				break;
-			case "D": //D
-			case "d": //d
-				dKey = !dKey;
-				break;
-			case "C": //C
-			case "c": //c
-				cKey = !cKey;
-				break;
-			default:
-				break;
-		}
-	});   
-}
-
 
 function changeWires(wires)
 {
@@ -205,69 +152,178 @@ function changeWires(wires)
 	kitty.getObjectByName("legs").getObjectByName("leg4").material.wireframe = wires;
 }
 
-function arrow_up()
-{
-	kitty.translateY(0.2);
-}
-
-function arrow_down()
-{
-	kitty.translateY(-0.2);
-}
-
-function arrow_left()
-{
-	kitty.translateZ(0.2);
-}
-
-function arrow_right()
-{
-	kitty.translateZ(-0.2);
-}
-
 function update(){
-	document.addEventListener('keypress', (event) => {
-		var name = event.key;
-		var max_rotation = Math.PI/35;
-		var min_rotation = -Math.PI/35;
-		if(qKey && name == "q"){
-			pivot.rotation.y += 0.2;
-		}
-		else if(wKey && name == "w"){
-			pivot.rotation.y += -0.2;
-		}
-		else if(aKey && name == "a"){
-			var head = kitty.getObjectByName("head");
-			if(head.rotation.z < max_rotation)
-				head.rotation.z += 0.02;
-		}
-		else if(sKey && name == "s"){
-			var head = kitty.getObjectByName("head");
-			if(head.rotation.z > min_rotation)
-				head.rotation.z += -0.02;
-		}
-		else if(zKey && name == "z"){
-			var ear1 = kitty.getObjectByName("head").getObjectByName("ear1");
-			ear1.rotation.z += 0.2;
-		}
-		else if(xKey && name == "x"){
-			var ear1 = kitty.getObjectByName("head").getObjectByName("ear1");
-			ear1.rotation.z += -0.2;
-		}
-		else if(dKey && name == "d"){
-			kitty.translateX(0.2);
-		}
-		else if(cKey && name == "c"){
-			kitty.translateX(-0.2);
-		}
-	}, false);
+	changeWires(wires);
+	var timeOccurred = clock.getDelta();
+	var maxHeadRotation = Math.PI/35;
+	var minHeadRotation = -Math.PI/35;
+	var bodyMovSpeed = 1.5;
+	var bodyRotSpeed = 1.5;
+	var headRotSpeed = 0.5;
+	var earRotSpeed = 1.5;
+	
+	if (qKey)
+		pivot.rotation.y += bodyRotSpeed * timeOccurred;
+	if (wKey)
+		pivot.rotation.y += - bodyRotSpeed * timeOccurred;
+	if (aKey){
+		var head = kitty.getObjectByName("head");
+		if (head.rotation.z < maxHeadRotation)
+			head.rotation.z += headRotSpeed * timeOccurred;
+	}
+	if (sKey){
+		var head = kitty.getObjectByName("head");
+		if(head.rotation.z > minHeadRotation)
+			head.rotation.z += - headRotSpeed * timeOccurred;
+	}
+	if (zKey){
+		var ear1 = kitty.getObjectByName("head").getObjectByName("ear1");
+		ear1.rotation.z += earRotSpeed * timeOccurred;
+	}
+	if (xKey) {
+		var ear1 = kitty.getObjectByName("head").getObjectByName("ear1");
+		ear1.rotation.z += - earRotSpeed * timeOccurred;
+	}
+	if (dKey)
+		kitty.translateX(bodyMovSpeed * timeOccurred);
+	if (cKey)
+		kitty.translateX(- bodyMovSpeed * timeOccurred);
+	if (upArrow)
+		kitty.translateY(bodyMovSpeed * timeOccurred);
+	if (downArrow)
+		kitty.translateY(- bodyMovSpeed * timeOccurred);
+	if (leftArrow)
+		kitty.translateZ(bodyMovSpeed * timeOccurred);
+	if (rightArrow)
+		kitty.translateZ(- bodyMovSpeed * timeOccurred);
 }
 
+function onKeyDown(e) {
+	var keyName = e.keyCode;
+	console.log(keyName);
+	switch (keyName) {
+		case 49://1
+			currentCamera = 0;
+			break;
+		case 50://2
+			currentCamera = 1;
+			break;
+		case 51://3
+			currentCamera = 2;
+			break;
 
+		case 52://4
+			wires = !wires;
+			break;
+	
+		case 37 : // left arrow key
+			leftArrow = true;
+			break;
+		case 38: // up arrow key
+			upArrow = true;
+			break;
+		case 39: // right arrow key
+			rightArrow = true;
+			break;
+		case 40: // down arrow key
+			downArrow = true;
+			break;
+
+		case 65: //A
+		case 97: //a
+			aKey = true;
+			break;
+		case 83: //S
+		case 115: //s
+			sKey = true;
+			break;
+		case 81: //Q
+		case 113: //q
+			qKey = true;
+			break;
+		case 87: //W
+		case 119: //w
+			wKey = true;
+			break;					
+		case 90: //Z
+		case 122: //z
+			zKey = true;
+			break;
+		case 88: //X
+		case 120: //x
+			xKey = true;
+			break;
+		case 68: //D
+		case 100: //d
+			dKey = true;
+			break;
+		case 67: //C
+		case 99: //c
+			cKey = true;
+			break;
+		default:
+			break;
+	}
+}
+
+function onKeyUp(e) {
+	var keyName = e.keyCode;
+	switch (keyName) {
+		case 37 : // left arrow key
+			leftArrow = false;
+			break;
+		case 38: // up arrow key
+			upArrow = false;
+			break;
+		case 39: // right arrow key
+			rightArrow = false;
+			break;
+		case 40: // down arrow key
+			downArrow = false;
+			break;
+
+		case 65: //A
+		case 97: //a
+			aKey = false;
+			console.log("hi A bitch");
+			console.log(aKey);
+			break;
+		case 83: //S
+		case 115: //s
+			sKey = false;
+			break;
+		case 81: //Q
+		case 113: //q
+			qKey = false;
+			break;
+		case 87: //W
+		case 119: //w
+			wKey = false;
+			break;					
+		case 90: //Z
+		case 122: //z
+			zKey = false;
+			break;
+		case 88: //X
+		case 120: //x
+			xKey = false;
+			break;
+		case 68: //D
+		case 100: //d
+			dKey = false;
+			break;
+		case 67: //C
+		case 99: //c
+			cKey = false;
+			break;
+		default:
+			break;
+	}
+}
 
 function animate() {
+	update();
 	requestAnimationFrame(animate);
-	changeWires(wires);
 //	controls.update();
 	render();
 }
@@ -312,6 +368,10 @@ function init() {
 	scene.add(pivot);
 	pivot.add(kitty);
 
+	animate();
+
 	//  controls = new THREE.OrbitControls( camera[currentCamera], renderer.domElement );
 	window.addEventListener("resize", onResize);
+	window.addEventListener("keydown", onKeyDown);
+	window.addEventListener("keyup", onKeyUp);
 }
