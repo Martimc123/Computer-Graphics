@@ -157,10 +157,10 @@ function update(){
 	var timeOccurred = clock.getDelta();
 	var maxHeadRotation = Math.PI/35;
 	var minHeadRotation = -Math.PI/35;
-	var bodyMovSpeed = 1.5;
-	var bodyRotSpeed = 1.5;
+	var bodyMovSpeed = 4.5;
+	var bodyRotSpeed = 4.5;
 	var headRotSpeed = 0.5;
-	var earRotSpeed = 1.5;
+	var earRotSpeed = 3.5;
 	
 	if (qKey)
 		kitty.rotation.y += bodyRotSpeed * timeOccurred;
@@ -196,8 +196,6 @@ function update(){
 		kitty.translateZ(bodyMovSpeed * timeOccurred);
 	if (rightArrow)
 		kitty.translateZ(- bodyMovSpeed * timeOccurred);
-
-	console.log(kitty.position.x, kitty.position.y, kitty.position.z);
 }
 
 function onKeyDown(e) {
@@ -359,9 +357,9 @@ function init() {
 	document.body.appendChild(renderer.domElement);
 	
 	createScene();
-	camera[0] = createCamera(20, 0, 0);
-	camera[1] = createCamera(0, 20, 0);
-	camera[2] = createCamera(0, 0, 20);
+	camera[0] = createCamera(viewSize, 0, 0);
+	camera[1] = createCamera(0, viewSize, 0);
+	camera[2] = createCamera(0, 0, viewSize);
 	pivot = new THREE.Group();
 
 	scene.add(pivot);
