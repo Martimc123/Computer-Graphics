@@ -8,7 +8,7 @@ var aspectRatio;
 
 var geometry, material, mesh;
 
-var kitty;
+var kitty, letterK;
 var wires;
 var defaultScale = 1;
 
@@ -19,6 +19,19 @@ var clock = new THREE.Clock();
 //var controls;
 
 'use strict';
+
+function createK(x, y, z, scale) {
+	letterK = new THREE.Object3D();
+	letterK.scale.set(scale, scale, scale);
+	var geometry = new THREE.BoxGeometry(2, 16, 2);
+	addKittyPart(letterK, "kBase", geometry, 0xd7fd00, -20, 0, -5, Math.PI/180 *20, 0, 0);
+	addKittyPart(letterK, "kUp", geometry, 0xd7fd00, 10, 10, 0, -7, 0, Math.PI/180 * -45);
+	addKittyPart(letterK, "kDown", geometry, 0xd7fd00, 10, -10, -3, 0, 0, Math.PI/180 * 45);
+	
+	letterK.position.set(x, y, z);
+	scene.add(letterK);
+	return letterK;
+}
 
 // change to receive position, yes, but also body radius and height
 function createKitty(x, y, z, scale) {
@@ -150,6 +163,9 @@ function changeWires(wires)
 	kitty.getObjectByName("legs").getObjectByName("leg2").material.wireframe = wires;
 	kitty.getObjectByName("legs").getObjectByName("leg3").material.wireframe = wires;
 	kitty.getObjectByName("legs").getObjectByName("leg4").material.wireframe = wires;
+	letterK.getObjectByName("kBase").material.wireframe = wires;
+	letterK.getObjectByName("kUp").material.wireframe = wires;
+	letterK.getObjectByName("kDown").material.wireframe = wires;
 }
 
 function update(){
@@ -328,6 +344,7 @@ function animate() {
 function createScene() {
 	scene = new THREE.Scene();
 	scene.add(new THREE.AxesHelper(100));
+	letterK = createK(6, 6, 6, defaultScale);
 	kitty = createKitty(0, 0, 0, defaultScale);
 }
 
