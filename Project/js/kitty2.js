@@ -185,17 +185,17 @@ function update(){
 		ear1.rotation.z += - earRotSpeed * timeOccurred;
 	}
 	if (dKey)
-		kitty.translateX(bodyMovSpeed * timeOccurred);
+		kitty.translateZ(bodyMovSpeed * timeOccurred);
 	if (cKey)
-		kitty.translateX(- bodyMovSpeed * timeOccurred);
+		kitty.translateZ(- bodyMovSpeed * timeOccurred);
 	if (upArrow)
 		kitty.translateY(bodyMovSpeed * timeOccurred);
 	if (downArrow)
 		kitty.translateY(- bodyMovSpeed * timeOccurred);
 	if (leftArrow)
-		kitty.translateZ(bodyMovSpeed * timeOccurred);
+		kitty.translateX(- bodyMovSpeed * timeOccurred);
 	if (rightArrow)
-		kitty.translateZ(- bodyMovSpeed * timeOccurred);
+		kitty.translateX(bodyMovSpeed * timeOccurred);
 }
 
 function onKeyDown(e) {
