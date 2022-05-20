@@ -16,7 +16,6 @@ var qKey,wKey,aKey,sKey,dKey,cKey,zKey,xKey;
 var leftArrow, rightArrow, upArrow, downArrow;
 var clock = new THREE.Clock();
 
-//var controls;
 
 'use strict';
 
@@ -33,13 +32,12 @@ function createK(x, y, z, scale) {
 	return letterK;
 }
 
-// change to receive position, yes, but also body radius and height
 function createKitty(x, y, z, scale) {
 		
 	wires = true;
 	kitty = new THREE.Object3D();
 	kitty.scale.set(scale,scale,scale);
-	// change for positions to be based on cylinder height and angle
+	
 	addKittyTorso(kitty, "torso", 0, 0, 0); // based on kitty origin position
 	var head = new THREE.Object3D();
 	addKittyFace(head, "face", 5, 4, 0);
@@ -181,7 +179,7 @@ function update(){
 	if (qKey)
 		kitty.rotation.y += bodyRotSpeed * timeOccurred;
 	if (wKey)
-		kitty.rotation.y += - bodyRotSpeed * timeOccurred;
+		kitty.rotation.y += -bodyRotSpeed * timeOccurred;
 	if (aKey){
 		var head = kitty.getObjectByName("head");
 		if (head.rotation.z < maxHeadRotation)
@@ -201,13 +199,13 @@ function update(){
 		ear1.rotation.z += - earRotSpeed * timeOccurred;
 	}
 	if (dKey)
-		kitty.translateZ(bodyMovSpeed * timeOccurred);
-	if (cKey)
 		kitty.translateZ(- bodyMovSpeed * timeOccurred);
-	if (upArrow)
-		kitty.translateY(bodyMovSpeed * timeOccurred);
+	if (cKey)
+		kitty.translateZ(bodyMovSpeed * timeOccurred);
 	if (downArrow)
 		kitty.translateY(- bodyMovSpeed * timeOccurred);
+	if (upArrow)
+		kitty.translateY(bodyMovSpeed * timeOccurred);
 	if (leftArrow)
 		kitty.translateX(- bodyMovSpeed * timeOccurred);
 	if (rightArrow)
@@ -337,7 +335,6 @@ function onKeyUp(e) {
 function animate() {
 	update();
 	requestAnimationFrame(animate);
-//	controls.update();
 	render();
 }
 
@@ -378,13 +375,13 @@ function init() {
 	camera[1] = createCamera(0, viewSize, 0);
 	camera[2] = createCamera(0, 0, viewSize);
 	pivot = new THREE.Group();
+	pivot.position.set(0, 0, 0);
 
 	scene.add(pivot);
 	pivot.add(kitty);
 
 	animate();
 
-	//  controls = new THREE.OrbitControls( camera[currentCamera], renderer.domElement );
 	window.addEventListener("resize", onResize);
 	window.addEventListener("keydown", onKeyDown);
 	window.addEventListener("keyup", onKeyUp);
