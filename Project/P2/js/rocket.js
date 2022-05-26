@@ -1,5 +1,4 @@
 /*global THREE*/
-
 var camera = [];
 var scene, renderer, currentCamera = 0;
 
@@ -13,7 +12,7 @@ var leftArrow, rightArrow, upArrow, downArrow;
 var clock = new THREE.Clock();
 
 var defaultScale = 1;
-var planetRadius = 50;
+var planetRadius = 10;
 var rocketHeight = planetRadius/10;
 var rocketTrashDistance = 1.2 * planetRadius;
 var nrTrash = 20;
@@ -25,12 +24,27 @@ var trashGeometries = [];
 
 var universe;
 var planet;
-
+var loader = new THREE.TextureLoader();
 
 'use strict';
 
-function addObjPart(obj, geometry, hex, x, y, z, rotX, rotY, rotZ) {
-	material = new THREE.MeshBasicMaterial({ color: hex, wireframe: wires});
+/*Booleano apenas para criar a mesh especifica para o planeta*/
+function addObjPart(obj, geometry, hex, x, y, z, rotX, rotY, rotZ,planetBool) {
+	
+	if (!planetBool)
+		material = new THREE.MeshBasicMaterial({color: hex, wireframe: wires});
+	else
+	{
+		var texture = new THREE.TextureLoader().load(
+			"https://st2.depositphotos.com/5171687/44380/i/450/depositphotos_443805316-stock-photo-equirectangular-map-clouds-storms-earth.jpg"
+			);
+		material = new THREE.MeshBasicMaterial( {
+		map: texture,
+		transparent:true,
+		side:THREE.DoubleSide,
+		} );
+	}
+	
 	mesh = new THREE.Mesh(geometry, material);
 	mesh.rotateX(rotX);
 	mesh.rotateY(rotY);
@@ -55,8 +69,8 @@ function createUniverse(x, y, z, scale) {
 }
 
 function addPlanet(obj, x, y, z) {
-	geometry = new THREE.SphereGeometry(planetRadius);
-	addObjPart(obj, geometry, 0x0000ff, x, y, z, 0, 0, 0);
+	geometry = new THREE.SphereBufferGeometry(planetRadius);
+	addObjPart(obj, geometry, 0x0000ff, x, y, z, 0, 0, 0,true);
 }
 
 function addRocket(obj, x, y, z) {
@@ -145,7 +159,6 @@ function init() {
 	camera[2] = createCamera(0, 0, viewSize);
 
 	animate();
-
 	window.addEventListener("resize", onResize);
 	window.addEventListener("keydown", onKeyDown);
 	window.addEventListener("keyup", onKeyUp);
