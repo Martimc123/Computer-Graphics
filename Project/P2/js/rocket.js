@@ -25,6 +25,8 @@ var trashGeometries = [];
 var universe;
 var planet;
 var loader = new THREE.TextureLoader();
+var space_texture = new THREE.TextureLoader().load(
+	"https://wallpaperaccess.com/full/1268183.jpg");
 
 'use strict';
 
@@ -122,6 +124,7 @@ function animate() {
 function createScene() {
 	scene = new THREE.Scene();
 	scene.add(new THREE.AxesHelper(100));
+	scene.background = space_texture;
 	universe = createUniverse(0, 0, 0, defaultScale);
 }
 
