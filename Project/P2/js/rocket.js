@@ -12,7 +12,7 @@ var leftArrow, rightArrow, upArrow, downArrow;
 var clock = new THREE.Clock();
 
 var defaultScale = 1;
-var planetRadius = 20;
+var planetRadius = 10;
 var rocketHeight = planetRadius/10;
 var rocketTrashDistance = 1.2 * planetRadius;
 var nrTrash = 20;
@@ -22,10 +22,13 @@ var minTrashSize = planetRadius/24;
 var maxTrashSize = planetRadius/20;
 var trashGeometries = [];
 
+var qKey,wKey,aKey,sKey,dKey,cKey,zKey,xKey;
+var leftArrow, rightArrow, upArrow, downArrow;
+var clock = new THREE.Clock();
+
 var copyVideo;
 var universe;
 var planet;
-var rocket;
 var loader = new THREE.TextureLoader();
 var space_texture = new THREE.TextureLoader().load(
 	"https://wallpaperaccess.com/full/1268183.jpg");
@@ -40,16 +43,29 @@ const videoTexture = new THREE.VideoTexture(video);
 
 'use strict';
 
-function addObjPart(obj, geometry, mater, hex, x, y, z, rotX, rotY, rotZ) {
-
-	material = (mater != null)? mater : new THREE.MeshBasicMaterial({color: hex, wireframe: wires});
+/*Booleano apenas para criar a mesh especifica para o planeta*/
+function addObjPart(obj, geometry, hex, x, y, z, rotX, rotY, rotZ,planetBool) {
+	
+	if (!planetBool)
+		material = new THREE.MeshBasicMaterial({color: hex, wireframe: false});
+	else
+	{
+		var texture = new THREE.TextureLoader().load(
+			"https://st2.depositphotos.com/5171687/44380/i/450/depositphotos_443805316-stock-photo-equirectangular-map-clouds-storms-earth.jpg"
+			);
+		material = new THREE.MeshBasicMaterial( {
+		map: texture,
+		transparent:true,
+		side:THREE.DoubleSide,
+		} );
+	}
+	
 	mesh = new THREE.Mesh(geometry, material);
 	mesh.rotateX(rotX);
 	mesh.rotateY(rotY);
 	mesh.rotateZ(rotZ);
 	mesh.position.set(x, y, z);
 	obj.add(mesh);
-	
 	return mesh;
 }
 
@@ -58,42 +74,32 @@ function createUniverse(x, y, z, scale) {
 	universe = new THREE.Object3D();
 	universe.scale.set(scale, scale, scale);
 
-	addPlanet(universe, 0, 0, 0);
-	addRocket(universe, 0, 0, rocketTrashDistance);
+	planet = new THREE.Object3D();
+	rocket = new THREE.Object3D();
+	addPlanet(planet, 0, 0, 0);
+	addRocket(rocket, 0, planetRadius*1.2, 0);
+	universe.add(planet);
+	universe.add(rocket);
 
 	universe.position.set(x, y, z);
 	scene.add(universe);
-
 	return universe;
 }
 
 function addPlanet(obj, x, y, z) {
-	planet = new THREE.Object3D();
-	geometry = new THREE.SphereBufferGeometry(planetRadius); // !! What's the difference between this one and regular Sphere?
-	var planetTexture = new THREE.TextureLoader().load(
-		"https://st2.depositphotos.com/5171687/44380/i/450/depositphotos_443805316-stock-photo-equirectangular-map-clouds-storms-earth.jpg"
-		);
-	var planetMaterial = new THREE.MeshBasicMaterial( {
-		map: planetTexture,
-		transparent:true,
-		side:THREE.DoubleSide,
-		} );
-	addObjPart(planet, geometry, planetMaterial, 0x051094, x, y, z, 0, 0, 0, planetBool=true);
-	obj.add(planet);
-
-	return planet;
+	geometry = new THREE.SphereBufferGeometry(planetRadius);
+	addObjPart(obj, geometry, 0x0000ff, x, y, z, 0, 0, 0,true);
 }
 
 function addRocket(obj, x, y, z) {
-	rocket = new THREE.Object3D();
-	addRocketCenter(rocket, 0, 0, 0);
-	addRocketLeg(rocket, 0, 0, 0); // !! placeholder
-	obj.add(rocket);
-	return rocket;
+	geometry = new THREE.CylinderGeometry( 0.5, 1, planetRadius/10, 41,1);
+	geometry2 = new THREE.CylinderGeometry( 0, 0.5, planetRadius/10, 41,1);
+	addObjPart(obj, geometry, 0x000fff, x, y, z, -Math.PI/180*90, 0, 0,false);
+	addObjPart(obj, geometry2, 0xff0000, x, y, z-1, -Math.PI/180*90, 0, 0,false);
 }
 
-function addRocketCenter(obj, x, y, z) {}
-function addRocketLeg(obj, x, y, z) {}
+function addRocketCenter(x, y, z) {}
+function addRocketLeg(x, y, z) {}
 
 function addTrash(x, y, z) {
 
@@ -127,7 +133,26 @@ function changeWires(wires) {
 	}
 }
 
-function update(){}
+function update()
+{
+	var timeOccurred = clock.getDelta();
+	var maxHeadRotation = Math.PI/35;
+	var minHeadRotation = -Math.PI/35;
+	var bodyMovSpeed = 4.5;
+	var bodyRotSpeed = 4.5;
+	var headRotSpeed = 2.5;
+	var earRotSpeed = 3.5;
+	
+	if (aKey){
+		var head = rocket;
+		head.rotation.x += headRotSpeed * timeOccurred;
+	}
+	if (sKey){
+		var head = rocket;
+		head.rotation.x += - headRotSpeed * timeOccurred;
+	}
+}
+
 function animate() {
 	update();
 	requestAnimationFrame(animate);
@@ -137,7 +162,7 @@ function animate() {
 function createScene() {
 	scene = new THREE.Scene();
 	scene.add(new THREE.AxesHelper(100));
-	scene.background = videoTexture;
+	scene.background = space_texture;
 	universe = createUniverse(0, 0, 0, defaultScale);
 }
 
@@ -160,9 +185,126 @@ function createCamera(x, y, z) {
 	return camera;
 }
 
+function onKeyDown(e) {
+	var keyName = e.keyCode;
+	switch (keyName) {
+		case 49://1
+			currentCamera = 0;
+			break;
+		case 50://2
+			currentCamera = 1;
+			break;
+		case 51://3
+			currentCamera = 2;
+			break;
 
-function onKeyUp(e) {}
-function onKeyDown(e) {}
+		case 52://4
+			wires = !wires;
+			break;
+	
+		case 37 : // left arrow key
+			leftArrow = true;
+			break;
+		case 38: // up arrow key
+			upArrow = true;
+			break;
+		case 39: // right arrow key
+			rightArrow = true;
+			break;
+		case 40: // down arrow key
+			downArrow = true;
+			break;
+
+		case 65: //A
+		case 97: //a
+			aKey = true;
+			break;
+		case 83: //S
+		case 115: //s
+			sKey = true;
+			break;
+		case 81: //Q
+		case 113: //q
+			qKey = true;
+			break;
+		case 87: //W
+		case 119: //w
+			wKey = true;
+			break;					
+		case 90: //Z
+		case 122: //z
+			zKey = true;
+			break;
+		case 88: //X
+		case 120: //x
+			xKey = true;
+			break;
+		case 68: //D
+		case 100: //d
+			dKey = true;
+			break;
+		case 67: //C
+		case 99: //c
+			cKey = true;
+			break;
+		default:
+			break;
+	}
+}
+
+function onKeyUp(e) {
+	var keyName = e.keyCode;
+	switch (keyName) {
+		case 37 : // left arrow key
+			leftArrow = false;
+			break;
+		case 38: // up arrow key
+			upArrow = false;
+			break;
+		case 39: // right arrow key
+			rightArrow = false;
+			break;
+		case 40: // down arrow key
+			downArrow = false;
+			break;
+
+		case 65: //A
+		case 97: //a
+			aKey = false;
+			break;
+		case 83: //S
+		case 115: //s
+			sKey = false;
+			break;
+		case 81: //Q
+		case 113: //q
+			qKey = false;
+			break;
+		case 87: //W
+		case 119: //w
+			wKey = false;
+			break;					
+		case 90: //Z
+		case 122: //z
+			zKey = false;
+			break;
+		case 88: //X
+		case 120: //x
+			xKey = false;
+			break;
+		case 68: //D
+		case 100: //d
+			dKey = false;
+			break;
+		case 67: //C
+		case 99: //c
+			cKey = false;
+			break;
+		default:
+			break;
+	}
+}
+
 function init() {
 		
 	renderer = new THREE.WebGLRenderer({antialias: true});
