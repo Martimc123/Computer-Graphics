@@ -13,7 +13,7 @@ var leftArrow, rightArrow, upArrow, downArrow;
 var clock = new THREE.Clock();
 
 var defaultScale = 1;
-var planetRadius = 50;
+var planetRadius = 20;
 var rocketHeight = planetRadius/10;
 var rocketTrashDistance = 1.2 * planetRadius;
 var nrTrash = 20;
@@ -25,6 +25,7 @@ var trashGeometries = [];
 
 var universe;
 var planet;
+var rocket;
 
 
 'use strict';
@@ -45,9 +46,8 @@ function createUniverse(x, y, z, scale) {
 	universe = new THREE.Object3D();
 	universe.scale.set(scale, scale, scale);
 
-	planet = new THREE.Object3D();
-	addPlanet(planet, 0, 0, 0);
-	universe.add(planet);
+	addPlanet(universe, 0, 0, 0);
+	addRocket(universe, 0, 0, rocketTrashDistance);
 
 	universe.position.set(x, y, z);
 	scene.add(universe);
@@ -55,16 +55,20 @@ function createUniverse(x, y, z, scale) {
 }
 
 function addPlanet(obj, x, y, z) {
+	planet = new THREE.Object3D();
 	geometry = new THREE.SphereGeometry(planetRadius);
-	addObjPart(obj, geometry, 0x0000ff, x, y, z, 0, 0, 0);
+	addObjPart(planet, geometry, 0x051094, x, y, z, 0, 0, 0);
+	universe.add(planet);
 }
 
 function addRocket(obj, x, y, z) {
-
+	rocket = new THREE.Object3D();
+	addRocketCenter(rocket, 0, 0, 0);
+	addRocketLeg(rocket, 0, 0, 0); // !! placeholder
 }
 
-function addRocketCenter(x, y, z) {}
-function addRocketLeg(x, y, z) {}
+function addRocketCenter(obj, x, y, z) {}
+function addRocketLeg(obj, x, y, z) {}
 
 function addTrash(x, y, z) {
 
