@@ -1,5 +1,4 @@
 /*global THREE*/
-
 var camera = [];
 var scene, renderer, currentCamera = 0;
 
@@ -23,21 +22,34 @@ var minTrashSize = planetRadius/24;
 var maxTrashSize = planetRadius/20;
 var trashGeometries = [];
 
+var copyVideo;
 var universe;
 var planet;
 var rocket;
+var loader = new THREE.TextureLoader();
+var space_texture = new THREE.TextureLoader().load(
+	"https://wallpaperaccess.com/full/1268183.jpg");
 
+const video = document.getElementById("video");
+video.onloadeddata = function () {
+	video.play();
+};
+
+const videoTexture = new THREE.VideoTexture(video);
+	  videoTexture.needsUpdate = true;
 
 'use strict';
 
-function addObjPart(obj, geometry, hex, x, y, z, rotX, rotY, rotZ) {
-	material = new THREE.MeshBasicMaterial({ color: hex, wireframe: wires});
+function addObjPart(obj, geometry, mater, hex, x, y, z, rotX, rotY, rotZ) {
+
+	material = (mater != null)? mater : new THREE.MeshBasicMaterial({color: hex, wireframe: wires});
 	mesh = new THREE.Mesh(geometry, material);
 	mesh.rotateX(rotX);
 	mesh.rotateY(rotY);
 	mesh.rotateZ(rotZ);
 	mesh.position.set(x, y, z);
 	obj.add(mesh);
+	
 	return mesh;
 }
 
@@ -51,20 +63,33 @@ function createUniverse(x, y, z, scale) {
 
 	universe.position.set(x, y, z);
 	scene.add(universe);
+
 	return universe;
 }
 
 function addPlanet(obj, x, y, z) {
 	planet = new THREE.Object3D();
-	geometry = new THREE.SphereGeometry(planetRadius);
-	addObjPart(planet, geometry, 0x051094, x, y, z, 0, 0, 0);
-	universe.add(planet);
+	geometry = new THREE.SphereBufferGeometry(planetRadius); // !! What's the difference between this one and regular Sphere?
+	var planetTexture = new THREE.TextureLoader().load(
+		"https://st2.depositphotos.com/5171687/44380/i/450/depositphotos_443805316-stock-photo-equirectangular-map-clouds-storms-earth.jpg"
+		);
+	var planetMaterial = new THREE.MeshBasicMaterial( {
+		map: planetTexture,
+		transparent:true,
+		side:THREE.DoubleSide,
+		} );
+	addObjPart(planet, geometry, planetMaterial, 0x051094, x, y, z, 0, 0, 0, planetBool=true);
+	obj.add(planet);
+
+	return planet;
 }
 
 function addRocket(obj, x, y, z) {
 	rocket = new THREE.Object3D();
 	addRocketCenter(rocket, 0, 0, 0);
 	addRocketLeg(rocket, 0, 0, 0); // !! placeholder
+	obj.add(rocket);
+	return rocket;
 }
 
 function addRocketCenter(obj, x, y, z) {}
@@ -112,6 +137,7 @@ function animate() {
 function createScene() {
 	scene = new THREE.Scene();
 	scene.add(new THREE.AxesHelper(100));
+	scene.background = videoTexture;
 	universe = createUniverse(0, 0, 0, defaultScale);
 }
 
@@ -149,7 +175,9 @@ function init() {
 	camera[2] = createCamera(0, 0, viewSize);
 
 	animate();
-
+	video.addEventListener("playing", function() {
+		copyVideo = true;
+	  }, true);
 	window.addEventListener("resize", onResize);
 	window.addEventListener("keydown", onKeyDown);
 	window.addEventListener("keyup", onKeyUp);
