@@ -2,7 +2,7 @@
 var camera = [];
 var scene, renderer, currentCamera = 0;
 
-var viewSize = 50;
+var viewSize = 40;
 var aspectRatio;
 
 var geometry, material, mesh;
@@ -21,6 +21,8 @@ var rocketSupRadius = 0;
 var boosterRadius = rocketInfRadius/5;
 var boosterHeight = rocketInfRadius/4;
 var rocketTrashDistance = 1.2 * planetRadius;
+var objPositions = [];
+var objAngles = [];
 var nrTrash = 20;
 var floatingTrash = [];
 var trashSizes = [];
@@ -32,7 +34,6 @@ var copyVideo;
 var universe;
 var planet;
 var rocket;
-var rocketSpin;
 var loader = new THREE.TextureLoader();
 var space_texture = new THREE.TextureLoader().load("https://wallpaperaccess.com/full/1268183.jpg");
 
@@ -58,17 +59,37 @@ function addObjPart(obj, geometry, mater, hex, x, y, z, rotX, rotY, rotZ) {
 	return mesh;
 }
 
+function getObjPositions() {
+	var i;
+	var nrObj = nrTrash+1;
+	var angleTheta, anglePhi;
+	var objX, objY, objZ;
+	var posVector = new THREE.Vector3(0,0,0); // spherical coordinates vector
+	var angleVector = new THREE.Vector2(0,0); // angles Theta and Phi for spherical coordinates
+
+	for (i = 0; i < nrObj; i++) {
+		angleTheta = Math.random() * 2*Math.PI;
+		anglePhi = Math.random() * 2*Math.PI;
+		angleVector.set(angleTheta, anglePhi);
+		objAngles.push(angleVector);
+
+		objX = rocketTrashDistance * Math.sin(angleTheta) * Math.sin(anglePhi);
+		objY = rocketTrashDistance * Math.cos(angleTheta);
+		objZ = rocketTrashDistance * Math.sin(angleTheta) * Math.cos(anglePhi);
+		posVector.set(objX, objY, objZ);	
+		objPositions.push(posVector);
+	}
+}
+
 function createUniverse(x, y, z, scale) {
 	wires = true;
 	universe = new THREE.Object3D();
 	universe.scale.set(scale, scale, scale);
+	var rocketPos = objPositions[0];
 
 	addPlanet(universe, 0, 0, 0);
-	addRocket(universe, 0, rocketTrashDistance, 0);
-
-	rocketGroup = new THREE.Group();
-	scene.add(rocketGroup);
-	rocketGroup.add(rocket);
+	addRocket(universe, rocketPos.x, rocketPos.y, rocketPos.z);
+	addAux(universe);
 
 	universe.position.set(x, y, z);
 	scene.add(universe);
@@ -77,7 +98,7 @@ function createUniverse(x, y, z, scale) {
 
 function addPlanet(obj, x, y, z) {
 	planet = new THREE.Object3D();
-	geometry = new THREE.SphereBufferGeometry(planetRadius);
+	geometry = new THREE.SphereGeometry(planetRadius);
 	
 	var planetTexture = new THREE.TextureLoader().load(
 		"https://st2.depositphotos.com/5171687/44380/i/450/depositphotos_443805316-stock-photo-equirectangular-map-clouds-storms-earth.jpg"
@@ -154,29 +175,33 @@ function changeWires(wires) {
 function update()
 {
 	var timeOccurred = clock.getDelta();
-	var rocketSpeed = 2.5;
-	var axis = new THREE.Vector3(0,0,0);
-	
-	/*
-	if (rightArrow){
-		rocket.rotateOnWorldAxis(axis, - rocketSpeed * timeOccurred);
-	}
-	if (leftArrow){
-		rocket.rotateOnWorldAxis(axis, rocketSpeed * timeOccurred);
-	} 
-*/
+	var rocketSpeed = Math.PI/180 * 40;
 
-	if (rightArrow){
-		rocketGroup.rotation.x += - rocketSpeed * timeOccurred;
-	}
-	if (leftArrow){
-		rocketGroup.rotation.x += rocketSpeed * timeOccurred;
-	}
-	if (upArrow){
-		rocketGroup.rotation.z += - rocketSpeed * timeOccurred;
-	}
-	if (downArrow){
-		rocketGroup.rotation.z += rocketSpeed * timeOccurred;
+	if (rightArrow || leftArrow || upArrow || downArrow) { // rocket movement flags
+		var rocketTheta = objAngles[0].x;
+		var rocketPhi = objAngles[0].y;	
+		var rocketX, rocketY, rocketZ;
+		
+		if (rightArrow){	
+			rocketPhi += rocketSpeed * timeOccurred;
+		}
+		if (leftArrow){
+			rocketPhi += - rocketSpeed * timeOccurred;
+		}
+		if (upArrow){
+			rocketTheta += rocketSpeed * timeOccurred;
+		}
+		if (downArrow){
+			rocketTheta += - rocketSpeed * timeOccurred;
+		}
+		
+		rocketX = rocketTrashDistance * Math.sin(rocketTheta) * Math.sin(rocketPhi);
+		rocketY = rocketTrashDistance * Math.cos(rocketTheta);
+		rocketZ = rocketTrashDistance * Math.sin(rocketTheta) * Math.cos(rocketPhi);
+		
+		rocket.position.set(rocketX, rocketY, rocketZ);
+		objAngles[0].set(rocketTheta, rocketPhi);
+		objPositions[0].set(rocketX, rocketY, rocketZ);
 	}
 }
 
@@ -186,14 +211,22 @@ function animate() {
 	render();
 }
 
+function addAux(obj) {
+	geometry = new THREE.SphereGeometry(5);
+	addObjPart(obj, geometry, null, 0xffc0cb, 15, 0, 0);
+	addObjPart(obj, geometry, null, 0xffff00, 15, 0, 0);
+	addObjPart(obj, geometry, null, 0x0000ff, 15, 0, 0);
+}
+
 function createScene() {
 	scene = new THREE.Scene();
 	scene.add(new THREE.AxesHelper(100));
 	scene.background = space_texture;
+	getObjPositions();
 	universe = createUniverse(0, 0, 0, defaultScale);
 }
 
-function createCamera(x, y, z) {
+function createOrtographicCamera(x, y, z) {
 
 	var val = 2;
 	aspectRatio = window.innerWidth / window.innerHeight;
@@ -202,6 +235,23 @@ function createCamera(x, y, z) {
 																					viewSize / val, 
 																					viewSize / -val, 
 																					1, 
+																					1000);
+	camera.position.x = x;
+	camera.position.y = y;
+	camera.position.z = z;
+	
+	camera.lookAt(scene.position);
+	
+	return camera;
+}
+
+function createPerspectiveCamera(x, y, z) {
+
+	var val = 2;
+	aspectRatio = window.innerWidth / window.innerHeight;
+	var camera = new THREE.PerspectiveCamera(70,
+																					aspectRatio,
+																					1,
 																					1000);
 	camera.position.x = x;
 	camera.position.y = y;
@@ -273,10 +323,11 @@ function init() {
 	document.body.appendChild(renderer.domElement);
 	
 	createScene();
-	camera[0] = createCamera(viewSize, 0, 0);
-	camera[1] = createCamera(0, viewSize, 0);
-	camera[2] = createCamera(0, 0, viewSize);
-
+	camera[0] = createOrtographicCamera(viewSize, 0, 0);
+	camera[1] = createPerspectiveCamera(viewSize/2, viewSize/2, viewSize/2);
+	camera[2] = createPerspectiveCamera(0, rocketInfRadius*2.5, rocketPartHeight*3);
+	rocket.add(camera[2]);
+	
 	animate();
 	video.addEventListener("playing", function() {
 		copyVideo = true;
