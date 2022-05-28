@@ -32,6 +32,14 @@ var planet;
 var loader = new THREE.TextureLoader();
 var space_texture = new THREE.TextureLoader().load("https://wallpaperaccess.com/full/1268183.jpg");
 
+const video = document.getElementById("video");
+video.onloadeddata = function () {
+	video.play();
+};
+
+const videoTexture = new THREE.VideoTexture(video);
+	  videoTexture.needsUpdate = true;
+
 'use strict';
 
 /*Booleano apenas para criar a mesh especifica para o planeta*/
@@ -68,7 +76,7 @@ function createUniverse(x, y, z, scale) {
 	planet = new THREE.Object3D();
 	rocket = new THREE.Object3D();
 	addPlanet(planet, 0, 0, 0);
-	addRocket(rocket, 0, planetRadius*1.2, 0);
+	addRocket(rocket, 0, rocketTrashDistance, 0);
 	universe.add(planet);
 	universe.add(rocket);
 
@@ -85,8 +93,11 @@ function addPlanet(obj, x, y, z) {
 function addRocket(obj, x, y, z) {
 	geometry = new THREE.CylinderGeometry( 0.5, 1, planetRadius/10, 41,1);
 	geometry2 = new THREE.CylinderGeometry( 0, 0.5, planetRadius/10, 41,1);
+	var geometry3 = new THREE.CapsuleGeometry( 0.2, 0.5, 0.5,20);
 	addObjPart(obj, geometry, 0x000fff, x, y, z, -Math.PI/180*90, 0, 0,false);
 	addObjPart(obj, geometry2, 0xff0000, x, y, z-1, -Math.PI/180*90, 0, 0,false);
+	addObjPart(obj, geometry3, 0xff0000, x,y+0.8,z+1.2, Math.PI/180*90, 0, 0,false);
+	
 }
 
 function addRocketCenter(x, y, z) {}
@@ -308,6 +319,9 @@ function init() {
 	camera[2] = createCamera(0, 0, viewSize);
 
 	animate();
+	video.addEventListener("playing", function() {
+		copyVideo = true;
+	  }, true);
 	window.addEventListener("resize", onResize);
 	window.addEventListener("keydown", onKeyDown);
 	window.addEventListener("keyup", onKeyUp);
