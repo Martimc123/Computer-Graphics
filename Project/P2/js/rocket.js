@@ -96,7 +96,7 @@ function addRocket(obj, x, y, z) {
 	var geometry3 = new THREE.CapsuleGeometry( 0.2, 0.5, 0.5,20);
 	addObjPart(obj, geometry, 0x000fff, x, y, z, -Math.PI/180*90, 0, 0,false);
 	addObjPart(obj, geometry2, 0xff0000, x, y, z-1, -Math.PI/180*90, 0, 0,false);
-	addObjPart(obj, geometry3, 0xff0000, x,y+0.8,z+1.2, Math.PI/180*90, 0, 0,false);
+	addObjPart(obj, geometry3, 0xff0000, x,y+0.8,z+0.8, Math.PI/180*90, 0, 0,false);
 	
 }
 

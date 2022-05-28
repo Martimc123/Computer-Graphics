@@ -1,0 +1,166 @@
+{
+	"metadata": {
+		"version": 4.5,
+		"type": "Object",
+		"generator": "Object3D.toJSON"
+	},
+	"geometries": [
+		{
+			"uuid": "2423f97c-7d34-4e10-9592-e3261ed16db9",
+			"type": "CylinderGeometry",
+			"radiusTop": 0.5,
+			"radiusBottom": 1,
+			"height": 1,
+			"radialSegments": 41,
+			"heightSegments": 1,
+			"openEnded": false,
+			"thetaStart": 0,
+			"thetaLength": 6.283185307179586
+		},
+		{
+			"uuid": "77e1b79e-a173-42f7-bb4f-f6f7a11fd1d1",
+			"type": "CylinderGeometry",
+			"radiusTop": 0,
+			"radiusBottom": 0.5,
+			"height": 1,
+			"radialSegments": 41,
+			"heightSegments": 1,
+			"openEnded": false,
+			"thetaStart": 0,
+			"thetaLength": 6.283185307179586
+		},
+		{
+			"uuid": "46b293c7-844d-4ff1-ac97-3ee0cb7c5b77",
+			"type": "CapsuleGeometry",
+			"radius": 0.2,
+			"height": 0.5,
+			"capSegments": 0.5,
+			"radialSegments": 15
+		},
+		{
+			"uuid": "9824c142-2af3-4c0a-a250-eb397077028b",
+			"type": "CapsuleGeometry",
+			"radius": 0.2,
+			"height": 0.5,
+			"capSegments": 0.5,
+			"radialSegments": 20
+		}],
+	"materials": [
+		{
+			"uuid": "d4fd5fa2-279f-4b0a-9cee-50a6ae8e53fb",
+			"type": "MeshStandardMaterial",
+			"color": 16777215,
+			"roughness": 1,
+			"metalness": 0,
+			"emissive": 1966335,
+			"envMapIntensity": 1,
+			"depthFunc": 3,
+			"depthTest": true,
+			"depthWrite": true,
+			"colorWrite": true,
+			"stencilWrite": false,
+			"stencilWriteMask": 255,
+			"stencilFunc": 519,
+			"stencilRef": 0,
+			"stencilFuncMask": 255,
+			"stencilFail": 7680,
+			"stencilZFail": 7680,
+			"stencilZPass": 7680
+		},
+		{
+			"uuid": "8a7de5bd-2dc8-4de8-81fd-4bf42664970f",
+			"type": "MeshStandardMaterial",
+			"color": 16777215,
+			"roughness": 1,
+			"metalness": 0,
+			"emissive": 16711680,
+			"envMapIntensity": 1,
+			"depthFunc": 3,
+			"depthTest": true,
+			"depthWrite": true,
+			"colorWrite": true,
+			"stencilWrite": false,
+			"stencilWriteMask": 255,
+			"stencilFunc": 519,
+			"stencilRef": 0,
+			"stencilFuncMask": 255,
+			"stencilFail": 7680,
+			"stencilZFail": 7680,
+			"stencilZPass": 7680
+		},
+		{
+			"uuid": "6a11f618-89b4-4d72-8206-374bb5e62463",
+			"type": "MeshStandardMaterial",
+			"color": 16777215,
+			"roughness": 1,
+			"metalness": 0,
+			"emissive": 16711680,
+			"envMapIntensity": 1,
+			"depthFunc": 3,
+			"depthTest": true,
+			"depthWrite": true,
+			"colorWrite": true,
+			"stencilWrite": false,
+			"stencilWriteMask": 255,
+			"stencilFunc": 519,
+			"stencilRef": 0,
+			"stencilFuncMask": 255,
+			"stencilFail": 7680,
+			"stencilZFail": 7680,
+			"stencilZPass": 7680,
+			"wireframe": true
+		}],
+	"object": {
+		"uuid": "04bd5536-bc20-47d1-8be9-1e1b808b3b77",
+		"type": "Scene",
+		"name": "Scene",
+		"layers": 1,
+		"matrix": [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],
+		"children": [
+			{
+				"uuid": "d8f58443-c01f-4c5d-bdd1-f9e17fe2c5fc",
+				"type": "Mesh",
+				"name": "Cylinder",
+				"layers": 1,
+				"matrix": [1,0,0,0,0,2.220446049250313e-16,-1,0,0,1,2.220446049250313e-16,0,-0.0006030928996434426,12,0,1],
+				"geometry": "2423f97c-7d34-4e10-9592-e3261ed16db9",
+				"material": "d4fd5fa2-279f-4b0a-9cee-50a6ae8e53fb"
+			},
+			{
+				"uuid": "2c17be6d-37ed-4cfe-9a0a-e8be279bdad4",
+				"type": "Mesh",
+				"name": "Cylinder",
+				"layers": 1,
+				"matrix": [1,0,0,0,0,2.220446049250313e-16,-1,0,0,1,2.220446049250313e-16,0,0,12,-1,1],
+				"geometry": "77e1b79e-a173-42f7-bb4f-f6f7a11fd1d1",
+				"material": "8a7de5bd-2dc8-4de8-81fd-4bf42664970f"
+			},
+			{
+				"uuid": "a40fc3fa-a480-4dcb-8c1e-21773a553121",
+				"type": "Mesh",
+				"name": "Capsule",
+				"layers": 1,
+				"matrix": [1,0,0,0,0,2.220446049250313e-16,1,0,0,-1,2.220446049250313e-16,0,0.021774829135381507,12.782179983871476,0.724398193949521,1],
+				"geometry": "46b293c7-844d-4ff1-ac97-3ee0cb7c5b77",
+				"material": "6a11f618-89b4-4d72-8206-374bb5e62463"
+			},
+			{
+				"uuid": "f2fc894c-f236-4240-b161-21d53a07d708",
+				"type": "Mesh",
+				"name": "Capsule",
+				"layers": 1,
+				"matrix": [1,0,0,0,0,2.220446049250313e-16,1,0,0,-1,2.220446049250313e-16,0,0.08965047867991324,11.210631161349093,0.7326599834999536,1],
+				"geometry": "46b293c7-844d-4ff1-ac97-3ee0cb7c5b77",
+				"material": "6a11f618-89b4-4d72-8206-374bb5e62463"
+			},
+			{
+				"uuid": "9271ab07-ab13-4074-80fe-22138afff3a2",
+				"type": "Mesh",
+				"name": "Capsule",
+				"layers": 1,
+				"matrix": [1,0,0,0,0,2.220446049250313e-16,1,0,0,-1,2.220446049250313e-16,0,0.021774829135381507,12.801688046709835,4.202838218765144,1],
+				"geometry": "9824c142-2af3-4c0a-a250-eb397077028b",
+				"material": "6a11f618-89b4-4d72-8206-374bb5e62463"
+			}]
+	}
+}
