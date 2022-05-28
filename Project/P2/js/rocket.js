@@ -30,16 +30,7 @@ var copyVideo;
 var universe;
 var planet;
 var loader = new THREE.TextureLoader();
-var space_texture = new THREE.TextureLoader().load(
-	"https://wallpaperaccess.com/full/1268183.jpg");
-
-const video = document.getElementById("video");
-video.onloadeddata = function () {
-	video.play();
-};
-
-const videoTexture = new THREE.VideoTexture(video);
-	  videoTexture.needsUpdate = true;
+var space_texture = new THREE.TextureLoader().load("https://wallpaperaccess.com/full/1268183.jpg");
 
 'use strict';
 
@@ -317,9 +308,6 @@ function init() {
 	camera[2] = createCamera(0, 0, viewSize);
 
 	animate();
-	video.addEventListener("playing", function() {
-		copyVideo = true;
-	  }, true);
 	window.addEventListener("resize", onResize);
 	window.addEventListener("keydown", onKeyDown);
 	window.addEventListener("keyup", onKeyUp);
