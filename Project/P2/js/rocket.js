@@ -91,6 +91,9 @@ function addRocket(obj, x, y, z) {
 	addRocketTop(rocket, 0, 0, -rocketPartHeight/2);
 	addRocketBottom(rocket, 0, 0, rocketPartHeight/2);
 	addRocketBooster(rocket, 0, rocketInfRadius-boosterRadius, rocketPartHeight+0.5*boosterHeight);
+	addRocketBooster(rocket, 0, -rocketInfRadius+boosterRadius,rocketPartHeight+0.5*boosterHeight);
+	addRocketBooster(rocket, rocketInfRadius-boosterRadius, 0, rocketPartHeight+0.5*boosterHeight);
+	addRocketBooster(rocket, -rocketInfRadius+boosterRadius, 0, rocketPartHeight+0.5*boosterHeight);
 	rocket.position.set(x, y, z);
 	obj.add(rocket);
 	return rocket;
