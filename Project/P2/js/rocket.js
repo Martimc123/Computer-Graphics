@@ -32,6 +32,7 @@ var copyVideo;
 var universe;
 var planet;
 var rocket;
+var rocketSpin;
 var loader = new THREE.TextureLoader();
 var space_texture = new THREE.TextureLoader().load("https://wallpaperaccess.com/full/1268183.jpg");
 
@@ -64,6 +65,10 @@ function createUniverse(x, y, z, scale) {
 
 	addPlanet(universe, 0, 0, 0);
 	addRocket(universe, 0, rocketTrashDistance, 0);
+
+	rocketGroup = new THREE.Group();
+	scene.add(rocketGroup);
+	rocketGroup.add(rocket);
 
 	universe.position.set(x, y, z);
 	scene.add(universe);
@@ -162,10 +167,16 @@ function update()
 */
 
 	if (rightArrow){
-		rocket.rotation.x += - rocketSpeed * timeOccurred;
+		rocketGroup.rotation.x += - rocketSpeed * timeOccurred;
 	}
 	if (leftArrow){
-		rocket.rotation.x += rocketSpeed * timeOccurred;
+		rocketGroup.rotation.x += rocketSpeed * timeOccurred;
+	}
+	if (upArrow){
+		rocketGroup.rotation.z += - rocketSpeed * timeOccurred;
+	}
+	if (downArrow){
+		rocketGroup.rotation.z += rocketSpeed * timeOccurred;
 	}
 }
 
