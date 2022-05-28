@@ -94,10 +94,13 @@ function addRocket(obj, x, y, z) {
 	geometry = new THREE.CylinderGeometry( 0.5, 1, planetRadius/10, 41,1);
 	geometry2 = new THREE.CylinderGeometry( 0, 0.5, planetRadius/10, 41,1);
 	var geometry3 = new THREE.CapsuleGeometry( 0.2, 0.5, 0.5,20);
+	var geometry4 = new THREE.CapsuleGeometry( 0.2, 0.5, 0.5,20);
 	addObjPart(obj, geometry, 0x000fff, x, y, z, -Math.PI/180*90, 0, 0,false);
 	addObjPart(obj, geometry2, 0xff0000, x, y, z-1, -Math.PI/180*90, 0, 0,false);
 	addObjPart(obj, geometry3, 0xff0000, x,y+0.8,z+0.8, Math.PI/180*90, 0, 0,false);
-	
+	addObjPart(obj, geometry3, 0xff0000, x,y-0.8,z+0.8, Math.PI/180*90, 0, 0,false);
+	addObjPart(obj, geometry3, 0xff0000, x-0.8,y,z+0.8, Math.PI/180*90, 0, 0,false);
+	addObjPart(obj, geometry3, 0xff0000, x+0.8,y,z+0.8, Math.PI/180*90, 0, 0,false);
 }
 
 function addRocketCenter(x, y, z) {}
