@@ -12,14 +12,14 @@ var leftArrow, rightArrow, upArrow, downArrow;
 var clock = new THREE.Clock();
 
 var defaultScale = 1;
-var planetRadius = 10;
-var rocketHeight = planetRadius/10;
+var planetRadius = 12;
+var rocketHeight = planetRadius/12;
 var rocketPartHeight = rocketHeight/2;
 var rocketInfRadius = rocketPartHeight;
 var rocketMidRadius = rocketPartHeight/2;
 var rocketSupRadius = 0;
 var boosterRadius = rocketInfRadius/5;
-var boosterHeight = rocketInfRadius/2;
+var boosterHeight = rocketInfRadius/4;
 var rocketTrashDistance = 1.2 * planetRadius;
 var nrTrash = 20;
 var floatingTrash = [];
@@ -83,7 +83,7 @@ function addPlanet(obj, x, y, z) {
 		side:THREE.DoubleSide,
 		} );
 
-	addObjPart(obj, geometry, planetMaterial, 0x0000ff, x, y, z, 0, 0, 0,true);
+	addObjPart(obj, geometry, planetMaterial, 0x0000ff, x, y, z, 0, 0, 0);
 }
 
 function addRocket(obj, x, y, z) {
