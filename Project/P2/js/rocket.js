@@ -11,6 +11,8 @@ var wiredObjects = [];
 var leftArrow, rightArrow, upArrow, downArrow;
 var clock = new THREE.Clock();
 
+//!!var controls;
+
 var defaultScale = 1;
 var planetRadius = 12;
 var rocketHeight = planetRadius/12;
@@ -221,6 +223,7 @@ function update()
 function animate() {
 	update();
 	requestAnimationFrame(animate);
+//	controls.update();
 	render();
 }
 
@@ -338,7 +341,7 @@ function init() {
 	camera[1] = createPerspectiveCamera(viewSize/2, viewSize/2, viewSize/2);
 	camera[2] = createPerspectiveCamera(0, rocketInfRadius*2.5, rocketPartHeight*3);
 	rocket.add(camera[2]);
-	
+//!!	controls = new THREE.OrbitControls(camera[0], renderer.domElement);
 	animate();
 	video.addEventListener("playing", function() {
 		copyVideo = true;
