@@ -59,6 +59,7 @@ function addObjPart(obj, geometry, mater, hex, x, y, z, rotX, rotY, rotZ) {
 	mesh.rotateZ(rotZ);
 	mesh.position.set(x, y, z);
 	obj.add(mesh);
+	wiredObjects.push(mesh);
 	return mesh;
 }
 
@@ -178,6 +179,8 @@ function changeWires(wires) {
 
 function update()
 {
+	changeWires(wires);
+
 	var timeOccurred = clock.getDelta();
 	var rocketSpeed = Math.PI/180 * 40;
 
