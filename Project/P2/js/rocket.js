@@ -35,7 +35,10 @@ var universe;
 var planet;
 var rocket;
 var loader = new THREE.TextureLoader();
-var space_texture = new THREE.TextureLoader().load("https://wallpaperaccess.com/full/1268183.jpg");
+var space_texture = new THREE.TextureLoader().load(
+	//"https://wallpaperaccess.com/full/1268183.jpg"
+	"./media/space.jpg"
+	);
 
 const video = document.getElementById("video");
 video.onloadeddata = function () {
@@ -101,7 +104,8 @@ function addPlanet(obj, x, y, z) {
 	geometry = new THREE.SphereGeometry(planetRadius);
 	
 	var planetTexture = new THREE.TextureLoader().load(
-		"https://st2.depositphotos.com/5171687/44380/i/450/depositphotos_443805316-stock-photo-equirectangular-map-clouds-storms-earth.jpg"
+		"./media/earth.jpg"
+		//"https://st2.depositphotos.com/5171687/44380/i/450/depositphotos_443805316-stock-photo-equirectangular-map-clouds-storms-earth.jpg"
 		);
 	var planetMaterial = new THREE.MeshBasicMaterial( {
 		map: planetTexture,
@@ -182,10 +186,10 @@ function update()
 		var rocketPhi = objAngles[0].y;	
 		var rocketX, rocketY, rocketZ;
 		
-		if (rightArrow){	
+		if (leftArrow){	
 			rocketPhi += rocketSpeed * timeOccurred;
 		}
-		if (leftArrow){
+		if (rightArrow){
 			rocketPhi += - rocketSpeed * timeOccurred;
 		}
 		if (upArrow){
