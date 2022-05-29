@@ -155,17 +155,23 @@ function render() {
 }
 
 function onResize() {
-	var i;
-	var val = 2;
-	aspectRatio = window.innerWidth / window.innerHeight;
-	renderer.setSize(window.innerWidth, window.innerHeight);
-	var nrCameras = camera.length;
-	for (var i = 0; i < nrCameras; i++) {
-		camera[i].left = -viewSize * aspectRatio / val;
-		camera[i].right = viewSize * aspectRatio / val;
-		camera[i].top = viewSize / val;
-		camera[i].bottom = viewSize / -val;
-		camera[i].updateProjectionMatrix();
+	if (window.innerWidth > 0 &&  window.innerHeight > 0){
+		var i;
+		var val = 2;
+		aspectRatio = window.innerWidth / window.innerHeight;
+		renderer.setSize(window.innerWidth, window.innerHeight);
+		var nrCameras = camera.length;
+		for (i = 0; i < 1; i++) { // Ortographic Cameras
+			camera[i].left = -viewSize * aspectRatio / val;
+			camera[i].right = viewSize * aspectRatio / val;
+			camera[i].top = viewSize / val;
+			camera[i].bottom = viewSize / -val;
+			camera[i].updateProjectionMatrix();
+		}
+		for (i=1; i < nrCameras; i++) { // Perspective cameras
+			camera[i].aspect = aspectRatio;
+			camera[i].updateProjectionMatrix();
+		}
 	}
 }
 
@@ -253,8 +259,6 @@ function createOrtographicCamera(x, y, z) {
 }
 
 function createPerspectiveCamera(x, y, z) {
-
-	var val = 2;
 	aspectRatio = window.innerWidth / window.innerHeight;
 	var camera = new THREE.PerspectiveCamera(70,
 																					aspectRatio,
