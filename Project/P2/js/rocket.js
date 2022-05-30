@@ -11,7 +11,7 @@ var wiredObjects = [];
 var leftArrow, rightArrow, upArrow, downArrow;
 var clock = new THREE.Clock();
 
-//!!var controls;
+var controls;
 
 var defaultScale = 1;
 var planetRadius = 12;
@@ -84,7 +84,10 @@ function getObjPositions() {
 		objZ = rocketTrashDistance * Math.sin(angleTheta) * Math.cos(anglePhi);
 		posVector.set(objX, objY, objZ);	
 		objPositions.push(posVector);
-	}
+	}/*
+	objAngles[0].set(0, Math.PI/2);
+	objPositions[0].set(0,rocketTrashDistance,0);
+	*/
 }
 
 function createUniverse(x, y, z, scale) {
@@ -121,30 +124,31 @@ function addPlanet(obj, x, y, z) {
 
 function addRocket(obj, x, y, z) {
 	rocket = new THREE.Object3D();
-	addRocketTop(rocket, 0, 0, -rocketPartHeight/2);
-	addRocketBottom(rocket, 0, 0, rocketPartHeight/2);
-	addRocketBooster(rocket, 0, rocketInfRadius-boosterRadius, rocketPartHeight+0.5*boosterHeight);
-	addRocketBooster(rocket, 0, -rocketInfRadius+boosterRadius,rocketPartHeight+0.5*boosterHeight);
-	addRocketBooster(rocket, rocketInfRadius-boosterRadius, 0, rocketPartHeight+0.5*boosterHeight);
-	addRocketBooster(rocket, -rocketInfRadius+boosterRadius, 0, rocketPartHeight+0.5*boosterHeight);
+	addRocketTop(rocket, 0, rocketPartHeight/2, 0);
+	addRocketBottom(rocket, 0, -rocketPartHeight/2, 0);
+	addRocketBooster(rocket, rocketInfRadius-boosterRadius, -rocketPartHeight-0.5*boosterHeight, 0);
+	addRocketBooster(rocket, -rocketInfRadius+boosterRadius, -rocketPartHeight-0.5*boosterHeight, 0);
+	addRocketBooster(rocket, 0,-rocketPartHeight-0.5*boosterHeight, rocketInfRadius-boosterRadius);
+	addRocketBooster(rocket, 0,-rocketPartHeight-0.5*boosterHeight, -rocketInfRadius+boosterRadius);
+	rocket.rotation.z = -Math.PI/180 * 90;
 	rocket.position.set(x, y, z);
 	obj.add(rocket);
 	return rocket;
 }
 
 function addRocketTop(obj, x, y, z) {
-	geometry = new THREE.CylinderGeometry(rocketMidRadius, rocketSupRadius, rocketPartHeight, 41,1);
-	addObjPart(obj, geometry, null, 0xff0000, x, y, z, Math.PI/180*90, 0, 0);
+	geometry = new THREE.CylinderGeometry(rocketSupRadius, rocketMidRadius, rocketPartHeight, 41,1);
+	addObjPart(obj, geometry, null, 0xff0000, x, y, z, 0, 0, 0);
 }
 
 function addRocketBottom(obj, x, y, z) {
-	geometry = new THREE.CylinderGeometry(rocketInfRadius, rocketMidRadius, rocketPartHeight, 41,1);
-	addObjPart(obj, geometry, null, 0x000fff, x, y, z, Math.PI/180*90, 0, 0);
+	geometry = new THREE.CylinderGeometry(rocketMidRadius, rocketInfRadius, rocketPartHeight, 41,1);
+	addObjPart(obj, geometry, null, 0x000fff, x, y, z, 0, 0, 0);
 }
 
 function addRocketBooster(obj, x, y, z) {
 	geometry = new THREE.CapsuleGeometry(boosterRadius, boosterHeight, 0.5, 20);
-	addObjPart(obj, geometry, null, 0xff0000, x, y, z, Math.PI/180*90, 0, 0);
+	addObjPart(obj, geometry, null, 0xff0000, x, y, z, 0, 0, 0);
 }
 
 function addTrash(x, y, z) {
@@ -187,10 +191,11 @@ function changeWires(wires) {
 
 function update()
 {
-	changeWires(wires);
-
+	controls.update();
 	var timeOccurred = clock.getDelta();
 	var rocketSpeed = Math.PI/180 * 40;
+	var directionRot = Math.PI/180 * 90;
+	var wholeRotation = 2*Math.PI;
 
 	if (rightArrow || leftArrow || upArrow || downArrow) { // rocket movement flags
 		var rocketTheta = objAngles[0].x;
@@ -199,15 +204,19 @@ function update()
 		
 		if (leftArrow){	
 			rocketPhi += rocketSpeed * timeOccurred;
+			rotZ = directionRot;
 		}
 		if (rightArrow){
 			rocketPhi += - rocketSpeed * timeOccurred;
+			rotZ = -directionRot;
 		}
 		if (upArrow){
 			rocketTheta += rocketSpeed * timeOccurred;
+			rotX = directionRot;
 		}
 		if (downArrow){
 			rocketTheta += - rocketSpeed * timeOccurred;
+			rotX = -directionRot;
 		}
 		
 		rocketX = rocketTrashDistance * Math.sin(rocketTheta) * Math.sin(rocketPhi);
@@ -215,16 +224,25 @@ function update()
 		rocketZ = rocketTrashDistance * Math.sin(rocketTheta) * Math.cos(rocketPhi);
 		
 		rocket.position.set(rocketX, rocketY, rocketZ);
+		rocket.lookAt(scene.position);
 		objAngles[0].set(rocketTheta, rocketPhi);
 		objPositions[0].set(rocketX, rocketY, rocketZ);
+	/*	console.log("pos:[" + rocket.position.x + "," 
+							+ rocket.position.y + ", "
+							+ rocket.position.z + "]");
+	*/	console.log("angles:[theta(lat):" + rocketTheta%wholeRotation + ", phi(long):" + rocketPhi%wholeRotation + "]");
 	}
+}
+
+function display() {
+	changeWires(wires);
+	requestAnimationFrame(animate);
+	render();
 }
 
 function animate() {
 	update();
-	requestAnimationFrame(animate);
-//	controls.update();
-	render();
+	display();
 }
 
 function addAux(obj) {
@@ -288,7 +306,10 @@ function onKeyDown(e) {
 		case 51://3
 			currentCamera = 2;
 			break;
-
+		case 53: //5
+			currentCamera = 3;
+			break;
+			
 		case 52://4
 			wires = !wires;
 			break;
@@ -337,11 +358,13 @@ function init() {
 	document.body.appendChild(renderer.domElement);
 	
 	createScene();
-	camera[0] = createOrtographicCamera(viewSize, 0, 0);
+	camera[0] = createOrtographicCamera(0, 0, viewSize);
 	camera[1] = createPerspectiveCamera(viewSize/2, viewSize/2, viewSize/2);
-	camera[2] = createPerspectiveCamera(0, rocketInfRadius*2.5, rocketPartHeight*3);
+	camera[2] = createPerspectiveCamera(0, -rocketInfRadius*2.5, -rocketPartHeight*3);
+	camera[3] = createOrtographicCamera(0, 0, viewSize);
 	rocket.add(camera[2]);
-//!!	controls = new THREE.OrbitControls(camera[0], renderer.domElement);
+	rocket.add(new THREE.AxesHelper(10));
+	controls = new THREE.OrbitControls(camera[3], renderer.domElement);
 	animate();
 	video.addEventListener("playing", function() {
 		copyVideo = true;
