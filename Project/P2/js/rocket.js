@@ -133,8 +133,9 @@ function checkCollisions()
 {
 	if (HasColision(rocket.getObjectByName("bb").geometry.boundingSphere,yellow_ball.getObjectByName("b1").geometry.boundingSphere))
 	{
-		universe.remove(yellow_ball);
-		scene.remove(yellow_ball);
+		console.log("COLISAO");
+		//universe.remove(yellow_ball);
+		//scene.remove(yellow_ball);
 	}
 }
 
@@ -143,7 +144,7 @@ function addPlanet(obj, x, y, z) {
 	geometry = new THREE.SphereGeometry(planetRadius);
 	
 	var planetTexture = new THREE.TextureLoader().load(
-		"./media/earth.jpg"
+		"./media/earth2.jpg"
 		//"https://st2.depositphotos.com/5171687/44380/i/450/depositphotos_443805316-stock-photo-equirectangular-map-clouds-storms-earth.jpg"
 		);
 	var planetMaterial = new THREE.MeshBasicMaterial( {
@@ -270,8 +271,8 @@ function update()
 		rocket.lookAt(scene.position);
 		objAngles[0].set(rocketTheta, rocketPhi);
 		objPositions[0].set(rocketX, rocketY, rocketZ);
-		yellow_ball.getObjectByName("b1").geometry.boundingSphere.set(new THREE.Vector3(-1.8707498945048748,1.1172412046804643,-14.234186556413192),2);
-		rocket.getObjectByName("bb").geometry.boundingSphere.set(new THREE.Vector3(rocketX, rocketY, rocketZ),2);
+		yellow_ball.getObjectByName("b1").geometry.boundingSphere.set(new THREE.Vector3(-1.8707498945048748,1.1172412046804643,-14.234186556413192),1.5);
+		rocket.getObjectByName("bb").geometry.boundingSphere.set(new THREE.Vector3(rocketX, rocketY, rocketZ),1.5);
 		checkCollisions();
 	}
 }
@@ -406,7 +407,7 @@ function init() {
 	camera[3] = createOrtographicCamera(0, 0, viewSize);
 	rocket.add(camera[2]);
 	rocket.add(new THREE.AxesHelper(10));
-	controls = new THREE.OrbitControls(camera[3], renderer.domElement);
+	controls = new THREE.OrbitControls(camera[currentCamera], renderer.domElement);
 	animate();
 	video.addEventListener("playing", function() {
 		copyVideo = true;
