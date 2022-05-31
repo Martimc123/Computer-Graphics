@@ -52,7 +52,7 @@ const videoTexture = new THREE.VideoTexture(video);
 
 'use strict';
 
-function addObjPart(obj, geometry, mater, hex, x, y, z, rotX, rotY, rotZ) {
+function addObjPart(obj, geometry, mater, hex, x, y, z, rotX, rotY, rotZ,tag = "") {
 
 	material = (mater != null)? mater : new THREE.MeshBasicMaterial({color: hex, wireframe: wires});
 	mesh = new THREE.Mesh(geometry, material);
@@ -60,6 +60,7 @@ function addObjPart(obj, geometry, mater, hex, x, y, z, rotX, rotY, rotZ) {
 	mesh.rotateY(rotY);
 	mesh.rotateZ(rotZ);
 	mesh.position.set(x, y, z);
+	mesh.name=tag;
 	obj.add(mesh);
 	wiredObjects.push(mesh);
 	return mesh;
@@ -100,9 +101,41 @@ function createUniverse(x, y, z, scale) {
 	addRocket(universe, rocketPos.x, rocketPos.y, rocketPos.z);
 	addAux(universe);
 
+	geometry = new THREE.SphereGeometry( 2,552, 32, 12 );
+	material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+
+	yellow_ball = new THREE.Object3D();
+	addObjPart(yellow_ball, geometry, material, 0xffff00, -1.8707498945048748,1.1172412046804643,-14.234186556413192, 0,0,0,"og");
+	
+	geometry = new THREE.SphereGeometry( 2,552, 32, 16);
+	material = new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe: true } );
+	addObjPart(yellow_ball, geometry, material, 0xffff00, -1.8707498945048748,1.1172412046804643,-14.234186556413192, 0,0,0,"b1");
+	universe.add(yellow_ball);
+	yellow_ball.getObjectByName("b1").geometry.computeBoundingSphere();
+	yellow_ball.getObjectByName("b1").position = new THREE.Vector3(-1.8707498945048748,1.1172412046804643,-14.234186556413192);
+
 	universe.position.set(x, y, z);
 	scene.add(universe);
 	return universe;
+}
+
+function HasColision(obj1,obj2)
+{
+	radius = (obj1.radius+obj2.radius)**2;
+	center = (obj1.center.x-obj2.center.x)**2 + (obj1.center.y-obj2.center.y)**2 + (obj1.center.z-obj2.center.z)**2;
+	if (radius >= center)
+		return true;
+	else
+		return false;
+}
+
+function checkCollisions()
+{
+	if (HasColision(rocket.getObjectByName("bb").geometry.boundingSphere,yellow_ball.getObjectByName("b1").geometry.boundingSphere))
+	{
+		universe.remove(yellow_ball);
+		scene.remove(yellow_ball);
+	}
 }
 
 function addPlanet(obj, x, y, z) {
@@ -130,10 +163,20 @@ function addRocket(obj, x, y, z) {
 	addRocketBooster(rocket, -rocketInfRadius+boosterRadius, -rocketPartHeight-0.5*boosterHeight, 0);
 	addRocketBooster(rocket, 0,-rocketPartHeight-0.5*boosterHeight, rocketInfRadius-boosterRadius);
 	addRocketBooster(rocket, 0,-rocketPartHeight-0.5*boosterHeight, -rocketInfRadius+boosterRadius);
+	addBoundaryBox(rocket,0, 0, rocketPartHeight/2,rocketHeight);
 	rocket.rotation.z = -Math.PI/180 * 90;
 	rocket.position.set(x, y, z);
 	obj.add(rocket);
 	return rocket;
+}
+
+
+function addBoundaryBox(obj,x,y,z,raio)
+{
+	geometry = new THREE.SphereGeometry(raio);
+	geometry.computeBoundingSphere();
+	material = new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe: false } );
+	addObjPart(obj, geometry, material, 0xffff00, x,y,z, 0,0,0,"bb");
 }
 
 function addRocketTop(obj, x, y, z) {
@@ -227,10 +270,9 @@ function update()
 		rocket.lookAt(scene.position);
 		objAngles[0].set(rocketTheta, rocketPhi);
 		objPositions[0].set(rocketX, rocketY, rocketZ);
-	/*	console.log("pos:[" + rocket.position.x + "," 
-							+ rocket.position.y + ", "
-							+ rocket.position.z + "]");
-	*/	console.log("angles:[theta(lat):" + rocketTheta%wholeRotation + ", phi(long):" + rocketPhi%wholeRotation + "]");
+		yellow_ball.getObjectByName("b1").geometry.boundingSphere.set(new THREE.Vector3(-1.8707498945048748,1.1172412046804643,-14.234186556413192),2);
+		rocket.getObjectByName("bb").geometry.boundingSphere.set(new THREE.Vector3(rocketX, rocketY, rocketZ),2);
+		checkCollisions();
 	}
 }
 
