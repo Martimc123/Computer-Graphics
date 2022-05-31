@@ -85,10 +85,8 @@ function getObjPositions() {
 		objZ = rocketTrashDistance * Math.sin(angleTheta) * Math.cos(anglePhi);
 		posVector.set(objX, objY, objZ);	
 		objPositions.push(posVector);
-	}/*
-	objAngles[0].set(0, Math.PI/2);
-	objPositions[0].set(0,rocketTrashDistance,0);
-	*/
+	}
+	
 }
 
 function createUniverse(x, y, z, scale) {
@@ -123,19 +121,16 @@ function HasColision(obj1,obj2)
 {
 	radius = (obj1.radius+obj2.radius)**2;
 	center = (obj1.center.x-obj2.center.x)**2 + (obj1.center.y-obj2.center.y)**2 + (obj1.center.z-obj2.center.z)**2;
-	if (radius >= center)
-		return true;
-	else
-		return false;
+	return radius >= center;
 }
 
 function checkCollisions()
 {
 	if (HasColision(rocket.getObjectByName("bb").geometry.boundingSphere,yellow_ball.getObjectByName("b1").geometry.boundingSphere))
 	{
-		console.log("COLISAO");
-		//universe.remove(yellow_ball);
-		//scene.remove(yellow_ball);
+		console.log("COLLISION");
+		universe.remove(yellow_ball);
+		scene.remove(yellow_ball);
 	}
 }
 
@@ -233,34 +228,66 @@ function changeWires(wires) {
 	}
 }
 
+function myLookAt(obj, targetPosition) {
+	var targetPos = obj.worldToLocal(targetPosition.clone());
+    var rotationAxis = new THREE.Vector3().crossVectors(
+        new THREE.Vector3(0, 0, -1),
+        targetPos
+    ).normalize();
+    var angle = new THREE.Vector3(0, 0, -1).angleTo(
+        targetPos.normalize().clone());
+
+    obj.rotateOnAxis(rotationAxis, angle);
+}
+
 function update()
 {
 	controls.update();
 	var timeOccurred = clock.getDelta();
 	var rocketSpeed = Math.PI/180 * 40;
-	var directionRot = Math.PI/180 * 90;
-	var wholeRotation = 2*Math.PI;
+	var degreesTraveled = rocketSpeed*timeOccurred;
+	var dirLatitudeCoef = -1;
+	var dirLongitudeCoef = -1;
 
 	if (rightArrow || leftArrow || upArrow || downArrow) { // rocket movement flags
 		var rocketTheta = objAngles[0].x;
 		var rocketPhi = objAngles[0].y;	
 		var rocketX, rocketY, rocketZ;
+		var rotZ;
 		
 		if (leftArrow){	
-			rocketPhi += rocketSpeed * timeOccurred;
-			rotZ = directionRot;
+			rocketPhi += dirLongitudeCoef * degreesTraveled;
+			rotZ = -Math.PI/2;
 		}
 		if (rightArrow){
-			rocketPhi += - rocketSpeed * timeOccurred;
-			rotZ = -directionRot;
+			rocketPhi += -dirLongitudeCoef * degreesTraveled;
+			rotZ = Math.PI/2;
 		}
 		if (upArrow){
-			rocketTheta += rocketSpeed * timeOccurred;
-			rotX = directionRot;
+			rocketTheta += dirLatitudeCoef * degreesTraveled;
+			rotZ = Math.PI;
 		}
 		if (downArrow){
-			rocketTheta += - rocketSpeed * timeOccurred;
-			rotX = -directionRot;
+			rocketTheta += - dirLatitudeCoef * degreesTraveled;
+			rotZ = -Math.PI;
+		}
+
+		// If speed is in both directions, to mantain total, speed in each direction is halved
+		if (leftArrow && upArrow) {
+			rocketPhi += -dirLongitudeCoef * degreesTraveled /2;
+			rocketTheta += -dirLatitudeCoef * degreesTraveled /2;
+		}
+		if (leftArrow && downArrow) {
+			rocketPhi += -dirLongitudeCoef * degreesTraveled /2;
+			rocketTheta += dirLatitudeCoef * degreesTraveled /2;
+		}
+		if (rightArrow && upArrow) {
+			rocketPhi += dirLongitudeCoef * degreesTraveled /2;
+			rocketTheta += -dirLatitudeCoef * degreesTraveled /2;
+		}
+		if (rightArrow && downArrow) {
+			rocketPhi += dirLongitudeCoef * degreesTraveled /2;
+			rocketTheta += dirLatitudeCoef * degreesTraveled /2;
 		}
 		
 		rocketX = rocketTrashDistance * Math.sin(rocketTheta) * Math.sin(rocketPhi);
@@ -407,7 +434,7 @@ function init() {
 	camera[3] = createOrtographicCamera(0, 0, viewSize);
 	rocket.add(camera[2]);
 	rocket.add(new THREE.AxesHelper(10));
-	controls = new THREE.OrbitControls(camera[currentCamera], renderer.domElement);
+	controls = new THREE.OrbitControls(camera[3], renderer.domElement);
 	animate();
 	video.addEventListener("playing", function() {
 		copyVideo = true;
