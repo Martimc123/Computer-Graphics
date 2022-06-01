@@ -1,3 +1,5 @@
+const { HemisphereLight } = require("./three");
+
 /*global THREE*/
 var camera = [];
 var scene, renderer, currentCamera = 0;
@@ -314,6 +316,23 @@ function changeWires(wires) {
 	for (i = 0; i < nrObj; i++) {
 		wiredObjects[i].material.wireframe = wires;
 	}
+}
+
+// returns semi-hemisphhere of an object's geometric center
+function getSemiHemisphere(obj) {
+	var posY = obj.position.y;
+	var posZ = obj.position.z;
+	var northernHemisphere = false;	
+	var easternHemisphere = false;
+
+	if (posY > 0) northernHemisphere = true;
+	if (posZ > 0) easternHemisphere = true;
+	
+	if (northernHemisphere && easternHemisphere) return 0; //NE
+	else if (northernHemisphere && !easternHemisphere) return 1; //NW
+	else if (!northernHemisphere && !easternHemisphere) return 2; //SW
+	else if (!northernHemisphere && easternHemisphere) return 3; //SE
+
 }
 
 function myLookAt(obj, targetPosition) {
