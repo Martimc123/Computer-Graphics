@@ -1,5 +1,3 @@
-const { HemisphereLight } = require("./three");
-
 /*global THREE*/
 var camera = [];
 var scene, renderer, currentCamera = 0;
@@ -27,7 +25,7 @@ var boosterHeight = rocketInfRadius/4;
 var rocketTrashDistance = 1.2 * planetRadius;
 var objPositions = [];
 var objAngles = [];
-var nrTrash = 3;
+var nrTrash = 20;
 var floatingTrash = [];
 var trashSize = planetRadius/24;
 var trashGeometries = [];
