@@ -15,7 +15,7 @@ var controls;
 
 var defaultScale = 1;
 var planetRadius = 12;
-var rocketHeight = planetRadius/11;
+var rocketHeight = planetRadius/12;
 var rocketPartHeight = rocketHeight/2;
 var rocketInfRadius = rocketPartHeight;
 var rocketMidRadius = rocketPartHeight/2;
@@ -25,12 +25,11 @@ var boosterHeight = rocketInfRadius/4;
 var rocketTrashDistance = 1.2 * planetRadius;
 var objPositions = [];
 var objAngles = [];
-var nrTrash = 20;
+var nrTrash = 3;
 var floatingTrash = [];
-var trashSizes = [];
-var minTrashSize = planetRadius/24;
-var maxTrashSize = planetRadius/20;
+var trashSize = planetRadius/24;
 var trashGeometries = [];
+var trashRadius = [];
 
 var copyVideo;
 var universe;
@@ -76,20 +75,36 @@ function getObjPositions() {
 	var objX, objY, objZ;
 
 	for (i = 0; i < nrObj; i++) {
-		var posVector = new THREE.Vector3(0,0,0); // spherical coordinates vector
-		var angleVector = new THREE.Vector2(0,0); // angles Theta and Phi for spherical coordinates
 		angleTheta = Math.random() * 2*Math.PI;
 		anglePhi = Math.random() * 2*Math.PI;
-		angleVector.set(angleTheta, anglePhi);
+		var angleVector = new THREE.Vector2(angleTheta, anglePhi); // angles Theta and Phi for spherical coordinates
 		objAngles.push(angleVector);
 
 		objX = rocketTrashDistance * Math.sin(angleTheta) * Math.sin(anglePhi);
 		objY = rocketTrashDistance * Math.cos(angleTheta);
 		objZ = rocketTrashDistance * Math.sin(angleTheta) * Math.cos(anglePhi);
-		posVector.set(objX, objY, objZ);	
+		var posVector = new THREE.Vector3(objX, objY, objZ); // spherical coordinates vector
 		objPositions.push(posVector);
 	}
+}
+
+function getTrashGeometries() {
+	var radius;
 	
+	geometry = new THREE.BoxGeometry(trashSize, trashSize, trashSize);
+	radius = Math.sqrt(trashSize**2+trashSize**2);
+	trashGeometries.push(geometry);
+	trashRadius.push(radius);
+
+	geometry = new THREE.DodecahedronGeometry(trashSize);
+	radius = trashSize;
+	trashGeometries.push(geometry);
+	trashRadius.push(radius);
+
+	geometry = new THREE.ConeGeometry(trashSize, 2*trashSize, 11);
+	radius = Math.sqrt(trashSize**2+trashSize**2);
+	trashGeometries.push(geometry);
+	trashRadius.push(radius);
 }
 
 function createUniverse(x, y, z, scale) {
@@ -104,102 +119,111 @@ function createUniverse(x, y, z, scale) {
 	addAux(universe);
 
 	universe.add(trash);
-	GenerateTrash(universe,trash);
-
-	/*geometry = new THREE.SphereGeometry( 2,552, 32, 12 );
-	material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
-
-	yellow_ball = new THREE.Object3D();
-	addObjPart(yellow_ball, geometry, material, 0xffff00, -1.8707498945048748,1.1172412046804643,-14.234186556413192, 0,0,0,"og");
-	
-	geometry = new THREE.SphereGeometry( 2,552, 32, 16);
-	material = new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe: true } );
-	addObjPart(yellow_ball, geometry, material, 0xffff00, -1.8707498945048748,1.1172412046804643,-14.234186556413192, 0,0,0,"b1");
-	universe.add(yellow_ball);
-	yellow_ball.getObjectByName("b1").geometry.computeBoundingSphere();
-	yellow_ball.getObjectByName("b1").position = new THREE.Vector3(-1.8707498945048748,1.1172412046804643,-14.234186556413192);*/
-
+	trash.position.set(0,0,0);
+	addTrash(trash);
 	universe.position.set(x, y, z);
 	scene.add(universe);
 	return universe;
 }
 
-function HasColision(obj1,obj2)
-{
-	radius = (obj1.radius+obj2.radius)**2;
-	distance = (obj1.center.x-obj2.center.x)**2 + (obj1.center.y-obj2.center.y)**2 + (obj1.center.z-obj2.center.z)**2;
-	return radius >= distance;
-}
-
 function getRndInteger(min, max) {
-	return Math.floor(Math.random() * (max - min)) + min;
+	return Math.floor(Math.random() * (max - min+1)) + min;
 }
 
-function GenerateTrash(universe,obj)
-{
-	for (i = 1;i<21;i++)
-	{
-		var option = getRndInteger(1,4);
-		//console.log("Option: "+option);
-		if (option == 1)
-		{
-			cubic_trash = new THREE.Object3D();
-			geometry = new THREE.BoxGeometry( planetRadius/21, planetRadius/21, planetRadius/21 );
-			material = new THREE.MeshBasicMaterial( {map: compressed_trash_texture,transparent:true} );
-			addObjPart(cubic_trash, geometry, material, 0x00ff00, objPositions[i].x,objPositions[i].y,objPositions[i].z,0,0,0,tag = "");
-			addBoundaryBox(cubic_trash,objPositions[i].x,objPositions[i].y,objPositions[i].z,(planetRadius/21));
-			cubic_trash.getObjectByName("bb").geometry.computeBoundingSphere();
-			cubic_trash.getObjectByName("bb").geometry.boundingSphere.set(new THREE.Vector3(objPositions[i].x,objPositions[i].y,objPositions[i].z),1.5);
-			cubic_trash.name = "trash"+i;
-			obj.add(cubic_trash);
-			floatingTrash.push(cubic_trash);
-			universe.add(obj);
-		}
-		if (option == 2)
-		{
-			polyhedron_trash = new THREE.Object3D();
-			geometry = new THREE.DodecahedronGeometry(planetRadius/21,0);
-			material = new THREE.MeshBasicMaterial( {map: compressed_trash_texture,transparent:true} );
-			addObjPart(polyhedron_trash, geometry, material, 0x00ff00, objPositions[i].x,objPositions[i].y,objPositions[i].z,0,0,0,tag = "");
-			addBoundaryBox(polyhedron_trash,objPositions[i].x,objPositions[i].y,objPositions[i].z,planetRadius/21+1);
-			polyhedron_trash.getObjectByName("bb").geometry.computeBoundingSphere();
-			polyhedron_trash.getObjectByName("bb").geometry.boundingSphere.set(new THREE.Vector3(objPositions[i].x,objPositions[i].y,objPositions[i].z),1.5);
-			polyhedron_trash.name = "trash"+i;
-			obj.add(polyhedron_trash);
-			floatingTrash.push(polyhedron_trash);
-			universe.add(obj);
-		}
-		if (option == 3)
-		{
-			cone_trash = new THREE.Object3D();
-			geometry = new THREE.ConeGeometry( planetRadius/21, 1, 11 );
-			material = new THREE.MeshBasicMaterial( {map: compressed_trash_texture,transparent:true} );
-			addObjPart(cone_trash, geometry, material, 0x00ff00, objPositions[i].x,objPositions[i].y,objPositions[i].z,0,0,0,tag = "");
-			addBoundaryBox(cone_trash,objPositions[i].x,objPositions[i].y,objPositions[i].z,planetRadius/21+0.2);
-			floatingTrash.push(cone_trash);
-			cone_trash.getObjectByName("bb").geometry.computeBoundingSphere();
-			cone_trash.getObjectByName("bb").geometry.boundingSphere.set(new THREE.Vector3(objPositions[i].x,objPositions[i].y,objPositions[i].z),1.5);
-			cone_trash.name = "trash"+i;
-			obj.add(cone_trash);
-			floatingTrash.push(cone_trash);
-			universe.add(obj);
-		}
+function addTrash(obj) {
+	var i;
+	var nrObj = nrTrash+1;
+	material = new THREE.MeshBasicMaterial( {map: compressed_trash_texture,transparent:false} );
+	for (i=1; i < nrObj; i++) {
+		var position = objPositions[i];
+		var option = getRndInteger(0,2);
+		console.log("geom=" +option);
+		var trashUnit = new THREE.Object3D();
+		geometry = trashGeometries[option];
+		addObjPart(trashUnit, geometry, material, 0x00ff00, 0, 0, 0, 0, 0, 0);
+		
+		var radius = trashRadius[option];
+		addBoundary(trashUnit, radius);
+		trashUnit.getObjectByName("boundary").visible = false;
+
+		trashUnit.name = "trash"+i;
+		floatingTrash.push(trashUnit);
+		obj.add(trashUnit);
+		trashUnit.position.set(position.x, position.y, position.z);
+	}
+	var nr = objPositions.length;
+	console.log(nr);
+	var obj2 = objPositions[0];
+	console.log("rocket:[" + obj2.x + ", " + obj2.y + "," + obj2.z + "]");
+	
+	for (i=1; i < nr; i++) {
+		var obj2 = objPositions[i];
+		console.log("trash:[" + obj2.x + ", " + obj2.y + "," + obj2.z + "]");
+	}
+	var nr = floatingTrash.length;
+	console.log(nr);
+	for (i=0; i < nr; i++) {
+		var obj = floatingTrash[i];
+		var obj2 = obj.position;
+		console.log("trash:[" + obj2.x + ", " + obj2.y + "," + obj2.z + "]");
 	}
 }
 
-function checkCollisions()
-{
-	for(var i=0;i<21;i++)
-	{	
-		if (HasColision(rocket.getObjectByName("bb").geometry.boundingSphere,floatingTrash[i].getObjectByName("bb").geometry.boundingSphere))
-		{
-				console.log("COLISAO");
-				trash.remove(floatingTrash[i]);
-				//universe.remove(yellow_ball);
-				//scene.remove(yellow_ball);
+function addBoundary(obj, radius) {
+	geometry = new THREE.SphereGeometry(radius, 16, 8);
+	material = new THREE.MeshBasicMaterial({wireframe: wires});
+	addObjPart(obj, geometry, material, 0x000000, 0, 0, 0, 0, 0, 0, "boundary");
+}
+
+function checkCollisions() {
+	console.log("i got in!");
+	var i;
+	var nrRemoved = 0;
+	var toRemove = [];
+	var nr = floatingTrash.length;
+	console.log(nr + " trashes before");
+	for (i=0; i < nrTrash; i++) {
+		var trashUnit = floatingTrash[i];
+		if (hasCollision(rocket, trashUnit)) {
+			nrRemoved++;
+			toRemove.push(trashUnit);
 		}
 	}
-	//console.log(floatingTrash[i].getObjectByName("bb"));
+	for (i = 0; i < nrRemoved; i++) {
+		var trashUnit = toRemove[i];
+		floatingTrash.pop(trashUnit);
+		trash.remove(trashUnit);
+	}
+	var nr = floatingTrash.length;
+	nrTrash += -nrRemoved;
+	console.log(nr + " trashes after");
+}
+
+function squareDistanceBetween(obj1, obj2) {
+	var squareD;
+
+	var x1 = obj1.position.x;
+	var x2 = obj2.position.x;
+
+	var y1 = obj1.position.y;
+	var y2 = obj2.position.y;
+	
+	var z1 = obj1.position.z;
+	var z2 = obj2.position.z;
+
+	squareD = (x1-x2)**2 + (y1-y2)**2 + (z1-z2)**2;
+
+	return squareD;
+}
+
+function hasCollision(obj1, obj2) {
+	var sphere1 = obj1.getObjectByName("boundary").geometry;
+	var sphere2 = obj2.getObjectByName("boundary").geometry;
+	console.log("rocketR:" + sphere1.parameters.radius + "; trashR:" + sphere2.parameters.radius);
+	/*console.log("rocketP:[" + obj1.position.x + ", " + obj1.position.y + "," + obj1.position.z + "]");
+	console.log("trash:[" + obj2.position.x + ", " + obj2.position.y + "," + obj2.position.z + "]");
+	*/var totalR = sphere1.parameters.radius + sphere2.parameters.radius;
+	return totalR**2 >= squareDistanceBetween(obj1, obj2);
 }
 
 function addPlanet(obj, x, y, z) {
@@ -227,20 +251,13 @@ function addRocket(obj, x, y, z) {
 	addRocketBooster(rocket, -rocketInfRadius+boosterRadius, -rocketPartHeight-0.5*boosterHeight, 0);
 	addRocketBooster(rocket, 0,-rocketPartHeight-0.5*boosterHeight, rocketInfRadius-boosterRadius);
 	addRocketBooster(rocket, 0,-rocketPartHeight-0.5*boosterHeight, -rocketInfRadius+boosterRadius);
-	addBoundaryBox(rocket,0, 0, rocketPartHeight/2,rocketHeight);
+	var radius = Math.sqrt((rocketPartHeight+boosterHeight)**2 + rocketInfRadius**2);
+	addBoundary(rocket, radius);
+	rocket.getObjectByName("boundary").visible = false; // !!
 	rocket.rotation.z = -Math.PI/180 * 90;
 	rocket.position.set(x, y, z);
 	obj.add(rocket);
 	return rocket;
-}
-
-
-function addBoundaryBox(obj,x,y,z,raio)
-{
-	geometry = new THREE.SphereGeometry(raio);
-	geometry.computeBoundingSphere();
-	material = {};//new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe: false } );
-	addObjPart(obj, geometry, material, 0xffff00, x,y,z, 0,0,0,"bb");
 }
 
 function addRocketTop(obj, x, y, z) {
@@ -282,6 +299,13 @@ function onResize() {
 			camera[i].aspect = aspectRatio;
 			camera[i].updateProjectionMatrix();
 		}
+		i = 3;
+		camera[i].left = -viewSize * aspectRatio / val;
+			camera[i].right = viewSize * aspectRatio / val;
+			camera[i].top = viewSize / val;
+			camera[i].bottom = viewSize / -val;
+			camera[i].updateProjectionMatrix();
+
 	}
 }
 
@@ -363,8 +387,6 @@ function update()
 		rocket.lookAt(scene.position);
 		objAngles[0].set(rocketTheta, rocketPhi);
 		objPositions[0].set(rocketX, rocketY, rocketZ);
-		//yellow_ball.getObjectByName("b1").geometry.boundingSphere.set(new THREE.Vector3(-1.8707498945048748,1.1172412046804643,-14.234186556413192),1.5);
-		rocket.getObjectByName("bb").geometry.boundingSphere.set(new THREE.Vector3(rocketX, rocketY, rocketZ),1.5);
 		checkCollisions();
 	}
 }
@@ -392,6 +414,7 @@ function createScene() {
 	scene.add(new THREE.AxesHelper(100));
 	scene.background = space_texture;
 	getObjPositions();
+	getTrashGeometries();
 	universe = createUniverse(0, 0, 0, defaultScale);
 }
 
@@ -500,7 +523,7 @@ function init() {
 	camera[3] = createOrtographicCamera(0, 0, viewSize);
 	rocket.add(camera[2]);
 	rocket.add(new THREE.AxesHelper(10));
-	controls = new THREE.OrbitControls(camera[currentCamera], renderer.domElement);
+	controls = new THREE.OrbitControls(camera[3], renderer.domElement);
 	animate();
 	video.addEventListener("playing", function() {
 		copyVideo = true;
