@@ -106,7 +106,7 @@ function createUniverse(x, y, z, scale) {
 	universe.add(trash);
 	GenerateTrash(universe,trash);
 
-	geometry = new THREE.SphereGeometry( 2,552, 32, 12 );
+	/*geometry = new THREE.SphereGeometry( 2,552, 32, 12 );
 	material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
 
 	yellow_ball = new THREE.Object3D();
@@ -117,7 +117,7 @@ function createUniverse(x, y, z, scale) {
 	addObjPart(yellow_ball, geometry, material, 0xffff00, -1.8707498945048748,1.1172412046804643,-14.234186556413192, 0,0,0,"b1");
 	universe.add(yellow_ball);
 	yellow_ball.getObjectByName("b1").geometry.computeBoundingSphere();
-	yellow_ball.getObjectByName("b1").position = new THREE.Vector3(-1.8707498945048748,1.1172412046804643,-14.234186556413192);
+	yellow_ball.getObjectByName("b1").position = new THREE.Vector3(-1.8707498945048748,1.1172412046804643,-14.234186556413192);*/
 
 	universe.position.set(x, y, z);
 	scene.add(universe);
@@ -148,11 +148,11 @@ function GenerateTrash(universe,obj)
 			material = new THREE.MeshBasicMaterial( {map: compressed_trash_texture,transparent:true} );
 			addObjPart(cubic_trash, geometry, material, 0x00ff00, objPositions[i].x,objPositions[i].y,objPositions[i].z,0,0,0,tag = "");
 			addBoundaryBox(cubic_trash,objPositions[i].x,objPositions[i].y,objPositions[i].z,(planetRadius/21));
-			floatingTrash.push(cubic_trash);
 			cubic_trash.getObjectByName("bb").geometry.computeBoundingSphere();
 			cubic_trash.getObjectByName("bb").geometry.boundingSphere.set(new THREE.Vector3(objPositions[i].x,objPositions[i].y,objPositions[i].z),1.5);
 			cubic_trash.name = "trash"+i;
 			obj.add(cubic_trash);
+			floatingTrash.push(cubic_trash);
 			universe.add(obj);
 		}
 		if (option == 2)
@@ -162,11 +162,11 @@ function GenerateTrash(universe,obj)
 			material = new THREE.MeshBasicMaterial( {map: compressed_trash_texture,transparent:true} );
 			addObjPart(polyhedron_trash, geometry, material, 0x00ff00, objPositions[i].x,objPositions[i].y,objPositions[i].z,0,0,0,tag = "");
 			addBoundaryBox(polyhedron_trash,objPositions[i].x,objPositions[i].y,objPositions[i].z,planetRadius/21+1);
-			floatingTrash.push(polyhedron_trash);
 			polyhedron_trash.getObjectByName("bb").geometry.computeBoundingSphere();
 			polyhedron_trash.getObjectByName("bb").geometry.boundingSphere.set(new THREE.Vector3(objPositions[i].x,objPositions[i].y,objPositions[i].z),1.5);
 			polyhedron_trash.name = "trash"+i;
 			obj.add(polyhedron_trash);
+			floatingTrash.push(polyhedron_trash);
 			universe.add(obj);
 		}
 		if (option == 3)
@@ -181,6 +181,7 @@ function GenerateTrash(universe,obj)
 			cone_trash.getObjectByName("bb").geometry.boundingSphere.set(new THREE.Vector3(objPositions[i].x,objPositions[i].y,objPositions[i].z),1.5);
 			cone_trash.name = "trash"+i;
 			obj.add(cone_trash);
+			floatingTrash.push(cone_trash);
 			universe.add(obj);
 		}
 	}
@@ -188,12 +189,17 @@ function GenerateTrash(universe,obj)
 
 function checkCollisions()
 {
-	if (HasColision(rocket.getObjectByName("bb").geometry.boundingSphere,yellow_ball.getObjectByName("b1").geometry.boundingSphere))
-	{
-		console.log("COLISAO");
-		universe.remove(yellow_ball);
-		scene.remove(yellow_ball);
+	for(var i=0;i<21;i++)
+	{	
+		if (HasColision(rocket.getObjectByName("bb").geometry.boundingSphere,floatingTrash[i].getObjectByName("bb").geometry.boundingSphere))
+		{
+				console.log("COLISAO");
+				trash.remove(floatingTrash[i]);
+				//universe.remove(yellow_ball);
+				//scene.remove(yellow_ball);
+		}
 	}
+	//console.log(floatingTrash[i].getObjectByName("bb"));
 }
 
 function addPlanet(obj, x, y, z) {
@@ -357,7 +363,7 @@ function update()
 		rocket.lookAt(scene.position);
 		objAngles[0].set(rocketTheta, rocketPhi);
 		objPositions[0].set(rocketX, rocketY, rocketZ);
-		yellow_ball.getObjectByName("b1").geometry.boundingSphere.set(new THREE.Vector3(-1.8707498945048748,1.1172412046804643,-14.234186556413192),1.5);
+		//yellow_ball.getObjectByName("b1").geometry.boundingSphere.set(new THREE.Vector3(-1.8707498945048748,1.1172412046804643,-14.234186556413192),1.5);
 		rocket.getObjectByName("bb").geometry.boundingSphere.set(new THREE.Vector3(rocketX, rocketY, rocketZ),1.5);
 		checkCollisions();
 	}
