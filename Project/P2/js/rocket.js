@@ -116,7 +116,6 @@ function createUniverse(x, y, z, scale) {
 
 	addPlanet(universe, 0, 0, 0);
 	addRocket(universe, rocketPos.x, rocketPos.y, rocketPos.z);
-	addAux(universe);
 
 	universe.add(trash);
 	trash.position.set(0,0,0);
@@ -335,56 +334,69 @@ function update()
 	var timeOccurred = clock.getDelta();
 	var rocketSpeed = Math.PI/180 * 40;
 	var degreesTraveled = rocketSpeed*timeOccurred;
-	var dirLatitudeCoef = -1;
+	var dirLatitudeCoef = -1; // clock-wise
 	var dirLongitudeCoef = -1;
 
 	if (rightArrow || leftArrow || upArrow || downArrow) { // rocket movement flags
 		var rocketTheta = objAngles[0].x;
 		var rocketPhi = objAngles[0].y;	
 		var rocketX, rocketY, rocketZ;
-		var rotZ;
+		var rotZ = 0;
 		
-		if (leftArrow){	
-			rocketPhi += dirLongitudeCoef * degreesTraveled;
-			rotZ = -Math.PI/2;
+		// Nullifies opposite direction arrows for simplicity
+		if (leftArrow && rightArrow) {
+			leftArrow=false;
+			rightArrow = false;
 		}
-		if (rightArrow){
-			rocketPhi += -dirLongitudeCoef * degreesTraveled;
-			rotZ = Math.PI/2;
-		}
-		if (upArrow){
-			rocketTheta += dirLatitudeCoef * degreesTraveled;
-			rotZ = Math.PI;
-		}
-		if (downArrow){
-			rocketTheta += - dirLatitudeCoef * degreesTraveled;
-			rotZ = -Math.PI;
+		if (upArrow && downArrow) {
+			upArrow = false;
+			downArrow = false;
 		}
 
-		// If speed is in both directions, to mantain total, speed in each direction is halved
 		if (leftArrow && upArrow) {
-			rocketPhi += -dirLongitudeCoef * degreesTraveled /2;
-			rocketTheta += -dirLatitudeCoef * degreesTraveled /2;
+			rotZ = -Math.PI/4;
+			rocketPhi += dirLongitudeCoef * Math.sqrt(0.5)*degreesTraveled;
+			rocketTheta += dirLatitudeCoef * Math.sqrt(0.5)*degreesTraveled;
 		}
-		if (leftArrow && downArrow) {
-			rocketPhi += -dirLongitudeCoef * degreesTraveled /2;
-			rocketTheta += dirLatitudeCoef * degreesTraveled /2;
+		else if (leftArrow && downArrow) {
+			rotZ = -3*Math.PI/4;
+			rocketPhi += dirLongitudeCoef * Math.sqrt(0.5)*degreesTraveled;
+			rocketTheta += - dirLatitudeCoef * Math.sqrt(0.5)*degreesTraveled;
 		}
-		if (rightArrow && upArrow) {
-			rocketPhi += dirLongitudeCoef * degreesTraveled /2;
-			rocketTheta += -dirLatitudeCoef * degreesTraveled /2;
+		else if (rightArrow && upArrow) {
+			rotZ = Math.PI/4;
+			rocketPhi += -dirLongitudeCoef * Math.sqrt(0.5)*degreesTraveled;
+			rocketTheta += dirLatitudeCoef * Math.sqrt(0.5)*degreesTraveled;
 		}
-		if (rightArrow && downArrow) {
-			rocketPhi += dirLongitudeCoef * degreesTraveled /2;
-			rocketTheta += dirLatitudeCoef * degreesTraveled /2;
+		else if (rightArrow && downArrow) {
+			rotZ = 3*Math.PI/4;
+			rocketPhi += -dirLongitudeCoef * Math.sqrt(0.5)*degreesTraveled;
+			rocketTheta += - dirLatitudeCoef * Math.sqrt(0.5)*degreesTraveled;
 		}
-		
+		else if (leftArrow) {
+			rotZ = -Math.PI/2;
+			rocketPhi += dirLongitudeCoef * degreesTraveled;
+		}
+		else if (rightArrow) {
+			rotZ = Math.PI/2;
+			rocketPhi += -dirLongitudeCoef * degreesTraveled;
+		}
+		else if (upArrow) {
+			rotZ = 0;
+			rocketTheta += dirLatitudeCoef * degreesTraveled;
+		}
+		else if (downArrow) {
+			rotZ = Math.PI;
+			rocketTheta += - dirLatitudeCoef * degreesTraveled;
+		}
+
 		rocketX = rocketTrashDistance * Math.sin(rocketTheta) * Math.sin(rocketPhi);
 		rocketY = rocketTrashDistance * Math.cos(rocketTheta);
 		rocketZ = rocketTrashDistance * Math.sin(rocketTheta) * Math.cos(rocketPhi);
 		
 		rocket.position.set(rocketX, rocketY, rocketZ);
 		rocket.lookAt(scene.position);
+		rocket.rotateZ(rotZ);
 		objAngles[0].set(rocketTheta, rocketPhi);
 		objPositions[0].set(rocketX, rocketY, rocketZ);
 		checkCollisions();
@@ -400,13 +412,6 @@ function display() {
 function animate() {
 	update();
 	display();
-}
-
-function addAux(obj) {
-	geometry = new THREE.SphereGeometry(5);
-	addObjPart(obj, geometry, null, 0xffc0cb, 15, 0, 0);
-	addObjPart(obj, geometry, null, 0xffff00, 15, 0, 0);
-	addObjPart(obj, geometry, null, 0x0000ff, 15, 0, 0);
 }
 
 function createScene() {
