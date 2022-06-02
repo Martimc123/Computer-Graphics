@@ -379,7 +379,7 @@ function addAux(obj) {
 function createScene() {
 	scene = new THREE.Scene();
 	scene.add(new THREE.AxesHelper(100));
-	scene.background = space_texture;
+	scene.background = videoTexture;//space_texture;
 	getObjPositions();
 	universe = createUniverse(0, 0, 0, defaultScale);
 }
