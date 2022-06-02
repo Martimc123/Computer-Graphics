@@ -28,10 +28,8 @@ var objAngles = [];
 var nrTrash = 20;
 var floatingTrash = [];
 var markedTrash = [];
-var trashSizes = [];
 var minTrashSize = planetRadius/24;
 var maxTrashSize = planetRadius/20;
-var trashGeometries = [];
 
 var copyVideo;
 var universe;
@@ -170,14 +168,12 @@ function GenerateTrash(obj)
 
 function checkCollisions()
 {
-	for(var i=0;i<21;i++)
-	{	
-		if (HasColision(rocket.getObjectByName("bb").geometry.boundingSphere,floatingTrash[i].getObjectByName("bb").geometry.boundingSphere))
+	trash.children.forEach( object => { 
+		if (HasColision(rocket.getObjectByName("bb").geometry.boundingSphere,object.getObjectByName("bb").geometry.boundingSphere))
 		{
-				console.log("COLISAO");
-				markedTrash.push(floatingTrash[i]);
+			markedTrash.push(object);
 		}
-	}
+	});
 }
 
 function removeTrash()
@@ -228,7 +224,7 @@ function addBoundaryBox(obj,x,y,z,raio)
 	geometry.boundingSphere = new THREE.Sphere(raio);
 	geometry.boundingSphere.center = new THREE.Vector3(x,y,z);
 	geometry.boundingSphere.radius = 1.5;
-	material = new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe: false } );
+	material = {};//new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe: false } );
 	addObjPart(obj, geometry, material, 0xffff00, x,y,z, 0,0,0,"bb");
 }
 
