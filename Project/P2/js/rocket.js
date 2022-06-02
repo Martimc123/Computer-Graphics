@@ -1,3 +1,6 @@
+// To generate the images, the videos and the overall project, run the command " python -m http.server "
+// in a terminal in the index.html folder and search for the url localhost:8000 in a browser
+
 /*global THREE*/
 var camera = [];
 var scene, renderer, currentCamera = 0;
@@ -15,7 +18,7 @@ var controls;
 
 var defaultScale = 1;
 var planetRadius = 12;
-var rocketHeight = planetRadius/12;
+var rocketHeight = planetRadius/11;
 var rocketPartHeight = rocketHeight/2;
 var rocketInfRadius = rocketPartHeight;
 var rocketMidRadius = rocketPartHeight/2;
@@ -26,10 +29,10 @@ var rocketTrashDistance = 1.2 * planetRadius;
 var objPositions = [];
 var objAngles = [];
 var nrTrash = 20;
-var floatingTrash = [];
-var trashSize = planetRadius/24;
-var trashGeometries = [];
-var trashRadius = [];
+var markedTrash = [];
+var minTrashSize = planetRadius/24;
+var maxTrashSize = planetRadius/20;
+var quadrants = [[],[],[],[],[],[],[],[],[]]; // case in border of quadrants goes to 9
 
 var copyVideo;
 var universe;
@@ -37,10 +40,7 @@ var planet;
 var rocket;
 var trash;
 var loader = new THREE.TextureLoader();
-var space_texture = new THREE.TextureLoader().load(
-	//"https://wallpaperaccess.com/full/1268183.jpg"
-	"./media/space.jpg"
-	);
+var space_texture = new THREE.TextureLoader().load("./media/space.jpg");
 
 var compressed_trash_texture = new THREE.TextureLoader().load("./media/trash.jpg");
 
@@ -75,36 +75,20 @@ function getObjPositions() {
 	var objX, objY, objZ;
 
 	for (i = 0; i < nrObj; i++) {
+		var posVector = new THREE.Vector3(0,0,0); // spherical coordinates vector
+		var angleVector = new THREE.Vector2(0,0); // angles Theta and Phi for spherical coordinates
 		angleTheta = Math.random() * 2*Math.PI;
 		anglePhi = Math.random() * 2*Math.PI;
-		var angleVector = new THREE.Vector2(angleTheta, anglePhi); // angles Theta and Phi for spherical coordinates
+		angleVector.set(angleTheta, anglePhi);
 		objAngles.push(angleVector);
 
 		objX = rocketTrashDistance * Math.sin(angleTheta) * Math.sin(anglePhi);
 		objY = rocketTrashDistance * Math.cos(angleTheta);
 		objZ = rocketTrashDistance * Math.sin(angleTheta) * Math.cos(anglePhi);
-		var posVector = new THREE.Vector3(objX, objY, objZ); // spherical coordinates vector
+		posVector.set(objX, objY, objZ);	
 		objPositions.push(posVector);
 	}
-}
-
-function getTrashGeometries() {
-	var radius;
 	
-	geometry = new THREE.BoxGeometry(trashSize, trashSize, trashSize);
-	radius = Math.sqrt(trashSize**2+trashSize**2);
-	trashGeometries.push(geometry);
-	trashRadius.push(radius);
-
-	geometry = new THREE.DodecahedronGeometry(trashSize);
-	radius = trashSize;
-	trashGeometries.push(geometry);
-	trashRadius.push(radius);
-
-	geometry = new THREE.ConeGeometry(trashSize, 2*trashSize, 11);
-	radius = Math.sqrt(trashSize**2+trashSize**2);
-	trashGeometries.push(geometry);
-	trashRadius.push(radius);
 }
 
 function createUniverse(x, y, z, scale) {
@@ -116,123 +100,125 @@ function createUniverse(x, y, z, scale) {
 
 	addPlanet(universe, 0, 0, 0);
 	addRocket(universe, rocketPos.x, rocketPos.y, rocketPos.z);
+	addAux(universe);
 
 	universe.add(trash);
-	trash.position.set(0,0,0);
-	addTrash(trash);
+	GenerateTrash(trash);
+
 	universe.position.set(x, y, z);
 	scene.add(universe);
 	return universe;
 }
 
+function HasColision(obj1,obj2)
+{
+	radius = (obj1.radius+obj2.radius)**2;
+	distance = (obj1.center.x-obj2.center.x)**2 + (obj1.center.y-obj2.center.y)**2 + (obj1.center.z-obj2.center.z)**2;
+	return radius >= distance;
+}
+
 function getRndInteger(min, max) {
-	return Math.floor(Math.random() * (max - min+1)) + min;
+	return Math.floor(Math.random() * (max - min)) + min;
 }
 
-function addTrash(obj) {
-	var i;
-	var nrObj = nrTrash+1;
-	material = new THREE.MeshBasicMaterial( {map: compressed_trash_texture,transparent:false} );
-	for (i=1; i < nrObj; i++) {
-		var position = objPositions[i];
-		var option = getRndInteger(0,2);
-		console.log("geom=" +option);
-		var trashUnit = new THREE.Object3D();
-		geometry = trashGeometries[option];
-		addObjPart(trashUnit, geometry, material, 0x00ff00, 0, 0, 0, 0, 0, 0);
-		
-		var radius = trashRadius[option];
-		addBoundary(trashUnit, radius);
-		trashUnit.getObjectByName("boundary").visible = false;
-
-		trashUnit.name = "trash"+i;
-		floatingTrash.push(trashUnit);
-		obj.add(trashUnit);
-		trashUnit.position.set(position.x, position.y, position.z);
-	}
-	var nr = objPositions.length;
-	console.log(nr);
-	var obj2 = objPositions[0];
-	console.log("rocket:[" + obj2.x + ", " + obj2.y + "," + obj2.z + "]");
-	
-	for (i=1; i < nr; i++) {
-		var obj2 = objPositions[i];
-		console.log("trash:[" + obj2.x + ", " + obj2.y + "," + obj2.z + "]");
-	}
-	var nr = floatingTrash.length;
-	console.log(nr);
-	for (i=0; i < nr; i++) {
-		var obj = floatingTrash[i];
-		var obj2 = obj.position;
-		console.log("trash:[" + obj2.x + ", " + obj2.y + "," + obj2.z + "]");
-	}
-}
-
-function addBoundary(obj, radius) {
-	geometry = new THREE.SphereGeometry(radius, 16, 8);
-	material = new THREE.MeshBasicMaterial({wireframe: wires});
-	addObjPart(obj, geometry, material, 0x000000, 0, 0, 0, 0, 0, 0, "boundary");
-}
-
-function checkCollisions() {
-	console.log("i got in!");
-	var i;
-	var nrRemoved = 0;
-	var toRemove = [];
-	var nr = floatingTrash.length;
-	console.log(nr + " trashes before");
-	for (i=0; i < nrTrash; i++) {
-		var trashUnit = floatingTrash[i];
-		if (hasCollision(rocket, trashUnit)) {
-			nrRemoved++;
-			toRemove.push(trashUnit);
+function GenerateTrash(obj)
+{
+	for (i = 1;i<21;i++)
+	{
+		var option = getRndInteger(1,4);
+		if (option == 1)
+		{
+			cubic_trash = new THREE.Object3D();
+			geometry = new THREE.BoxGeometry( (planetRadius/21)/2, (planetRadius/21)/2, (planetRadius/21)/2 );
+			material = new THREE.MeshBasicMaterial( {map: compressed_trash_texture,transparent:true} );
+			addObjPart(cubic_trash, geometry, material, 0x00ff00, objPositions[i].x,objPositions[i].y,objPositions[i].z,0,0,0,tag = "");
+			addBoundaryBox(cubic_trash,objPositions[i].x,objPositions[i].y,objPositions[i].z,(planetRadius/21));
+			cubic_trash.getObjectByName("bb").geometry.boundingSphere.set(new THREE.Vector3(objPositions[i].x,objPositions[i].y,objPositions[i].z),1.5);
+			cubic_trash.name = "trash"+i;
+			quadrants[quadrantIdentifier(objPositions[i].x,objPositions[i].y,objPositions[i].z)-1].push(cubic_trash);
+			obj.add(cubic_trash);
+		}
+		if (option == 2)
+		{
+			polyhedron_trash = new THREE.Object3D();
+			geometry = new THREE.DodecahedronGeometry((planetRadius/21)/2,0);
+			material = new THREE.MeshBasicMaterial( {map: compressed_trash_texture,transparent:true} );
+			addObjPart(polyhedron_trash, geometry, material, 0x00ff00, objPositions[i].x,objPositions[i].y,objPositions[i].z,0,0,0,tag = "");
+			addBoundaryBox(polyhedron_trash,objPositions[i].x,objPositions[i].y,objPositions[i].z,planetRadius/21+1);
+			polyhedron_trash.getObjectByName("bb").geometry.boundingSphere.set(new THREE.Vector3(objPositions[i].x,objPositions[i].y,objPositions[i].z),1.5);
+			polyhedron_trash.name = "trash"+i;
+			quadrants[quadrantIdentifier(objPositions[i].x,objPositions[i].y,objPositions[i].z)-1].push(polyhedron_trash);
+			obj.add(polyhedron_trash);
+		}
+		if (option == 3)
+		{
+			cone_trash = new THREE.Object3D();
+			geometry = new THREE.ConeGeometry( (planetRadius/21)/2, 1, 11 );
+			material = new THREE.MeshBasicMaterial( {map: compressed_trash_texture,transparent:true} );
+			addObjPart(cone_trash, geometry, material, 0x00ff00, objPositions[i].x,objPositions[i].y,objPositions[i].z,0,0,0,tag = "");
+			addBoundaryBox(cone_trash,objPositions[i].x,objPositions[i].y,objPositions[i].z,planetRadius/21+0.2);
+			cone_trash.getObjectByName("bb").geometry.boundingSphere.set(new THREE.Vector3(objPositions[i].x,objPositions[i].y,objPositions[i].z),1.5);
+			cone_trash.name = "trash"+i;
+			quadrants[quadrantIdentifier(objPositions[i].x,objPositions[i].y,objPositions[i].z)-1].push(cone_trash);
+			obj.add(cone_trash);
 		}
 	}
-	for (i = 0; i < nrRemoved; i++) {
-		var trashUnit = toRemove[i];
-		floatingTrash.pop(trashUnit);
-		trash.remove(trashUnit);
+}
+
+function checkCollisions()
+{
+	var i = quadrantIdentifier(objPositions[0].x,objPositions[0].y,objPositions[0].z)-1;
+	quadrants[i].forEach( object => { 
+		if (HasColision(rocket.getObjectByName("bb").geometry.boundingSphere,object.getObjectByName("bb").geometry.boundingSphere))
+		{
+			markedTrash.push(object);
+		}
+	});
+}
+
+function removeTrash()
+{
+	for (var i = 0; markedTrash.length; i++)
+	{
+		trash.remove(markedTrash[i]);
+		markedTrash.splice(0,i);
 	}
-	var nr = floatingTrash.length;
-	nrTrash += -nrRemoved;
-	console.log(nr + " trashes after");
 }
 
-function squareDistanceBetween(obj1, obj2) {
-	var squareD;
+function quadrantIdentifier(x,y,z)
+{
+	if (x>0,y>0,z>0)
+		return 1;
 
-	var x1 = obj1.position.x;
-	var x2 = obj2.position.x;
+	else if(x>0,y<0,z>0)
+		return 2;
 
-	var y1 = obj1.position.y;
-	var y2 = obj2.position.y;
+	else if(x<0,y>0,z>0)
+		return 3;
+
+	else if(x<0,y>0,z>0)
+		return 4;
+
+	else if(x>0,y>0,z<0)
+		return 5;
+
+	else if(x>0,y<0,z<0)
+		return 6;
+
+	else if (x<0,y>0,z<0)
+		return 7;
+	else if(x<0,y<0,z<0)
+		return 8;
 	
-	var z1 = obj1.position.z;
-	var z2 = obj2.position.z;
-
-	squareD = (x1-x2)**2 + (y1-y2)**2 + (z1-z2)**2;
-
-	return squareD;
-}
-
-function hasCollision(obj1, obj2) {
-	var sphere1 = obj1.getObjectByName("boundary").geometry;
-	var sphere2 = obj2.getObjectByName("boundary").geometry;
-	console.log("rocketR:" + sphere1.parameters.radius + "; trashR:" + sphere2.parameters.radius);
-	/*console.log("rocketP:[" + obj1.position.x + ", " + obj1.position.y + "," + obj1.position.z + "]");
-	console.log("trash:[" + obj2.position.x + ", " + obj2.position.y + "," + obj2.position.z + "]");
-	*/var totalR = sphere1.parameters.radius + sphere2.parameters.radius;
-	return totalR**2 >= squareDistanceBetween(obj1, obj2);
+	else
+		return 9;
 }
 
 function addPlanet(obj, x, y, z) {
 	planet = new THREE.Object3D();
 	geometry = new THREE.SphereGeometry(planetRadius);
 	
-	var planetTexture = new THREE.TextureLoader().load(
-		"./media/earth2.jpg"
-		//"https://st2.depositphotos.com/5171687/44380/i/450/depositphotos_443805316-stock-photo-equirectangular-map-clouds-storms-earth.jpg"
-		);
+	var planetTexture = new THREE.TextureLoader().load("./media/earth2.jpg");
 	var planetMaterial = new THREE.MeshBasicMaterial( {
 		map: planetTexture,
 		transparent:true,
@@ -250,13 +236,22 @@ function addRocket(obj, x, y, z) {
 	addRocketBooster(rocket, -rocketInfRadius+boosterRadius, -rocketPartHeight-0.5*boosterHeight, 0);
 	addRocketBooster(rocket, 0,-rocketPartHeight-0.5*boosterHeight, rocketInfRadius-boosterRadius);
 	addRocketBooster(rocket, 0,-rocketPartHeight-0.5*boosterHeight, -rocketInfRadius+boosterRadius);
-	var radius = Math.sqrt((rocketPartHeight+boosterHeight)**2 + rocketInfRadius**2);
-	addBoundary(rocket, radius);
-	rocket.getObjectByName("boundary").visible = false; // !!
+	addBoundaryBox(rocket,0, 0, rocketPartHeight/2,rocketHeight);
 	rocket.rotation.z = -Math.PI/180 * 90;
 	rocket.position.set(x, y, z);
 	obj.add(rocket);
 	return rocket;
+}
+
+
+function addBoundaryBox(obj,x,y,z,raio)
+{
+	geometry = new THREE.SphereGeometry(raio);
+	geometry.boundingSphere = new THREE.Sphere(raio);
+	geometry.boundingSphere.center = new THREE.Vector3(x,y,z);
+	geometry.boundingSphere.radius = 1.5;
+	material = {};
+	addObjPart(obj, geometry, material, 0xffff00, x,y,z, 0,0,0,"bb");
 }
 
 function addRocketTop(obj, x, y, z) {
@@ -298,13 +293,6 @@ function onResize() {
 			camera[i].aspect = aspectRatio;
 			camera[i].updateProjectionMatrix();
 		}
-		i = 3;
-		camera[i].left = -viewSize * aspectRatio / val;
-			camera[i].right = viewSize * aspectRatio / val;
-			camera[i].top = viewSize / val;
-			camera[i].bottom = viewSize / -val;
-			camera[i].updateProjectionMatrix();
-
 	}
 }
 
@@ -314,23 +302,6 @@ function changeWires(wires) {
 	for (i = 0; i < nrObj; i++) {
 		wiredObjects[i].material.wireframe = wires;
 	}
-}
-
-// returns semi-hemisphhere of an object's geometric center
-function getSemiHemisphere(obj) {
-	var posY = obj.position.y;
-	var posZ = obj.position.z;
-	var northernHemisphere = false;	
-	var easternHemisphere = false;
-
-	if (posY > 0) northernHemisphere = true;
-	if (posZ > 0) easternHemisphere = true;
-	
-	if (northernHemisphere && easternHemisphere) return 0; //NE
-	else if (northernHemisphere && !easternHemisphere) return 1; //NW
-	else if (!northernHemisphere && !easternHemisphere) return 2; //SW
-	else if (!northernHemisphere && easternHemisphere) return 3; //SE
-
 }
 
 function myLookAt(obj, targetPosition) {
@@ -351,77 +322,66 @@ function update()
 	var timeOccurred = clock.getDelta();
 	var rocketSpeed = Math.PI/180 * 40;
 	var degreesTraveled = rocketSpeed*timeOccurred;
-	var dirLatitudeCoef = -1; // clock-wise
+	var dirLatitudeCoef = -1;
 	var dirLongitudeCoef = -1;
 
 	if (rightArrow || leftArrow || upArrow || downArrow) { // rocket movement flags
 		var rocketTheta = objAngles[0].x;
 		var rocketPhi = objAngles[0].y;	
 		var rocketX, rocketY, rocketZ;
-		var rotZ = 0;
+		var rotZ;
 		
-		// Nullifies opposite direction arrows for simplicity
-		if (leftArrow && rightArrow) {
-			leftArrow=false;
-			rightArrow = false;
-		}
-		if (upArrow && downArrow) {
-			upArrow = false;
-			downArrow = false;
-		}
-
-		if (leftArrow && upArrow) {
-			rotZ = -Math.PI/4;
-			rocketPhi += dirLongitudeCoef * Math.sqrt(0.5)*degreesTraveled;
-			rocketTheta += dirLatitudeCoef * Math.sqrt(0.5)*degreesTraveled;
-		}
-		else if (leftArrow && downArrow) {
-			rotZ = -3*Math.PI/4;
-			rocketPhi += dirLongitudeCoef * Math.sqrt(0.5)*degreesTraveled;
-			rocketTheta += - dirLatitudeCoef * Math.sqrt(0.5)*degreesTraveled;
-		}
-		else if (rightArrow && upArrow) {
-			rotZ = Math.PI/4;
-			rocketPhi += -dirLongitudeCoef * Math.sqrt(0.5)*degreesTraveled;
-			rocketTheta += dirLatitudeCoef * Math.sqrt(0.5)*degreesTraveled;
-		}
-		else if (rightArrow && downArrow) {
-			rotZ = 3*Math.PI/4;
-			rocketPhi += -dirLongitudeCoef * Math.sqrt(0.5)*degreesTraveled;
-			rocketTheta += - dirLatitudeCoef * Math.sqrt(0.5)*degreesTraveled;
-		}
-		else if (leftArrow) {
-			rotZ = -Math.PI/2;
+		if (leftArrow){	
 			rocketPhi += dirLongitudeCoef * degreesTraveled;
+			rotZ = -Math.PI/2;
 		}
-		else if (rightArrow) {
-			rotZ = Math.PI/2;
+		if (rightArrow){
 			rocketPhi += -dirLongitudeCoef * degreesTraveled;
+			rotZ = Math.PI/2;
 		}
-		else if (upArrow) {
-			rotZ = 0;
+		if (upArrow){
 			rocketTheta += dirLatitudeCoef * degreesTraveled;
-		}
-		else if (downArrow) {
 			rotZ = Math.PI;
+		}
+		if (downArrow){
 			rocketTheta += - dirLatitudeCoef * degreesTraveled;
+			rotZ = -Math.PI;
 		}
 
+		// If speed is in both directions, to mantain total, speed in each direction is halved
+		if (leftArrow && upArrow) {
+			rocketPhi += -dirLongitudeCoef * degreesTraveled /2;
+			rocketTheta += -dirLatitudeCoef * degreesTraveled /2;
+		}
+		if (leftArrow && downArrow) {
+			rocketPhi += -dirLongitudeCoef * degreesTraveled /2;
+			rocketTheta += dirLatitudeCoef * degreesTraveled /2;
+		}
+		if (rightArrow && upArrow) {
+			rocketPhi += dirLongitudeCoef * degreesTraveled /2;
+			rocketTheta += -dirLatitudeCoef * degreesTraveled /2;
+		}
+		if (rightArrow && downArrow) {
+			rocketPhi += dirLongitudeCoef * degreesTraveled /2;
+			rocketTheta += dirLatitudeCoef * degreesTraveled /2;
+		}
+		
 		rocketX = rocketTrashDistance * Math.sin(rocketTheta) * Math.sin(rocketPhi);
 		rocketY = rocketTrashDistance * Math.cos(rocketTheta);
 		rocketZ = rocketTrashDistance * Math.sin(rocketTheta) * Math.cos(rocketPhi);
 		
 		rocket.position.set(rocketX, rocketY, rocketZ);
 		rocket.lookAt(scene.position);
-		rocket.rotateZ(rotZ);
 		objAngles[0].set(rocketTheta, rocketPhi);
 		objPositions[0].set(rocketX, rocketY, rocketZ);
+		rocket.getObjectByName("bb").geometry.boundingSphere.set(new THREE.Vector3(rocketX, rocketY, rocketZ),1.5);
 		checkCollisions();
 	}
 }
 
 function display() {
 	changeWires(wires);
+	removeTrash();
 	requestAnimationFrame(animate);
 	render();
 }
@@ -431,12 +391,18 @@ function animate() {
 	display();
 }
 
+function addAux(obj) {
+	geometry = new THREE.SphereGeometry(5);
+	addObjPart(obj, geometry, null, 0xffc0cb, 15, 0, 0);
+	addObjPart(obj, geometry, null, 0xffff00, 15, 0, 0);
+	addObjPart(obj, geometry, null, 0x0000ff, 15, 0, 0);
+}
+
 function createScene() {
 	scene = new THREE.Scene();
 	scene.add(new THREE.AxesHelper(100));
-	scene.background = space_texture;
+	scene.background = videoTexture;//space_texture;
 	getObjPositions();
-	getTrashGeometries();
 	universe = createUniverse(0, 0, 0, defaultScale);
 }
 
@@ -545,7 +511,7 @@ function init() {
 	camera[3] = createOrtographicCamera(0, 0, viewSize);
 	rocket.add(camera[2]);
 	rocket.add(new THREE.AxesHelper(10));
-	controls = new THREE.OrbitControls(camera[3], renderer.domElement);
+	controls = new THREE.OrbitControls(camera[currentCamera], renderer.domElement);
 	animate();
 	video.addEventListener("playing", function() {
 		copyVideo = true;
