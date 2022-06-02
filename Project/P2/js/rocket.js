@@ -1,3 +1,6 @@
+// To generate the images, the videos and the overall project, run the command " python -m http.server "
+// in a terminal in the index.html folder and search for the url localhost:8000 in a browser
+
 /*global THREE*/
 var camera = [];
 var scene, renderer, currentCamera = 0;
