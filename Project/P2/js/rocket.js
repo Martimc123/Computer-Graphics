@@ -41,6 +41,7 @@ var universe;
 var planet;
 var rocket;
 var trash;
+var rotate = false;
 var loader = new THREE.TextureLoader();
 var space_texture = new THREE.TextureLoader().load("./media/space.jpg");
 
@@ -352,18 +353,22 @@ function update()
 			rocketTheta += - dirLatitudeCoef * Math.sqrt(0.5)*degreesTraveled;
 		}
 		else if (leftArrow) {
+			rotate=true;
 			rotZ = -Math.PI/2;
 			rocketPhi += dirLongitudeCoef * degreesTraveled;
 		}
 		else if (rightArrow) {
+			rotate=true;
 			rotZ = Math.PI/2;
 			rocketPhi += -dirLongitudeCoef * degreesTraveled;
 		}
 		else if (upArrow) {
+			rotate=false;
 			rotZ = 0;
 			rocketTheta += dirLatitudeCoef * degreesTraveled;
 		}
 		else if (downArrow) {
+			rotate=false;
 			rotZ = Math.PI;
 			rocketTheta += - dirLatitudeCoef * degreesTraveled;
 		}
@@ -374,6 +379,8 @@ function update()
 		
 		rocket.position.set(rocketX, rocketY, rocketZ);
 		rocket.lookAt(scene.position);
+		if (rotate)
+			rocket.rotateZ(Math.PI/180 * 90);
 		objAngles[0].set(rocketTheta, rocketPhi);
 		objPositions[0].set(rocketX, rocketY, rocketZ);
 		rocket.getObjectByName("bb").geometry.boundingSphere.set(new THREE.Vector3(rocketX, rocketY, rocketZ),rocketBoundaryRadius);
