@@ -1,0 +1,19 @@
+glitch do polo norte/sul - p corrigir: 
+multiplicar o up do lookat por um escalar negativo sempre q muda de polo
+
+n e pedido rodar p acompanhar
+quem roda qdo anda p trás, essa rotação deve ter em conta o lookat mudar
+
+- bounding sphere pode-se usar da forma q a gente usou?
+- limites de tempo/raio fazem mal ser assim? <= vs <
+
+
+1 vista de cena
+foguetao
+algum lixo
+ref global
+pos cameras
+
+grafo cena:
+- foguetao camera
+- transformaçoes setas n e preciso
