@@ -59,10 +59,10 @@ function createMesh(obj,name,type,posx,posy,posz,rotX,rotY,rotZ,mat)
 		
 		case 'triangle':
 			width = 10;
-			shape.moveTo(0,0);
+			shape.moveTo(0,-width);
 			shape.lineTo(0,width);
-			shape.lineTo(width,width);
-			shape.lineTo(0,0);
+			shape.lineTo(width,0);
+			shape.lineTo(0,-width);
 			pos.x=0;
 			pos.y=0;
 			break;
@@ -133,9 +133,7 @@ function createFig1(obj,x,y,z)
 	
 	//creates lower left triangle
 	createMesh(obj,'triangle',2,0,0,0,0,Math.PI/180*90,0,1);
-	createMesh(obj,'triangle',2,0,0,0,0,0,0,1);
-	createMesh(obj,'triangle',2,0,20,0,Math.PI/180*180,0,0,1);
-	createMesh(obj,'triangle',2,0,20,0,-Math.PI/180*180,-Math.PI/180*90,0,1);
+	createMesh(obj,'triangle',2,0,0,0,0,Math.PI/180*20,0,1);
 	obj.position.set(x,y,z);
 
 	universe.add(obj);
