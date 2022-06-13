@@ -5,14 +5,20 @@
 // For the Ubuntu wsl terminal, use "python -m SimpleHTTPServer 8000" instead
 
 /*global THREE*/
+
+
 var camera = [];
 var scene, renderer, currentCamera = 0;
 
 var viewSize = 40;
 var aspectRatio;
+var podiumStepHeight = 0.5;
+var podiumBottomLen = 20;
+var podiumTopLen = 0.75*podiumBottomLen;
 
 var geometry, material, mesh;
 var wiredObjects = [];
+var wires = false;
 
 var leftArrow, rightArrow, upArrow, downArrow;
 var clock = new THREE.Clock();
@@ -23,38 +29,68 @@ var loader = new THREE.TextureLoader();
 var controls;
 var fig1;
 var fig2;
-var wood_texture = new THREE.TextureLoader().load("./media/wood.jpg");
-var glass_texture = new THREE.TextureLoader().load("./media/glass.jpg");
-var direc_light;
+var wood_texture;
+var glass_texture;
+var lambertMaterial;
+var phongMaterial;
+loader.load("./media/wood.jpg", (texture) => {
+  wood_texture = texture;
+	phongMaterial = new THREE.MeshPhongMaterial({color: 0x333333, map: wood_texture, side: THREE.DoubleSide});
+});
+loader.load("./media/glass.jpg", (texture) => {
+  glass_texture = texture;
+	lambertMaterial = new THREE.MeshLambertMaterial({color: 0x55555, map: glass_texture, side: THREE.DoubleSide})
+});
+var dirLightObj;
 var directionalLight;
-var direc_intensity = 0.5;
+var dirLightIntensity = 0.5;
 var figures = [];
-var change_material = true;
+var isMaterialLambert = true;
 var qKey,wKey,eKey,rKey,tKey,yKey;
 
 'use strict';
 
-function createFloor(obj, x, y, z) {
-	geometry = new THREE.BoxGeometry(30,0.5, 40);
-	material = new THREE.MeshPhongMaterial( { map: wood_texture } );
+function addObjPart(obj, geometry, mater, hex, x, y, z, rotX, rotY, rotZ,tag = "") {
+	material = (mater != null)? mater : new THREE.MeshBasicMaterial({color: hex, wireframe: wires});
 	mesh = new THREE.Mesh(geometry, material);
+	mesh.rotateX(rotX);
+	mesh.rotateY(rotY);
+	mesh.rotateZ(rotZ);
 	mesh.position.set(x, y, z);
+	mesh.name=tag;
 	obj.add(mesh);
+	wiredObjects.push(mesh);
+	return mesh;
 }
 
-function createPalanque(obj, x, y, z) {
-	geometry = new THREE.BoxGeometry(20,0.5, 20);
-	let geometry2 = new THREE.BoxGeometry(15,0.5, 15);
-	material = new THREE.MeshLambertMaterial( { map: glass_texture } );
-	mesh = new THREE.Mesh(geometry, material);
-	mesh.position.set(x, y, z);
-	mesh2 = new THREE.Mesh(geometry2, material);
-	mesh2.position.set(x, y+2, z);
-	obj.add(mesh);
-	obj.add(mesh2);
+function addFloor(obj, x, y, z) {
+	geometry = new THREE.PlaneGeometry(viewSize*2, viewSize*2);
+	material = phongMaterial;
+	addObjPart(obj, geometry, material, 0x449999, x, y, z, -Math.PI*90);
 }
 
-function createMesh(obj,name,type,posx,posy,posz,rotX,rotY,rotZ,mat)
+function addPodium(obj, x, y, z) {
+	var podium = new THREE.Object3D();
+	addPodiumBottom(podium, 0, -podiumStepHeight/2, 0);
+	addPodiumTop(podium, 0, podiumStepHeight/2, 0);	
+	podium.position.set(x, y, z);
+	obj.add(podium);
+	return podium;
+}
+
+function addPodiumBottom(obj, x, y, z) {
+	geometry = new THREE.BoxGeometry(podiumBottomLen,podiumStepHeight, podiumBottomLen);
+	material = lambertMaterial;
+	addObjPart(obj, geometry, material, 0x449999, x, y, z);
+}
+
+function addPodiumTop(obj, x, y, z) {
+	geometry = new THREE.BoxGeometry(podiumTopLen,podiumStepHeight, podiumTopLen);
+	material = lambertMaterial;
+	addObjPart(obj, geometry, material, 0x449999, x, y, z);
+}
+
+function addMesh(obj,name,type,posx,posy,posz,rotX,rotY,rotZ,mat)
 {
 	let shape = new THREE.Shape();
 	let width;
@@ -179,20 +215,20 @@ function changeLightning(intensity) {
 	universe.getObjectByName("directional").getObjectByName("light").intensity = intensity;
 }
 
-function changeMaterial(change) {
+function changeMaterial(isMaterialLambert) {
 	for (i = 0; i < figures.length; i++)
 	{
-		if (change)
-			figures[i].material = new THREE.MeshLambertMaterial( {color: 0xff0000} )
+		if (isMaterialLambert)
+			figures[i].material = lambertMaterial
 		else
-			figures[i].material = new THREE.MeshPhongMaterial( {color: 0xffffff} )
+			figures[i].material = phongMaterial;
 	}
 }
 
 var i = 0;
 function display() {
-	changeLightning(direc_intensity);
-	changeMaterial(change_material);
+	changeLightning(dirLightIntensity);
+	changeMaterial(isMaterialLambert);
 	requestAnimationFrame(animate);
 	render();
 }
@@ -202,31 +238,31 @@ function animate() {
 	display();
 }
 
-function createCube(obj,x,y,z)
+function addCube(obj,x,y,z)
 {
 	const geometry = new THREE.BoxGeometry( 2, 2, 2 );
-	const material = new THREE.MeshPhongMaterial( {color: 0xff0000} );
+	const material = phongMaterial;
 	const cube = new THREE.Mesh( geometry, material );
 	cube.position.set(x,y,z);
 	obj.add(cube);
 	figures.push(cube);
 }
 
-function createFig1(obj,x,y,z)
+function addFig1(obj,x,y,z)
 {
 	//creates 1st figure
 	
 	//creates lower left triangle
-	createMesh(obj,'triangle',2,0,0,0,0,Math.PI/180*90,0,1);
-	createMesh(obj,'triangle',2,0,0,0,0,Math.PI/180*20,0,1);
+	addMesh(obj,'triangle',2,0,0,0,0,Math.PI/180*90,0,1);
+	addMesh(obj,'triangle',2,0,0,0,0,Math.PI/180*20,0,1);
 	obj.position.set(x,y,z);
 
 	universe.add(obj);
 }
 
-function createDirectionalLight(obj)
+function addDirectionalLight(obj)
 {
-	directionalLight = new THREE.DirectionalLight( 0xffffff,direc_intensity );
+	directionalLight = new THREE.DirectionalLight( 0xffffff,dirLightIntensity);
 	directionalLight.name="light";
 	obj.add( directionalLight );
 }
@@ -238,35 +274,34 @@ function createScene() {
 	universe = new THREE.Object3D();
 	universe.scale.set(1,1,1);
 
-	direc_light = new THREE.Object3D();
-	direc_light.name="directional";
-	createDirectionalLight(direc_light);
-	direc_light.rotateZ(Math.PI/180*30);
-	console.log(direc_light);
-	universe.add(direc_light);
+	dirLightObj = new THREE.Object3D();
+	dirLightObj.name="directional";
+	addDirectionalLight(dirLightObj);
+	dirLightObj.rotateZ(Math.PI/180*30);
+	console.log(dirLightObj);
+	universe.add(dirLightObj);
 	
-	palanque = new THREE.Object3D();
-	directionalLight.target = palanque;
-	universe.add(palanque);
-	createFloor(palanque,0,0,0);
-	createPalanque(palanque,0,2,0);
+	podium = addPodium(universe, 0, podiumStepHeight, 0);
+	directionalLight.target = podium;
+	addFloor(podium,0,0,0);
+	addPodium(podium,0,2,0);
 
-	createCube(universe,0,4.5+1,5);
-	createCube(universe,0,4.5+1,0);
-	createCube(universe,0,4.5+1,-5);
+	addCube(universe,0,4.5+1,5);
+	addCube(universe,0,4.5+1,0);
+	addCube(universe,0,4.5+1,-5);
 
 	const light = new THREE.AmbientLight( 0x404040 ); // soft white light
 	universe.add( light );
 
 	fig1 = new THREE.Object3D();
-	createFig1(fig1,10,10,10);
+	addFig1(fig1,10,10,10);
 
 	fig2 = new THREE.Object3D();
-	//createFig1(fig2,20,1,1);
+	//addFig1(fig2,20,1,1);
 
 	universe.position.set(0,0,0);
 	scene.add(universe);
-	//createMesh('triangle',1,0,10,0.8,0,-Math.PI/180*45,0);
+	//addMesh('triangle',1,0,10,0.8,0,-Math.PI/180*45,0);
 }
 
 function createOrtographicCamera(x, y, z) {
@@ -315,6 +350,9 @@ function onKeyDown(e) {
 		case 51://3
 			currentCamera = 2;
 			break;
+			case 55://7
+			currentCamera = 3;
+			break;
 		
 		case 81: //Q
 		case 113: //q
@@ -345,12 +383,12 @@ function onKeyDown(e) {
 		
 		case 68:  //D
 		case 100: //d
-			direc_intensity = (direc_intensity == 0 ? 0.5 : 0);
+			dirLightIntensity = (dirLightIntensity == 0 ? 0.5 : 0);
 			break;
 		
 		case 65://A
 		case 97://a
-			change_material = !change_material;
+			isMaterialLambert = !isMaterialLambert;
 			break;
 
 		case 52://4
@@ -431,7 +469,9 @@ function init() {
 	createScene();
 	camera[0] = createPerspectiveCamera(viewSize/1.5,viewSize/4,0);
 	camera[1] = createOrtographicCamera(0, viewSize,0);
-	controls = new THREE.OrbitControls(camera[currentCamera], renderer.domElement);
+	camera[2] = createOrtographicCamera(0, viewSize,0);
+	camera[3] = createOrtographicCamera(0, viewSize,0);
+	controls = new THREE.OrbitControls(camera[3], renderer.domElement);
 	animate();
 	
 	window.addEventListener("resize", onResize);
