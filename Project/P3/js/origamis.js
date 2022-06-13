@@ -10,9 +10,15 @@ var scene, renderer, currentCamera = 0;
 
 var viewSize = 40;
 var aspectRatio;
+var podiumStepHeight = 0.5;
+var podiumBottomLen = 20;
+var podiumTopLen = 0.75*podiumBottomLen;
+var origamiLen = 2;
+var origamiDist = 1/3*podiumTopLen;
 
 var geometry, material, mesh;
 var wiredObjects = [];
+var wires = true;
 
 var leftArrow, rightArrow, upArrow, downArrow;
 var clock = new THREE.Clock();
@@ -25,36 +31,42 @@ var fig1;
 var fig2;
 var wood_texture = new THREE.TextureLoader().load("./media/wood.jpg");
 var glass_texture = new THREE.TextureLoader().load("./media/glass.jpg");
-var direc_light;
+var dirLightObj;
 var directionalLight;
-var direc_intensity = 0.5;
+var dirLightIntensity = 0.5;
 var figures = [];
-var change_material = true;
+var isMaterialLambert = true;
 var qKey,wKey,eKey,rKey,tKey,yKey;
+var refreshKey, pauseKey = true;
+var i = 0;
 
 'use strict';
 
-function createFloor(obj, x, y, z) {
-	geometry = new THREE.BoxGeometry(30,0.5, 40);
+function addFloor(obj, x, y, z) {
+	geometry = new THREE.BoxGeometry(viewSize*2,0.1, viewSize*2);
 	material = new THREE.MeshPhongMaterial( { map: wood_texture } );
 	mesh = new THREE.Mesh(geometry, material);
 	mesh.position.set(x, y, z);
 	obj.add(mesh);
 }
 
-function createPalanque(obj, x, y, z) {
-	geometry = new THREE.BoxGeometry(20,0.5, 20);
-	let geometry2 = new THREE.BoxGeometry(15,0.5, 15);
+function addPodium(obj, x, y, z) {
+	var podiumObj = new THREE.Object3D();
+	geometry = new THREE.BoxGeometry(podiumBottomLen,podiumStepHeight, podiumBottomLen);
+	let geometry2 = new THREE.BoxGeometry(podiumTopLen,podiumStepHeight, podiumTopLen);
 	material = new THREE.MeshLambertMaterial( { map: glass_texture } );
 	mesh = new THREE.Mesh(geometry, material);
-	mesh.position.set(x, y, z);
+	mesh.position.set(0, -podiumStepHeight/2, 0);
 	mesh2 = new THREE.Mesh(geometry2, material);
-	mesh2.position.set(x, y+2, z);
-	obj.add(mesh);
-	obj.add(mesh2);
+	mesh2.position.set(0, podiumStepHeight/2, 0);
+	podiumObj.add(mesh);
+	podiumObj.add(mesh2);
+	podiumObj.position.set(x,y,z);
+	obj.add(podiumObj);
+	return podiumObj;
 }
 
-function createMesh(obj,name,type,posx,posy,posz,rotX,rotY,rotZ,mat)
+function addMesh(obj,name,type,posx,posy,posz,rotX,rotY,rotZ,mat)
 {
 	let shape = new THREE.Shape();
 	let width;
@@ -142,36 +154,34 @@ function update()
 	var timeOccurred = clock.getDelta();
 	var RotSpeed = 2.5;
 
-	if (qKey || wKey || eKey || rKey || tKey || yKey) { // rocket movement flags
-		if (qKey)
-			figures[0].rotation.y += RotSpeed * timeOccurred;
-		if (wKey)
-			figures[0].rotation.y += -RotSpeed * timeOccurred;
-		
-		if (eKey)
-			figures[1].rotation.y += RotSpeed * timeOccurred;
-		if (rKey)
-			figures[1].rotation.y += -RotSpeed * timeOccurred;
-		
-		if (tKey)
-			figures[2].rotation.y += RotSpeed * timeOccurred;
-		if (yKey)
-			figures[2].rotation.y += -RotSpeed * timeOccurred;
-		
+	if (qKey || wKey || eKey || rKey || tKey || yKey) { // origami movement flags
 		if (qKey && wKey) {
 			qKey = false;
 			wKey = false;
 		}
-
 		if (eKey && rKey) {
 			eKey = false;
 			rKey = false;
 		}
-
 		if (tKey && yKey) {
 			tKey = false;
 			yKey = false;
 		}
+
+		if (qKey)
+			figures[0].rotation.y += -RotSpeed * timeOccurred;
+		else if (wKey)
+			figures[0].rotation.y += RotSpeed * timeOccurred;
+		
+		if (eKey)
+			figures[1].rotation.y += -RotSpeed * timeOccurred;
+		else if (rKey)
+			figures[1].rotation.y += RotSpeed * timeOccurred;
+		
+		if (tKey)
+			figures[2].rotation.y += -RotSpeed * timeOccurred;
+		else if (yKey)
+			figures[2].rotation.y += RotSpeed * timeOccurred;
 	}
 }
 
@@ -179,20 +189,25 @@ function changeLightning(intensity) {
 	universe.getObjectByName("directional").getObjectByName("light").intensity = intensity;
 }
 
-function changeMaterial(change) {
+function changeMaterial(isMaterialLambert) {
 	for (i = 0; i < figures.length; i++)
 	{
-		if (change)
+		if (isMaterialLambert)
 			figures[i].material = new THREE.MeshLambertMaterial( {color: 0xff0000} )
 		else
 			figures[i].material = new THREE.MeshPhongMaterial( {color: 0xffffff} )
 	}
 }
 
-var i = 0;
+function changeRefresh(pauseKey, refreshKey) {
+	if (pauseKey && refreshKey)
+		createScene();
+}
+
 function display() {
-	changeLightning(direc_intensity);
-	changeMaterial(change_material);
+	changeLightning(dirLightIntensity);
+	changeMaterial(isMaterialLambert);
+	changeRefresh(pauseKey, refreshKey);
 	requestAnimationFrame(animate);
 	render();
 }
@@ -202,9 +217,9 @@ function animate() {
 	display();
 }
 
-function createCube(obj,x,y,z)
+function addCube(obj,x,y,z)
 {
-	const geometry = new THREE.BoxGeometry( 2, 2, 2 );
+	const geometry = new THREE.BoxGeometry( origamiLen, origamiLen, origamiLen );
 	const material = new THREE.MeshPhongMaterial( {color: 0xff0000} );
 	const cube = new THREE.Mesh( geometry, material );
 	cube.position.set(x,y,z);
@@ -212,21 +227,21 @@ function createCube(obj,x,y,z)
 	figures.push(cube);
 }
 
-function createFig1(obj,x,y,z)
+function addFig1(obj,x,y,z)
 {
-	//creates 1st figure
+	//adds 1st figure
 	
-	//creates lower left triangle
-	createMesh(obj,'triangle',2,0,0,0,0,Math.PI/180*90,0,1);
-	createMesh(obj,'triangle',2,0,0,0,0,Math.PI/180*20,0,1);
+	//adds lower left triangle
+	addMesh(obj,'triangle',2,0,0,0,0,Math.PI/180*90,0,1);
+	addMesh(obj,'triangle',2,0,0,0,0,Math.PI/180*20,0,1);
 	obj.position.set(x,y,z);
 
 	universe.add(obj);
 }
 
-function createDirectionalLight(obj)
+function addDirectionalLight(obj)
 {
-	directionalLight = new THREE.DirectionalLight( 0xffffff,direc_intensity );
+	directionalLight = new THREE.DirectionalLight( 0xffffff,dirLightIntensity );
 	directionalLight.name="light";
 	obj.add( directionalLight );
 }
@@ -236,37 +251,35 @@ function createScene() {
 	scene.add(new THREE.AxesHelper(100));
 
 	universe = new THREE.Object3D();
-	universe.scale.set(1,1,1);
+	universe.scale.set(defaultScale,defaultScale,defaultScale);
 
-	direc_light = new THREE.Object3D();
-	direc_light.name="directional";
-	createDirectionalLight(direc_light);
-	direc_light.rotateZ(Math.PI/180*30);
-	console.log(direc_light);
-	universe.add(direc_light);
+	dirLightObj = new THREE.Object3D();
+	dirLightObj.name="directional";
+	addDirectionalLight(dirLightObj);
+	dirLightObj.rotateZ(Math.PI/180*30);
+	console.log(dirLightObj);
+	universe.add(dirLightObj);
 	
-	palanque = new THREE.Object3D();
-	directionalLight.target = palanque;
-	universe.add(palanque);
-	createFloor(palanque,0,0,0);
-	createPalanque(palanque,0,2,0);
+	podium = addPodium(universe, 0, podiumStepHeight, 0);
+	directionalLight.target = podium;
+	addFloor(universe,0,0,0);
 
-	createCube(universe,0,4.5+1,5);
-	createCube(universe,0,4.5+1,0);
-	createCube(universe,0,4.5+1,-5);
+	addCube(universe,0,podiumStepHeight*2+origamiLen,origamiDist);
+	addCube(universe,0,podiumStepHeight*2+origamiLen,0);
+	addCube(universe,0,podiumStepHeight*2+origamiLen,-origamiDist);
 
 	const light = new THREE.AmbientLight( 0x404040 ); // soft white light
 	universe.add( light );
 
 	fig1 = new THREE.Object3D();
-	createFig1(fig1,10,10,10);
+	addFig1(fig1,10,10,10);
 
 	fig2 = new THREE.Object3D();
-	//createFig1(fig2,20,1,1);
+	//addFig1(fig2,20,1,1);
 
 	universe.position.set(0,0,0);
 	scene.add(universe);
-	//createMesh('triangle',1,0,10,0.8,0,-Math.PI/180*45,0);
+	//addMesh('triangle',1,0,10,0.8,0,-Math.PI/180*45,0);
 }
 
 function createOrtographicCamera(x, y, z) {
@@ -306,6 +319,10 @@ function createPerspectiveCamera(x, y, z) {
 function onKeyDown(e) {
 	var keyName = e.keyCode;
 	switch (keyName) {
+		case 88: //X - replace by the refresh symbol
+		case 120: //x
+			refreshKey = true;
+			break;
 		case 49://1
 			currentCamera = 0;
 			break;
@@ -314,6 +331,13 @@ function onKeyDown(e) {
 			break;
 		case 51://3
 			currentCamera = 2;
+			break;
+		case 52://4
+			currentCamera = 3;
+			break;
+
+		case 53://5
+			wires = !wires;
 			break;
 		
 		case 81: //Q
@@ -345,29 +369,12 @@ function onKeyDown(e) {
 		
 		case 68:  //D
 		case 100: //d
-			direc_intensity = (direc_intensity == 0 ? 0.5 : 0);
+			dirLightIntensity = (dirLightIntensity == 0 ? 0.5 : 0);
 			break;
 		
 		case 65://A
 		case 97://a
-			change_material = !change_material;
-			break;
-
-		case 52://4
-			wires = !wires;
-			break;
-	
-		case 37 : // left arrow key
-			leftArrow = true;
-			break;
-		case 38: // up arrow key
-			upArrow = true;
-			break;
-		case 39: // right arrow key
-			rightArrow = true;
-			break;
-		case 40: // down arrow key
-			downArrow = true;
+			isMaterialLambert = !isMaterialLambert;
 			break;
 		default:
 			break;
@@ -377,17 +384,9 @@ function onKeyDown(e) {
 function onKeyUp(e) {
 	var keyName = e.keyCode;
 	switch (keyName) {
-		case 37 : // left arrow key
-			leftArrow = false;
-			break;
-		case 38: // up arrow key
-			upArrow = false;
-			break;
-		case 39: // right arrow key
-			rightArrow = false;
-			break;
-		case 40: // down arrow key
-			downArrow = false;
+		case 88: //X - replace by the refresh symbol
+		case 120: //x
+			refreshKey = true;
 			break;
 
 		case 81: //Q
@@ -431,7 +430,9 @@ function init() {
 	createScene();
 	camera[0] = createPerspectiveCamera(viewSize/1.5,viewSize/4,0);
 	camera[1] = createOrtographicCamera(0, viewSize,0);
-	controls = new THREE.OrbitControls(camera[currentCamera], renderer.domElement);
+	camera[2] = createPerspectiveCamera(viewSize/1.5,viewSize/4,0); //stereocamera, placeholder
+	camera[3] = createPerspectiveCamera(viewSize/1.5,viewSize/4,0); // camera for orbit controls, do not delete!
+	controls = new THREE.OrbitControls(camera[3], renderer.domElement);
 	animate();
 	
 	window.addEventListener("resize", onResize);
