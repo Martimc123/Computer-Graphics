@@ -5,12 +5,13 @@
 // For the Ubuntu wsl terminal, use "python -m SimpleHTTPServer 8000" instead
 
 /*global THREE*/
+
 var camera = [];
 var scene= [];
 var renderer, currentCamera = 0;
 let cameraRatio = 10;
 
-var viewSize = 40;
+var viewSize = 50;
 var aspectRatio;
 
 var geometry, material, mesh;
@@ -135,6 +136,27 @@ function render() {
 	}
 }
 
+function render2()
+{
+	renderer.render(scene[0], camera[currentCamera]);
+    camera[currentCamera].updateWorldMatrix();
+    camera[2].update(camera[currentCamera]);
+    const size = new THREE.Vector2();
+    renderer.getSize(size);
+
+    renderer.setScissorTest(true);
+
+    renderer.setScissor(0, 0, size.width / 2, size.height);
+    renderer.setViewport(0, 0, size.width / 2, size.height);
+    renderer.render(scene[0], camera[2].cameraL);
+
+    renderer.setScissor(size.width, 0, size.width / 2, size.height);
+    renderer.setViewport(size.width / 2, 0, size.width / 2, size.height);
+    renderer.render(scene[0], camera[2].cameraR);
+
+    renderer.setScissorTest(false);
+}
+
 function onResize() {
 
 	renderer.setSize(window.innerWidth, window.innerHeight);
@@ -229,6 +251,7 @@ function display() {
 	changeMaterial(change_material);
 	requestAnimationFrame(animate);
 	render();
+	VRinit();
 }
 
 function animate() {
@@ -368,7 +391,7 @@ function onKeyDown(e) {
 			if(!pause)
 				currentCamera = 1;
 			break;
-		
+
 		case 81: //Q
 		case 113: //q
 			qKey = true;
@@ -518,17 +541,30 @@ function createOrtogonalCamera(x, y, z) {
 	return camera;
 }
 
+function VRinit()
+{
+	if (renderer.xr.getSession())
+	{
+		renderer.setAnimationLoop( function () {
+			renderer.render( scene[0], camera[currentCamera] );
+		} );
+	}
+}
+
 function init() {
 		
 	renderer = new THREE.WebGLRenderer({antialias: true});
 	renderer.setSize(window.innerWidth, window.innerHeight);
 	document.body.appendChild(renderer.domElement);
+	document.body.appendChild( VRButton.createButton( renderer ) );
+	renderer.xr.enabled = true;
 	
 	createScene();
 	OrtogonalCamera = createOrtogonalCamera(0, 100, 20);
 	OrtogonalCamera2 = createOrtogonalCamera(0, 10, 10);
 	camera[0] = createPerspectiveCamera(viewSize/1.5,viewSize/4,0);
 	camera[1] = createOrtographicCamera(0, viewSize,0);
+	camera[2] = new THREE.StereoCamera();
 	controls = new THREE.OrbitControls(camera[currentCamera], renderer.domElement);
 	animate();
 	createPauseMessage();
