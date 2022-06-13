@@ -37,11 +37,11 @@ function createMesh(obj,name,type,posx,posy,posz,rotX,rotY,rotZ,mat)
 	const pos = new THREE.Vector3();
 	let rot=0;
 	const extrudeSettings = {
-		depth: 0.2,
+		depth: 0.002,
 		bevelEnabled: true,
-		bevelSegments: 2,
-		steps: 2,
-		bevelSize: 1,
+		bevelSegments: 1,
+		steps: 0,
+		bevelSize: 0,
 		bevelThickness: 0.1
 	}
 	switch(name)
@@ -132,8 +132,8 @@ function createFig1(obj,x,y,z)
 	//creates 1st figure
 	
 	//creates lower left triangle
-	createMesh(obj,'triangle',2,0,0,0,0,Math.PI/180*90,0,1);
-	createMesh(obj,'triangle',2,0,0,0,0,Math.PI/180*20,0,1);
+	createMesh(obj,'triangle',1,0,0,0,0,Math.PI/180*90,0,0);
+	createMesh(obj,'triangle',1,0,0,0,0,Math.PI/180*20,0,0);
 	obj.position.set(x,y,z);
 
 	universe.add(obj);
