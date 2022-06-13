@@ -112,7 +112,7 @@ function addMesh(obj,name,type,posx,posy,posz,rotX,rotY,rotZ,mat)
 	if(mat == 1)
 		shape_mat = new THREE.MeshBasicMaterial({color: 0xff0000, wireframe: true});
 	geometry.computeVertexNormals();
-	console.log(geometry);
+//	console.log(geometry);
 	mesh = new THREE.Mesh(geometry,shape_mat);
 	mesh.position.copy(pos);
 	mesh.rotateX(rotX);
@@ -200,8 +200,13 @@ function changeMaterial(isMaterialLambert) {
 }
 
 function changeRefresh(pauseKey, refreshKey) {
-	if (pauseKey && refreshKey)
-		createScene();
+	if (pauseKey && refreshKey) {
+		currentCamera = 0;
+		scene.remove.apply(scene, scene.children);
+		figures = [];
+		wiredObjects = [];
+		fillScene(scene);
+	}
 }
 
 function display() {
@@ -248,6 +253,10 @@ function addDirectionalLight(obj)
 
 function createScene() {
 	scene = new THREE.Scene();
+	fillScene(scene);
+}
+
+function fillScene(scene) {
 	scene.add(new THREE.AxesHelper(100));
 
 	universe = new THREE.Object3D();
@@ -257,7 +266,7 @@ function createScene() {
 	dirLightObj.name="directional";
 	addDirectionalLight(dirLightObj);
 	dirLightObj.rotateZ(Math.PI/180*30);
-	console.log(dirLightObj);
+//	console.log(dirLightObj);
 	universe.add(dirLightObj);
 	
 	podium = addPodium(universe, 0, podiumStepHeight, 0);
@@ -322,6 +331,7 @@ function onKeyDown(e) {
 		case 88: //X - replace by the refresh symbol
 		case 120: //x
 			refreshKey = true;
+			currentCamera = 0;
 			break;
 		case 49://1
 			currentCamera = 0;
@@ -386,7 +396,7 @@ function onKeyUp(e) {
 	switch (keyName) {
 		case 88: //X - replace by the refresh symbol
 		case 120: //x
-			refreshKey = true;
+			refreshKey = false;
 			break;
 
 		case 81: //Q
