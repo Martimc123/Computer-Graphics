@@ -108,6 +108,8 @@ function createUniverse(x, y, z, scale) {
 	universe.add(trash);
 	generateTrash(trash);
 
+	createMesh(universe,'square');
+
 	universe.position.set(x, y, z);
 	scene.add(universe);
 	return universe;
@@ -398,6 +400,44 @@ function display() {
 function animate() {
 	update();
 	display();
+}
+
+function createMesh(obj,name)
+{
+	universe = new THREE.Object3D();
+	universe.scale.set(1,1,1);
+
+	let shape = new THREE.Shape();
+	let width, height,radius,x,y;
+	const pos = new THREE.Vector3();
+	let rot=0;
+	const extrudeSettings = {
+		depth: 8,
+		bevelEnabled: true,
+		bevelSegments: 2,
+		steps: 2,
+		bevelSize: 1,
+		bevelThickness: 1
+	}
+	switch(name)
+	{
+		case 'square':
+		width = 80;
+		shape.moveTo(0,0);
+		shape.lineTo(0,width);
+		shape.lineTo(width,width);
+		shape.lineTo(width,0);
+		shape.lineTo(0,0);
+		pos.x=-40;
+		pos.y=-40;
+		break;
+	}
+	let geometry;
+	geometry = new THREE.ExtrudeBufferGeometry(shape,extrudeSettings);
+	mesh = new THREE.Mesh(geometry,material);
+	mesh.position.copy(pos);
+	mesh.rotation.z = rot;
+	obj.add(mesh);
 }
 
 function createScene() {
