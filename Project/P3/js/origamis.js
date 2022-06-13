@@ -32,13 +32,10 @@ var figures = [];
 var change_material = true;
 var qKey,wKey,eKey,rKey,tKey,yKey;
 
-//var compressed_trash_texture = new THREE.TextureLoader().load("./media/trash.jpg");
-
-
 'use strict';
 
 function createFloor(obj, x, y, z) {
-	geometry = new THREE.BoxGeometry(30,0.5, 30);
+	geometry = new THREE.BoxGeometry(30,0.5, 40);
 	material = new THREE.MeshPhongMaterial( { map: wood_texture } );
 	mesh = new THREE.Mesh(geometry, material);
 	mesh.position.set(x, y, z);
@@ -60,9 +57,8 @@ function createPalanque(obj, x, y, z) {
 function createMesh(obj,name,type,posx,posy,posz,rotX,rotY,rotZ,mat)
 {
 	let shape = new THREE.Shape();
-	let width, height,radius,x,y;
+	let width;
 	const pos = new THREE.Vector3();
-	let rot=0;
 	const extrudeSettings = {
 		depth: 0.002,
 		bevelEnabled: true,
@@ -210,7 +206,6 @@ function createCube(obj,x,y,z)
 {
 	const geometry = new THREE.BoxGeometry( 2, 2, 2 );
 	const material = new THREE.MeshPhongMaterial( {color: 0xff0000} );
-	//const material2 = new MeshLambertMaterial( {color: 0xff0000} );
 	const cube = new THREE.Mesh( geometry, material );
 	cube.position.set(x,y,z);
 	obj.add(cube);
@@ -222,8 +217,8 @@ function createFig1(obj,x,y,z)
 	//creates 1st figure
 	
 	//creates lower left triangle
-	createMesh(obj,'triangle',2,0,0,0,0,Math.PI/180*90,0,0);
-	createMesh(obj,'triangle',2,0,0,0,0,Math.PI/180*20,0,0);
+	createMesh(obj,'triangle',2,0,0,0,0,Math.PI/180*90,0,1);
+	createMesh(obj,'triangle',2,0,0,0,0,Math.PI/180*20,0,1);
 	obj.position.set(x,y,z);
 
 	universe.add(obj);
@@ -232,7 +227,6 @@ function createFig1(obj,x,y,z)
 function createDirectionalLight(obj)
 {
 	directionalLight = new THREE.DirectionalLight( 0xffffff,direc_intensity );
-	directionalLight.rotateZ(90);
 	directionalLight.name="light";
 	obj.add( directionalLight );
 }
@@ -247,7 +241,7 @@ function createScene() {
 	direc_light = new THREE.Object3D();
 	direc_light.name="directional";
 	createDirectionalLight(direc_light);
-	direc_light.rotateY(Math.PI/180*30);
+	direc_light.rotateZ(Math.PI/180*30);
 	console.log(direc_light);
 	universe.add(direc_light);
 	
@@ -265,7 +259,7 @@ function createScene() {
 	universe.add( light );
 
 	fig1 = new THREE.Object3D();
-	//createFig1(fig1,1,1,1);
+	createFig1(fig1,10,10,10);
 
 	fig2 = new THREE.Object3D();
 	//createFig1(fig2,20,1,1);
@@ -437,7 +431,6 @@ function init() {
 	createScene();
 	camera[0] = createPerspectiveCamera(viewSize/1.5,viewSize/4,0);
 	camera[1] = createOrtographicCamera(0, viewSize,0);
-	//camera[2] = createPerspectiveCamera(0, -rocketInfRadius*2.5, -rocketPartHeight*3);
 	controls = new THREE.OrbitControls(camera[currentCamera], renderer.domElement);
 	animate();
 	
