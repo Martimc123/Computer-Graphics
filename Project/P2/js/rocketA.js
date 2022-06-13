@@ -1,9 +1,3 @@
-// To generate the images, the videos and the overall project:
-//  1. Run the command "python -m http.server" on a terminal in the index.html folder
-//  2. Search for the url "localhost:8000" in a browser
-// It may take a few seconds to load (about a minute, in the first try).
-// For the Ubuntu wsl terminal, use "python -m SimpleHTTPServer 8000" instead
-
 /*global THREE*/
 var camera = [];
 var scene, renderer, currentCamera = 0;
@@ -16,6 +10,8 @@ var wiredObjects = [];
 
 var leftArrow, rightArrow, upArrow, downArrow;
 var clock = new THREE.Clock();
+
+var controls;
 
 var defaultScale = 1;
 var planetRadius = 12;
@@ -30,11 +26,11 @@ var rocketTrashDistance = 1.2 * planetRadius;
 var objPositions = [];
 var objAngles = [];
 var nrTrash = 20;
-var markedTrash = [];
-var trashLen = planetRadius/24;
-var trashRadius = trashLen/2;
-var rocketBoundaryRadius = Math.sqrt((rocketPartHeight+boosterHeight)**2 + rocketInfRadius**2);
-var quadrants = [[],[],[],[],[],[],[],[],[]]; // case in border of quadrants goes to 9
+var nrObj = nrTrash+1;
+var floatingTrash = [];
+var trashSize = planetRadius/24;
+var trashGeometries = [];
+var trashRadius = [];
 
 var copyVideo;
 var universe;
@@ -42,7 +38,10 @@ var planet;
 var rocket;
 var trash;
 var loader = new THREE.TextureLoader();
-var space_texture = new THREE.TextureLoader().load("./media/space.jpg");
+var space_texture = new THREE.TextureLoader().load(
+	//"https://wallpaperaccess.com/full/1268183.jpg"
+	"./media/space.jpg"
+	);
 
 var compressed_trash_texture = new THREE.TextureLoader().load("./media/trash.jpg");
 
@@ -77,20 +76,36 @@ function getObjPositions() {
 	var objX, objY, objZ;
 
 	for (i = 0; i < nrObj; i++) {
-		var posVector = new THREE.Vector3(0,0,0); // spherical coordinates vector
-		var angleVector = new THREE.Vector2(0,0); // angles Theta and Phi for spherical coordinates
 		angleTheta = Math.random() * 2*Math.PI;
 		anglePhi = Math.random() * 2*Math.PI;
-		angleVector.set(angleTheta, anglePhi);
+		var angleVector = new THREE.Vector2(angleTheta, anglePhi); // angles Theta and Phi for spherical coordinates
 		objAngles.push(angleVector);
 
 		objX = rocketTrashDistance * Math.sin(angleTheta) * Math.sin(anglePhi);
 		objY = rocketTrashDistance * Math.cos(angleTheta);
 		objZ = rocketTrashDistance * Math.sin(angleTheta) * Math.cos(anglePhi);
-		posVector.set(objX, objY, objZ);	
+		var posVector = new THREE.Vector3(objX, objY, objZ); // spherical coordinates vector
 		objPositions.push(posVector);
 	}
+}
+
+function getTrashGeometries() {
+	var radius;
 	
+	geometry = new THREE.BoxGeometry(trashSize, trashSize, trashSize);
+	radius = Math.sqrt(trashSize**2+trashSize**2);
+	trashGeometries.push(geometry);
+	trashRadius.push(radius);
+
+	geometry = new THREE.DodecahedronGeometry(trashSize);
+	radius = trashSize;
+	trashGeometries.push(geometry);
+	trashRadius.push(radius);
+
+	geometry = new THREE.ConeGeometry(trashSize, 2*trashSize, 11);
+	radius = Math.sqrt(trashSize**2+trashSize**2);
+	trashGeometries.push(geometry);
+	trashRadius.push(radius);
 }
 
 function createUniverse(x, y, z, scale) {
@@ -102,128 +117,123 @@ function createUniverse(x, y, z, scale) {
 
 	addPlanet(universe, 0, 0, 0);
 	addRocket(universe, rocketPos.x, rocketPos.y, rocketPos.z);
-	rocket.lookAt(scene.position);
 
 	universe.add(trash);
-	generateTrash(trash);
-
-	createMesh(universe,'square');
-
+	trash.position.set(0,0,0);
+	addTrash(trash);
 	universe.position.set(x, y, z);
 	scene.add(universe);
 	return universe;
 }
 
-function hasColision(obj1,obj2)
-{
-	radius = (obj1.radius+obj2.radius)**2;
-	distance = (obj1.center.x-obj2.center.x)**2 + (obj1.center.y-obj2.center.y)**2 + (obj1.center.z-obj2.center.z)**2;
-	return radius >= distance;
-}
-
 function getRndInteger(min, max) {
-	return Math.floor(Math.random() * (max - min)) + min;
+	return Math.floor(Math.random() * (max - min+1)) + min;
 }
 
-function generateTrash(obj)
-{
+function addTrash(obj) {
+	var i;
 	var nrObj = nrTrash+1;
-	for (i = 1;i<nrObj;i++)
-	{
-		var option = getRndInteger(1,4);
-		if (option == 1)
-		{
-			cubic_trash = new THREE.Object3D();
-			geometry = new THREE.BoxGeometry(trashLen, trashLen, trashLen);
-			material = new THREE.MeshBasicMaterial( {map: compressed_trash_texture,transparent:true} );
-			addObjPart(cubic_trash, geometry, material, 0x00ff00, objPositions[i].x,objPositions[i].y,objPositions[i].z,0,0,0,tag = "");
-			addBoundary(cubic_trash,objPositions[i].x,objPositions[i].y,objPositions[i].z, Math.sqrt(2*trashRadius**2));
-			cubic_trash.getObjectByName("bb").geometry.boundingSphere.set(new THREE.Vector3(objPositions[i].x,objPositions[i].y,objPositions[i].z),Math.sqrt(2*trashRadius**2));
-			cubic_trash.name = "trash"+i;
-			quadrants[quadrantIdentifier(objPositions[i].x,objPositions[i].y,objPositions[i].z)-1].push(cubic_trash);
-			obj.add(cubic_trash);
-		}
-		if (option == 2)
-		{
-			polyhedron_trash = new THREE.Object3D();
-			geometry = new THREE.DodecahedronGeometry(trashRadius,0);
-			material = new THREE.MeshBasicMaterial( {map: compressed_trash_texture,transparent:true} );
-			addObjPart(polyhedron_trash, geometry, material, 0x00ff00, objPositions[i].x,objPositions[i].y,objPositions[i].z,0,0,0,tag = "");
-			addBoundary(polyhedron_trash,objPositions[i].x,objPositions[i].y,objPositions[i].z,trashRadius);
-			polyhedron_trash.getObjectByName("bb").geometry.boundingSphere.set(new THREE.Vector3(objPositions[i].x,objPositions[i].y,objPositions[i].z),trashRadius);
-			polyhedron_trash.name = "trash"+i;
-			quadrants[quadrantIdentifier(objPositions[i].x,objPositions[i].y,objPositions[i].z)-1].push(polyhedron_trash);
-			obj.add(polyhedron_trash);
-		}
-		if (option == 3)
-		{
-			cone_trash = new THREE.Object3D();
-			geometry = new THREE.ConeGeometry(trashRadius, 2*trashRadius, 11 );
-			material = new THREE.MeshBasicMaterial( {map: compressed_trash_texture,transparent:true} );
-			addObjPart(cone_trash, geometry, material, 0x00ff00, objPositions[i].x,objPositions[i].y,objPositions[i].z,0,0,0,tag = "");
-			addBoundary(cone_trash,objPositions[i].x,objPositions[i].y,objPositions[i].z,Math.sqrt(2*trashRadius**2));
-			cone_trash.getObjectByName("bb").geometry.boundingSphere.set(new THREE.Vector3(objPositions[i].x,objPositions[i].y,objPositions[i].z),Math.sqrt(2*trashRadius**2));
-			cone_trash.name = "trash"+i;
-			quadrants[quadrantIdentifier(objPositions[i].x,objPositions[i].y,objPositions[i].z)-1].push(cone_trash);
-			obj.add(cone_trash);
-		}
+	material = new THREE.MeshBasicMaterial( {map: compressed_trash_texture,transparent:false} );
+	for (i=1; i < nrObj; i++) {
+		var position = objPositions[i];
+		var option = getRndInteger(0,2);
+		console.log("geom=" +option);
+		var trashUnit = new THREE.Object3D();
+		geometry = trashGeometries[option];
+		addObjPart(trashUnit, geometry, material, 0x00ff00, 0, 0, 0, 0, 0, 0);
+		
+		var radius = trashRadius[option];
+		addBoundary(trashUnit, radius);
+		trashUnit.getObjectByName("boundary").visible = false;
+
+		trashUnit.name = "trash"+i;
+		floatingTrash.push(trashUnit);
+		obj.add(trashUnit);
+		trashUnit.position.set(position.x, position.y, position.z);
 	}
-}
-
-function checkCollisions()
-{
-	var i = quadrantIdentifier(objPositions[0].x,objPositions[0].y,objPositions[0].z)-1;
-	quadrants[i].forEach( object => { 
-		if (hasColision(rocket.getObjectByName("bb").geometry.boundingSphere,object.getObjectByName("bb").geometry.boundingSphere))
-		{
-			markedTrash.push(object);
-		}
-	});
-}
-
-function removeTrash()
-{
-	for (var i = 0; markedTrash.length; i++)
-	{
-		trash.remove(markedTrash[i]);
-		markedTrash.splice(0,i);
-	}
-}
-
-function quadrantIdentifier(x,y,z)
-{
-	if (x>0,y>0,z>0)
-		return 1;
-
-	else if(x>0,y<0,z>0)
-		return 2;
-
-	else if(x<0,y>0,z>0)
-		return 3;
-
-	else if(x<0,y>0,z>0)
-		return 4;
-
-	else if(x>0,y>0,z<0)
-		return 5;
-
-	else if(x>0,y<0,z<0)
-		return 6;
-
-	else if (x<0,y>0,z<0)
-		return 7;
-	else if(x<0,y<0,z<0)
-		return 8;
+	var nr = objPositions.length;
+	console.log(nr);
+	var obj2 = objPositions[0];
+	console.log("rocket:[" + obj2.x + ", " + obj2.y + "," + obj2.z + "]");
 	
-	else
-		return 9;
+	for (i=1; i < nr; i++) {
+		var obj2 = objPositions[i];
+		console.log("trash:[" + obj2.x + ", " + obj2.y + "," + obj2.z + "]");
+	}
+	var nr = floatingTrash.length;
+	console.log(nr);
+	for (i=0; i < nr; i++) {
+		var obj = floatingTrash[i];
+		var obj2 = obj.position;
+		console.log("trash:[" + obj2.x + ", " + obj2.y + "," + obj2.z + "]");
+	}
+}
+
+function addBoundary(obj, radius) {
+	geometry = new THREE.SphereGeometry(radius, 16, 8);
+	material = new THREE.MeshBasicMaterial({wireframe: wires});
+	addObjPart(obj, geometry, material, 0x000000, 0, 0, 0, 0, 0, 0, "boundary");
+}
+
+function checkCollisions() {
+	console.log("i got in!");
+	var i;
+	var nrRemoved = 0;
+	var toRemove = [];
+	var nr = floatingTrash.length;
+	console.log(nr + " trashes before");
+	for (i=0; i < nrTrash; i++) {
+		var trashUnit = floatingTrash[i];
+		if (hasCollision(rocket, trashUnit)) {
+			nrRemoved++;
+			toRemove.push(trashUnit);
+		}
+	}
+	for (i = 0; i < nrRemoved; i++) {
+		var trashUnit = toRemove[i];
+		floatingTrash.pop(trashUnit);
+		trash.remove(trashUnit);
+	}
+	var nr = floatingTrash.length;
+	nrTrash += -nrRemoved;
+	console.log(nr + " trashes after");
+}
+
+function squareDistanceBetween(obj1, obj2) {
+	var squareD;
+
+	var x1 = obj1.position.x;
+	var x2 = obj2.position.x;
+
+	var y1 = obj1.position.y;
+	var y2 = obj2.position.y;
+	
+	var z1 = obj1.position.z;
+	var z2 = obj2.position.z;
+
+	squareD = (x1-x2)**2 + (y1-y2)**2 + (z1-z2)**2;
+
+	return squareD;
+}
+
+function hasCollision(obj1, obj2) {
+	var sphere1 = obj1.getObjectByName("boundary").geometry;
+	var sphere2 = obj2.getObjectByName("boundary").geometry;
+	console.log("rocketR:" + sphere1.parameters.radius + "; trashR:" + sphere2.parameters.radius);
+	/*console.log("rocketP:[" + obj1.position.x + ", " + obj1.position.y + "," + obj1.position.z + "]");
+	console.log("trash:[" + obj2.position.x + ", " + obj2.position.y + "," + obj2.position.z + "]");
+	*/var totalR = sphere1.parameters.radius + sphere2.parameters.radius;
+	return totalR**2 >= squareDistanceBetween(obj1, obj2);
 }
 
 function addPlanet(obj, x, y, z) {
 	planet = new THREE.Object3D();
 	geometry = new THREE.SphereGeometry(planetRadius);
 	
-	var planetTexture = new THREE.TextureLoader().load("./media/earth2.jpg");
+	var planetTexture = new THREE.TextureLoader().load(
+		"./media/earth2.jpg"
+		//"https://st2.depositphotos.com/5171687/44380/i/450/depositphotos_443805316-stock-photo-equirectangular-map-clouds-storms-earth.jpg"
+		);
 	var planetMaterial = new THREE.MeshBasicMaterial( {
 		map: planetTexture,
 		transparent:true,
@@ -241,22 +251,13 @@ function addRocket(obj, x, y, z) {
 	addRocketBooster(rocket, -rocketInfRadius+boosterRadius, -rocketPartHeight-0.5*boosterHeight, 0);
 	addRocketBooster(rocket, 0,-rocketPartHeight-0.5*boosterHeight, rocketInfRadius-boosterRadius);
 	addRocketBooster(rocket, 0,-rocketPartHeight-0.5*boosterHeight, -rocketInfRadius+boosterRadius);
-	addBoundary(rocket,0, 0, 0, rocketBoundaryRadius);
+	var radius = Math.sqrt((rocketPartHeight+boosterHeight)**2 + rocketInfRadius**2);
+	addBoundary(rocket, radius);
+	rocket.getObjectByName("boundary").visible = false; // !!
 	rocket.rotation.z = -Math.PI/180 * 90;
 	rocket.position.set(x, y, z);
 	obj.add(rocket);
 	return rocket;
-}
-
-
-function addBoundary(obj,x,y,z,radius)
-{
-	geometry = new THREE.SphereGeometry(radius);
-	geometry.boundingSphere = new THREE.Sphere(radius);
-	geometry.boundingSphere.center = new THREE.Vector3(x,y,z);
-	geometry.boundingSphere.radius = radius;
-	material = {};
-	addObjPart(obj, geometry, material, 0xffff00, x,y,z, 0,0,0,"bb");
 }
 
 function addRocketTop(obj, x, y, z) {
@@ -298,6 +299,13 @@ function onResize() {
 			camera[i].aspect = aspectRatio;
 			camera[i].updateProjectionMatrix();
 		}
+		i = 3;
+		camera[i].left = -viewSize * aspectRatio / val;
+			camera[i].right = viewSize * aspectRatio / val;
+			camera[i].top = viewSize / val;
+			camera[i].bottom = viewSize / -val;
+			camera[i].updateProjectionMatrix();
+
 	}
 }
 
@@ -309,19 +317,49 @@ function changeWires(wires) {
 	}
 }
 
+// returns semi-hemisphhere of an object's geometric center
+function getSemiHemisphere(obj) {
+	var posY = obj.position.y;
+	var posZ = obj.position.z;
+	var northernHemisphere = false;	
+	var easternHemisphere = false;
+
+	if (posY > 0) northernHemisphere = true;
+	if (posZ > 0) easternHemisphere = true;
+	
+	if (northernHemisphere && easternHemisphere) return 0; //NE
+	else if (northernHemisphere && !easternHemisphere) return 1; //NW
+	else if (!northernHemisphere && !easternHemisphere) return 2; //SW
+	else if (!northernHemisphere && easternHemisphere) return 3; //SE
+
+}
+
+function myLookAt(obj, targetPosition) {
+	var targetPos = obj.worldToLocal(targetPosition.clone());
+    var rotationAxis = new THREE.Vector3().crossVectors(
+        new THREE.Vector3(0, 0, -1),
+        targetPos
+    ).normalize();
+    var angle = new THREE.Vector3(0, 0, -1).angleTo(
+        targetPos.normalize().clone());
+
+    obj.rotateOnAxis(rotationAxis, angle);
+}
+
 function update()
 {
+	controls.update();
 	var timeOccurred = clock.getDelta();
 	var rocketSpeed = Math.PI/180 * 40;
 	var degreesTraveled = rocketSpeed*timeOccurred;
-	var dirLatitudeCoef = -1;
+	var dirLatitudeCoef = -1; // clock-wise
 	var dirLongitudeCoef = -1;
 
 	if (rightArrow || leftArrow || upArrow || downArrow) { // rocket movement flags
 		var rocketTheta = objAngles[0].x;
 		var rocketPhi = objAngles[0].y;	
 		var rocketX, rocketY, rocketZ;
-		var rotZ;
+		var rotZ = 0;
 		
 		// Nullifies opposite direction arrows for simplicity
 		if (leftArrow && rightArrow) {
@@ -369,23 +407,22 @@ function update()
 			rotZ = Math.PI;
 			rocketTheta += - dirLatitudeCoef * degreesTraveled;
 		}
-		
+
 		rocketX = rocketTrashDistance * Math.sin(rocketTheta) * Math.sin(rocketPhi);
 		rocketY = rocketTrashDistance * Math.cos(rocketTheta);
 		rocketZ = rocketTrashDistance * Math.sin(rocketTheta) * Math.cos(rocketPhi);
 		
 		rocket.position.set(rocketX, rocketY, rocketZ);
 		rocket.lookAt(scene.position);
+		rocket.rotateZ(rotZ);
 		objAngles[0].set(rocketTheta, rocketPhi);
 		objPositions[0].set(rocketX, rocketY, rocketZ);
-		rocket.getObjectByName("bb").geometry.boundingSphere.set(new THREE.Vector3(rocketX, rocketY, rocketZ),rocketBoundaryRadius);
 		checkCollisions();
 	}
 }
 
 function display() {
 	changeWires(wires);
-	removeTrash();
 	requestAnimationFrame(animate);
 	render();
 }
@@ -395,49 +432,12 @@ function animate() {
 	display();
 }
 
-function createMesh(obj,name)
-{
-	universe = new THREE.Object3D();
-	universe.scale.set(1,1,1);
-
-	let shape = new THREE.Shape();
-	let width, height,radius,x,y;
-	const pos = new THREE.Vector3();
-	let rot=0;
-	const extrudeSettings = {
-		depth: 8,
-		bevelEnabled: true,
-		bevelSegments: 2,
-		steps: 2,
-		bevelSize: 1,
-		bevelThickness: 1
-	}
-	switch(name)
-	{
-		case 'square':
-		width = 80;
-		shape.moveTo(0,0);
-		shape.lineTo(0,width);
-		shape.lineTo(width,width);
-		shape.lineTo(width,0);
-		shape.lineTo(0,0);
-		pos.x=-40;
-		pos.y=-40;
-		break;
-	}
-	let geometry;
-	geometry = new THREE.ExtrudeBufferGeometry(shape,extrudeSettings);
-	mesh = new THREE.Mesh(geometry,material);
-	mesh.position.copy(pos);
-	mesh.rotation.z = rot;
-	obj.add(mesh);
-}
-
 function createScene() {
 	scene = new THREE.Scene();
 	scene.add(new THREE.AxesHelper(100));
-	scene.background = videoTexture;//space_texture;
+	scene.background = space_texture;
 	getObjPositions();
+	getTrashGeometries();
 	universe = createUniverse(0, 0, 0, defaultScale);
 }
 
@@ -486,6 +486,9 @@ function onKeyDown(e) {
 			break;
 		case 51://3
 			currentCamera = 2;
+			break;
+		case 53: //5
+			currentCamera = 3;
 			break;
 			
 		case 52://4
@@ -540,8 +543,10 @@ function init() {
 	camera[0] = createOrtographicCamera(0, 0, viewSize);
 	camera[1] = createPerspectiveCamera(viewSize/2, viewSize/2, viewSize/2);
 	camera[2] = createPerspectiveCamera(0, -rocketInfRadius*2.5, -rocketPartHeight*3);
+	camera[3] = createOrtographicCamera(0, 0, viewSize);
 	rocket.add(camera[2]);
 	rocket.add(new THREE.AxesHelper(10));
+	controls = new THREE.OrbitControls(camera[3], renderer.domElement);
 	animate();
 	video.addEventListener("playing", function() {
 		copyVideo = true;
