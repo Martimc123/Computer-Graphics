@@ -40,7 +40,6 @@ var dirLightIntensity = 0.5;
 var figures = [];
 var isMaterialLambert = true;
 var qKey,wKey,eKey,rKey,tKey,yKey;
-var reset = false;
 let pause = false;
 var OrtogonalCamera;
 
@@ -413,11 +412,6 @@ function onKeyDown(e) {
 			pause = !pause;
 			console.log("Pause=" + pause);
 			break;
-		
-		case 77: // M
-		case 109: // m 
-			reset=true;
-			break;
 
 		case 49://1
 			if(!pause)
@@ -445,8 +439,8 @@ function onKeyDown(e) {
 		case 101: //e
 			eKey = true;
 			break;
-		case 82: //R
-		case 114: //r
+		case 82: //R, reset
+		case 114: //r, reset
 			rKey = true;
 			break;		
 			
@@ -513,15 +507,14 @@ function onKeyUp(e) {
 
 function resetState()
 {
-	if (pause && reset) {
+	if (pause && rKey) {
 			isMaterialLambert = true;
 			changeMaterial(isMaterialLambert);
 			for(i=0;i<figures.length;i++)
 				figures[i].rotation.y = 0;
 			dirLightIntensity=0.5;
 			changeLightning(dirLightIntensity);
-			reset=false;
-			pause = false;
+			rKey=false;
 	}
 }
 
