@@ -42,7 +42,7 @@ var qKey,wKey,eKey,rKey,tKey,yKey;
 var i = 0;
 var reset = false;
 let pause = false;
-var OrtogonalCamera;
+var OrtographicCamera;
 
 'use strict';
 
@@ -115,6 +115,8 @@ function addMesh(obj,name,type,posx,posy,posz,rotX,rotY,rotZ,mat)
 	var shape_mat;
 	if(mat == 1)
 		shape_mat = new THREE.MeshBasicMaterial({color: 0xff0000, wireframe: true});
+
+	shape_mat = new THREE.MeshLambertMaterial({wireframe: false, map: wood_texture, side: THREE.DoubleSided});
 	geometry.computeVertexNormals();
 //	console.log(geometry);
 	mesh = new THREE.Mesh(geometry,shape_mat);
@@ -136,12 +138,12 @@ function render() {
 		if (currentCamera == 1)
 		{
 			renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
-			renderer.render(scene[1], OrtogonalCamera2);
+			renderer.render(scene[1], OrtographicCamera2);
 		}
 		else
 		{
 			renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
-			renderer.render(scene[1],OrtogonalCamera);
+			renderer.render(scene[1],OrtographicCamera);
 		}
 	}
 }
@@ -176,17 +178,17 @@ function onResize() {
 		var val = 2;
 		var nrCameras = camera.length;
 		for (indexCamera=0; i<nrCameras;i++){
-			if (camera[indexCamera] === OrtogonalCamera) {
+			if (i == 1) {
 				aspectRatio = window.innerWidth / window.innerHeight;
 				camera[indexCamera].left = -viewSize * aspectRatio / val;
 				camera[indexCamera].right = viewSize * aspectRatio / val;
 				camera[indexCamera].top = viewSize / val;
 				camera[indexCamera].bottom = viewSize / -val;
+				camera[indexCamera].updateProjectionMatrix();
 			}
-			else if((window.innerWidth / window.innerHeight) < 1.6) {
+			else if(i==0 || i == 3) {
 					camera[indexCamera].aspect = window.innerWidth / window.innerHeight;
 					camera[indexCamera].updateProjectionMatrix();
-					camera[indexCamera].lookAt(scene.position);
 			}
 			camera[indexCamera].updateProjectionMatrix();
 		}
@@ -317,7 +319,7 @@ function createScene() {
 	universe.add( light );
 
 	fig1 = new THREE.Object3D();
-	//addFig1(fig1,10,10,10);
+	addFig1(fig1,10,10,10);
 
 	fig2 = new THREE.Object3D();
 	//addFig1(fig2,20,1,1);
@@ -505,7 +507,7 @@ function resetState()
 	pause = false;
 }
 
-function createOrtogonalCamera(x, y, z) {
+function createOrtographicCamera(x, y, z) {
 	// Adjusts camera ratio so the scene is totally visible 
 	// OrthographicCamera( left, right, top, bottom, near, far )
 	camera = new THREE.OrthographicCamera(window.innerWidth / -(2 * cameraRatio),
@@ -538,10 +540,10 @@ function init() {
 	renderer.xr.enabled = true;
 	
 	createScene();
-	OrtogonalCamera = createOrtogonalCamera(0, 100, 20);
-	OrtogonalCamera2 = createOrtogonalCamera(0, 10, 10);
-	camera[0] = createPerspectiveCamera(viewSize/1.5,viewSize/4,0);
-	camera[1] = createOrtographicCamera(0, viewSize,0);
+	OrtographicCamera = createOrtographicCamera(0, 100, 20);
+	OrtographicCamera2 = createOrtographicCamera(0, 10, 10);
+	camera[0] = createPerspectiveCamera(-viewSize/2,viewSize/2,-viewSize/2);
+	camera[1] = createOrtographicCamera(podiumTopLen*2, podiumStepHeight,0);
 	camera[2] = new THREE.StereoCamera();
 	camera[3] = createPerspectiveCamera(viewSize/1.5,viewSize/4,0); // camera for orbit controls, do not delete!
 	controls = new THREE.OrbitControls(camera[3], renderer.domElement);
