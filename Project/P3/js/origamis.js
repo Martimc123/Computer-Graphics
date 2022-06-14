@@ -11,6 +11,7 @@ var scene= [];
 var renderer, currentCamera = 0;
 let cameraRatio = 10;
 
+var defaultScale = 1;
 var viewSize = 50;
 var aspectRatio;
 var podiumStepHeight = 0.5;
@@ -23,9 +24,9 @@ var geometry, material, mesh;
 var wiredObjects = [];
 var wires = true;
 
+var leftArrow, rightArrow, upArrow, downArrow;
 var clock = new THREE.Clock();
 
-var defaultScale = 1;
 var universe;
 var loader = new THREE.TextureLoader();
 var controls;
@@ -39,10 +40,9 @@ var dirLightIntensity = 0.5;
 var figures = [];
 var isMaterialLambert = true;
 var qKey,wKey,eKey,rKey,tKey,yKey;
-var i = 0;
 var reset = false;
 let pause = false;
-var OrtographicCamera;
+var OrtogonalCamera;
 
 'use strict';
 
@@ -60,9 +60,9 @@ function addPodium(obj, x, y, z) {
 	let geometry2 = new THREE.BoxGeometry(podiumTopLen,podiumStepHeight, podiumTopLen);
 	material = new THREE.MeshLambertMaterial( { map: glass_texture } );
 	mesh = new THREE.Mesh(geometry, material);
-	mesh.position.set(0, -podiumStepHeight/2, 0);
+	mesh.position.set(0, -podiumStepHeight/2+y, 0);
 	mesh2 = new THREE.Mesh(geometry2, material);
-	mesh2.position.set(0, podiumStepHeight/2, 0);
+	mesh2.position.set(0, podiumStepHeight/2+y, 0);
 	podiumObj.add(mesh);
 	podiumObj.add(mesh2);
 	podiumObj.position.set(x,y,z);
@@ -115,10 +115,8 @@ function addMesh(obj,name,type,posx,posy,posz,rotX,rotY,rotZ,mat)
 	var shape_mat;
 	if(mat == 1)
 		shape_mat = new THREE.MeshBasicMaterial({color: 0xff0000, wireframe: true});
-
-	shape_mat = new THREE.MeshLambertMaterial({wireframe: false, map: wood_texture, side: THREE.DoubleSided});
 	geometry.computeVertexNormals();
-//	console.log(geometry);
+	console.log(geometry);
 	mesh = new THREE.Mesh(geometry,shape_mat);
 	mesh.position.copy(pos);
 	mesh.rotateX(rotX);
@@ -133,17 +131,36 @@ function render() {
 	renderer.autoClear = false;
 	renderer.clear();
 	renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
+	renderer.render(scene[0], camera[currentCamera]);
+	if (pause) {
+		if (currentCamera == 1)
+		{
+			renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
+			renderer.render(scene[1], OrtogonalCamera2);
+		}
+		else
+		{
+			renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
+			renderer.render(scene[1],OrtogonalCamera);
+		}
+	}
+}
+
+function render3() {
+	renderer.autoClear = false;
+	renderer.clear();
+	renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
 	renderer.render(scene[0], camera[currentCamera]); // tells 3js renderer to draw scene visualization based on camera
 	if (pause) {
 		if (currentCamera == 1)
 		{
 			renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
-			renderer.render(scene[1], OrtographicCamera2);
+			renderer.render(scene[1], OrtogonalCamera2);
 		}
 		else
 		{
 			renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
-			renderer.render(scene[1],OrtographicCamera);
+			renderer.render(scene[1],OrtogonalCamera);
 		}
 	}
 }
@@ -174,34 +191,42 @@ function onResize() {
 	renderer.setSize(window.innerWidth, window.innerHeight);
 	
 	if (window.innerWidth > 0 &&  window.innerHeight > 0){
-		var indexCamera;
-		var val = 2;
-		var nrCameras = camera.length;
-		for (indexCamera=0; i<nrCameras;i++){
-			if (i == 1) {
-				aspectRatio = window.innerWidth / window.innerHeight;
-				camera[indexCamera].left = -viewSize * aspectRatio / val;
-				camera[indexCamera].right = viewSize * aspectRatio / val;
-				camera[indexCamera].top = viewSize / val;
-				camera[indexCamera].bottom = viewSize / -val;
-				camera[indexCamera].updateProjectionMatrix();
+		if (camera[currentCamera] === OrtogonalCamera) {
+			var i;
+			var val = 2;
+			aspectRatio = window.innerWidth / window.innerHeight;
+			renderer.setSize(window.innerWidth, window.innerHeight);
+			for (i = 0; i < 1; i++) { // Ortographic Cameras
+				camera[currentCamera].left = -viewSize * aspectRatio / val;
+				camera[currentCamera].right = viewSize * aspectRatio / val;
+				camera[currentCamera].top = viewSize / val;
+				camera[currentCamera].bottom = viewSize / -val;
+				camera[currentCamera].updateProjectionMatrix();
 			}
-			else if(i==0 || i == 3) {
-					camera[indexCamera].aspect = window.innerWidth / window.innerHeight;
-					camera[indexCamera].updateProjectionMatrix();
-			}
-			camera[indexCamera].updateProjectionMatrix();
 		}
+		else	
+		{
+			if((window.innerWidth / window.innerHeight) < 1.6) {
+				camera[indexCamera].aspect = window.innerWidth / window.innerHeight;
+				camera[indexCamera].updateProjectionMatrix();
+				camera[indexCamera].lookAt(scene.position);
+			}
+		}
+		
+		camera[currentCamera].updateProjectionMatrix();
 	}
 }
 
 
-function update() {
-	if(!pause) {
+function update()
+{
+	controls.update();
+	if(!pause)
+	{
 		var timeOccurred = clock.getDelta();
 		var RotSpeed = 2.5;
 
-		if (qKey || wKey || eKey || rKey || tKey || yKey) { // figure's movement flags
+		if (qKey || wKey || eKey || rKey || tKey || yKey) { // figures movement flags
 			if (qKey && wKey) {
 				qKey = false;
 				wKey = false;
@@ -237,16 +262,17 @@ function changeLightning(intensity) {
 	universe.getObjectByName("directional").getObjectByName("light").intensity = intensity;
 }
 
-function changeMaterial(isMaterialLambert) {
+function changeMaterial(change) {
 	for (i = 0; i < figures.length; i++)
 	{
-		if (isMaterialLambert)
+		if (change)
 			figures[i].material = new THREE.MeshLambertMaterial( {color: 0xff0000} )
 		else
 			figures[i].material = new THREE.MeshPhongMaterial( {color: 0xffffff} )
 	}
 }
 
+var i = 0;
 function display() {
 	resetState();
 	changeLightning(dirLightIntensity);
@@ -263,7 +289,7 @@ function animate() {
 
 function addCube(obj,x,y,z)
 {
-	const geometry = new THREE.BoxGeometry( origamiLen, origamiLen, origamiLen );
+	const geometry = new THREE.BoxGeometry( 2, 2, 2 );
 	const material = new THREE.MeshPhongMaterial( {color: 0xff0000} );
 	const cube = new THREE.Mesh( geometry, material );
 	cube.position.set(x,y,z);
@@ -304,7 +330,7 @@ function createScene() {
 	dirLightObj.name="directional";
 	addDirectionalLight(dirLightObj);
 	dirLightObj.rotateZ(Math.PI/180*30);
-//	console.log(dirLightObj);
+	console.log(dirLightObj);
 	universe.add(dirLightObj);
 	
 	podium = addPodium(universe, 0, podiumStepHeight, 0);
@@ -319,14 +345,14 @@ function createScene() {
 	universe.add( light );
 
 	fig1 = new THREE.Object3D();
-	addFig1(fig1,10,10,10);
+	addFig1(fig1,-10,10,-10);
 
 	fig2 = new THREE.Object3D();
 	//addFig1(fig2,20,1,1);
 
 	universe.position.set(0,0,0);
 	scene[0].add(universe);
-	//createMesh('triangle',1,0,10,0.8,0,-Math.PI/180*45,0);
+	//addMesh('triangle',1,0,10,0.8,0,-Math.PI/180*45,0);
 }
 
 function createOrtographicCamera(x, y, z) {
@@ -383,28 +409,29 @@ function createPerspectiveCamera(x, y, z) {
 function onKeyDown(e) {
 	var keyName = e.keyCode;
 	switch (keyName) {
-		case 88:	// X, Pause
-		case 120: // x, Pause
+		case 32: // [SPACE], Pause
 			pause = !pause;
+			console.log("Pause=" + pause);
+			break;
+		
+		case 77: // M
+		case 109: // m 
+			reset=true;
 			break;
 
 		case 49://1
-			currentCamera = 0;
+			if(!pause)
+				currentCamera = 0;
 			break;
 		case 50://2
-			currentCamera = 1;
+			if(!pause)
+				currentCamera = 1;
 			break;
 		case 51://3
-			currentCamera = 2;
-			break;
-		case 52://4
-			currentCamera = 3;
+			if(!pause)
+				currentCamera = 3;
 			break;
 
-		case 53://5
-			wires = !wires;
-			break;
-		
 		case 81: //Q
 		case 113: //q
 			qKey = true;
@@ -434,20 +461,17 @@ function onKeyDown(e) {
 		
 		case 68:  //D
 		case 100: //d
-			if(!pause)
-				dirLightIntensity = (dirLightIntensity == 0 ? 0.5 : 0);
+			dirLightIntensity = (dirLightIntensity == 0 ? 0.5 : 0);
 			break;
 		
 		case 65://A
 		case 97://a
 			isMaterialLambert = !isMaterialLambert;
 			break;
-		
-		case 77: // M, reset
-		case 109: // m, reset
-			reset=true;
-			break;
 
+		case 52://4
+			wires = !wires;
+			break;
 		default:
 			break;
 	}
@@ -456,11 +480,6 @@ function onKeyDown(e) {
 function onKeyUp(e) {
 	var keyName = e.keyCode;
 	switch (keyName) {
-		case 88: //X - replace by the refresh symbol
-		case 120: //x
-			refreshKey = false;
-			break;
-
 		case 81: //Q
 		case 113: //q
 			qKey = false;
@@ -474,11 +493,11 @@ function onKeyUp(e) {
 		case 101: //e
 			eKey = false;
 			break;
-
 		case 82: //R
 		case 114: //r
 			rKey = false;
-			break;		
+			break;
+
 		case 84: //T
 		case 116: //t
 			tKey = false;
@@ -501,13 +520,12 @@ function resetState()
 				figures[i].rotation.y = 0;
 			dirLightIntensity=0.5;
 			changeLightning(dirLightIntensity);
-			currentCamera = 0;
+			reset=false;
+			pause = false;
 	}
-	reset=false;
-	pause = false;
 }
 
-function createOrtographicCamera(x, y, z) {
+function createOrtogonalCamera(x, y, z) {
 	// Adjusts camera ratio so the scene is totally visible 
 	// OrthographicCamera( left, right, top, bottom, near, far )
 	camera = new THREE.OrthographicCamera(window.innerWidth / -(2 * cameraRatio),
@@ -540,12 +558,12 @@ function init() {
 	renderer.xr.enabled = true;
 	
 	createScene();
-	OrtographicCamera = createOrtographicCamera(0, 100, 20);
-	OrtographicCamera2 = createOrtographicCamera(0, 10, 10);
-	camera[0] = createPerspectiveCamera(-viewSize/2,viewSize/2,-viewSize/2);
-	camera[1] = createOrtographicCamera(podiumTopLen*2, podiumStepHeight,0);
+	OrtogonalCamera = createOrtogonalCamera(0, 100, 20);
+	OrtogonalCamera2 = createOrtogonalCamera(0, 10, 10);
+	camera[0] = createPerspectiveCamera(viewSize/4*defaultScale,viewSize/4*defaultScale,viewSize/4*defaultScale);
+	camera[1] = createOrtographicCamera(podiumTopLen/4*defaultScale, podiumStepHeight*defaultScale,0*defaultScale);
 	camera[2] = new THREE.StereoCamera();
-	camera[3] = createPerspectiveCamera(viewSize/1.5,viewSize/4,0); // camera for orbit controls, do not delete!
+	camera[3] = createOrtographicCamera(podiumTopLen*defaultScale, podiumStepHeight*defaultScale,0); // for orbit controls
 	controls = new THREE.OrbitControls(camera[3], renderer.domElement);
 	animate();
 	createPauseMessage();
