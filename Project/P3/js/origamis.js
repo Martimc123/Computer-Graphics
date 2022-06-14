@@ -41,9 +41,24 @@ var figures = [];
 var isMaterialLambert = true;
 var qKey,wKey,eKey,rKey,tKey,yKey;
 let pause = false;
-var OrtogonalCamera;
+var OrtogonalPauseCamera;
 
 'use strict';
+
+function addObjPart(obj, geometry, mater, hex, x, y, z, rotX, rotY, rotZ,tag = "") {
+	material = (mater != null)? mater : new THREE.MeshBasicMaterial({wireframe: wires});
+	if (hex!=null)
+		material.color=hex;
+	mesh = new THREE.Mesh(geometry, material);
+	mesh.rotateX(rotX);
+	mesh.rotateY(rotY);
+	mesh.rotateZ(rotZ);
+	mesh.position.set(x, y, z);
+	mesh.name=tag;
+	obj.add(mesh);
+	wiredObjects.push(mesh);
+	return mesh;
+}
 
 function addFloor(obj, x, y, z) {
 	geometry = new THREE.BoxGeometry(viewSize*2,0.1, viewSize*2);
@@ -74,27 +89,7 @@ function addMesh(obj,name,type,posx,posy,posz,rotX,rotY,rotZ,mat)
 	let shape = new THREE.Shape();
 	let width;
 	const pos = new THREE.Vector3();
-	const extrudeSettings = {
-		depth: 0.002,
-		bevelEnabled: true,
-		bevelSegments: 1,
-		steps: 0,
-		bevelSize: 0,
-		bevelThickness: 0.1
-	}
-	switch(name)
-	{
-		case 'square':
-			width = 10;
-			shape.moveTo(0,0);
-			shape.lineTo(0,width);
-			shape.lineTo(width,width);
-			shape.lineTo(width,0);
-			shape.lineTo(0,0);
-			pos.x=-40;
-			pos.y=-40;
-			break;
-		
+	switch(name) {
 		case 'triangle':
 			width = 10;
 			shape.moveTo(0,-width);
@@ -104,18 +99,13 @@ function addMesh(obj,name,type,posx,posy,posz,rotX,rotY,rotZ,mat)
 			pos.x=0;
 			pos.y=0;
 			break;
+		default:
+			break;
 	}
-	let geometry;
-	if (type == 1)
-		geometry = new THREE.ExtrudeBufferGeometry(shape,extrudeSettings);
 	if (type == 2)
 		geometry = new THREE.ShapeBufferGeometry(shape);
 
-	var shape_mat;
-	if(mat == 1)
-		shape_mat = new THREE.MeshBasicMaterial({color: 0xff0000, wireframe: true});
-
-		shape_mat = new THREE.MeshLambertMaterial({map: glass_texture, side: THREE.DoubleSide});
+	var shape_mat = new THREE.MeshLambertMaterial({map: glass_texture, side: THREE.DoubleSide});
 	geometry.computeVertexNormals();
 	console.log(geometry);
 	mesh = new THREE.Mesh(geometry,shape_mat);
@@ -135,15 +125,9 @@ function render() {
 	renderer.render(scene[0], camera[currentCamera]);
 	if (pause) {
 		if (currentCamera == 1)
-		{
-			renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
-			renderer.render(scene[1], OrtogonalCamera2);
-		}
+			renderer.render(scene[1], OrtogonalPauseCamera2);
 		else
-		{
-			renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
-			renderer.render(scene[1],OrtogonalCamera);
-		}
+			renderer.render(scene[1],OrtogonalPauseCamera);
 	}
 }
 
@@ -156,12 +140,12 @@ function render3() {
 		if (currentCamera == 1)
 		{
 			renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
-			renderer.render(scene[1], OrtogonalCamera2);
+			renderer.render(scene[1], OrtogonalPauseCamera2);
 		}
 		else
 		{
 			renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
-			renderer.render(scene[1],OrtogonalCamera);
+			renderer.render(scene[1],OrtogonalPauseCamera);
 		}
 	}
 }
@@ -257,17 +241,16 @@ function changeLightning(intensity) {
 	universe.getObjectByName("directional").getObjectByName("light").intensity = intensity;
 }
 
-function changeMaterial(change) {
+function changeMaterial(isMaterialLambert) {
 	for (i = 0; i < figures.length; i++)
 	{
-		if (change)
+		if (isMaterialLambert)
 			figures[i].material = new THREE.MeshLambertMaterial( {color: 0xff0000} )
 		else
 			figures[i].material = new THREE.MeshPhongMaterial( {color: 0xffffff} )
 	}
 }
 
-var i = 0;
 function display() {
 	resetState();
 	changeLightning(dirLightIntensity);
@@ -350,25 +333,6 @@ function createScene() {
 	//addMesh('triangle',1,0,10,0.8,0,-Math.PI/180*45,0);
 }
 
-function createOrtographicCamera(x, y, z) {
-
-	var val = 2;
-	aspectRatio = window.innerWidth / window.innerHeight;
-	var camera = new THREE.OrthographicCamera( viewSize * aspectRatio/-val, 
-																					viewSize * aspectRatio / val, 
-																					viewSize / val, 
-																					viewSize / -val, 
-																					1, 
-																					1000);
-	camera.position.x = x;
-	camera.position.y = y;
-	camera.position.z = z;
-	
-	camera.lookAt(scene[0].position);
-	
-	return camera;
-}
-
 //creates a new scene with Pause Mode
 function createPauseMessage() {
 	scene[1] = new THREE.Scene();
@@ -384,21 +348,6 @@ function createPauseMessage() {
 	message.position.set(0, 0, 20);
   
 	scene[1].add(message);
-}
-
-function createPerspectiveCamera(x, y, z) {
-	aspectRatio = window.innerWidth / window.innerHeight;
-	var camera = new THREE.PerspectiveCamera(70,
-																					aspectRatio,
-																					1,
-																					1000);
-	camera.position.x = x;
-	camera.position.y = y;
-	camera.position.z = z;
-	
-	camera.lookAt(scene[0].position);
-	
-	return camera;
 }
 
 function onKeyDown(e) {
@@ -514,10 +463,25 @@ function resetState()
 	}
 }
 
-function createOrtogonalCamera(x, y, z) {
+function createPerspectiveCamera(x, y, z) {
+	aspectRatio = window.innerWidth / window.innerHeight;
+	var camera = new THREE.PerspectiveCamera(70,
+																					aspectRatio,
+																					1,
+																					1000);
+	camera.position.x = x;
+	camera.position.y = y;
+	camera.position.z = z;
+	
+	camera.lookAt(scene[0].position);
+	
+	return camera;
+}
+
+function createOrtographicCamera(x, y, z) {
 	// Adjusts camera ratio so the scene is totally visible 
 	// OrthographicCamera( left, right, top, bottom, near, far )
-	camera = new THREE.OrthographicCamera(window.innerWidth / -(2 * cameraRatio),
+	var camera = new THREE.OrthographicCamera(window.innerWidth / -(2 * cameraRatio),
 		window.innerWidth / (2 * cameraRatio), window.innerHeight / (2 * cameraRatio),
 		window.innerHeight / -(2 * cameraRatio), 0, 1000);
 
@@ -547,14 +511,14 @@ function init() {
 	renderer.xr.enabled = true;
 	
 	createScene();
-	OrtogonalCamera = createOrtogonalCamera(0, 100, 20);
-	OrtogonalCamera2 = createOrtogonalCamera(0, 10, 10);
+	OrtogonalPauseCamera = createOrtographicCamera(0, 100, 20);
+	OrtogonalPauseCamera2 = createOrtographicCamera(0, 10, 10);
 	camera[0] = createPerspectiveCamera(viewSize/4*defaultScale,viewSize/4*defaultScale,viewSize/4*defaultScale);
-	camera[1] = createOrtographicCamera(podiumTopLen/4*defaultScale, podiumStepHeight*defaultScale,0*defaultScale);
+	camera[1] = createOrtographicCamera(podiumTopLen*defaultScale, podiumStepHeight*defaultScale,0*defaultScale);
 	camera[2] = new THREE.StereoCamera();
 	camera[3] = createOrtographicCamera(podiumTopLen*defaultScale, podiumStepHeight*defaultScale,0); // for orbit controls
-	camera[4] = OrtogonalCamera;
-	camera[5] = OrtogonalCamera2;
+	camera[4] = OrtogonalPauseCamera;
+	camera[5] = OrtogonalPauseCamera2;
 	controls = new THREE.OrbitControls(camera[3], renderer.domElement);
 	animate();
 	createPauseMessage();
