@@ -9,20 +9,20 @@ copiar uma face(c textura), duplicar, inclinar p dar ilusão de 3D
 
 
 TO-DO:
-- Palanque + Chão (M)
-- Fazer cisne real-life (A, M)
+- Palanque + Chão (M -> M+A)
+- Fazer cisne real-life (A, M -> A)
 - Desenhar cena
 - Para cada iteração:
  - Perceber design e angulos do cisne
  - Criar triangulos do cisne
  - Unir triangulos do cisne
-- Rotação das 3 iterações (A)
+- Rotação das 3 iterações (A -> M+A)
 - Texturas (M)
 - Iluminação (M)
 - Sombreamento (A)
 - Materials (A, M)
-- Camera fixa perspetiva (A)
-- Camera fixa ortogonal (A)
-- StereoCamera para VR (A)
-- Permitir q as coisas fiquem no browser
+- Camera fixa perspetiva (A -> M+A)
+- Camera fixa ortogonal (A -> M+A)
+- StereoCamera para VR (A-> M)
+- Permitir q as coisas fiquem no browser (-> M)
 - Stop/Refresh (M)
