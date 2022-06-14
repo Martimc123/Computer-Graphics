@@ -59,9 +59,9 @@ function addPodium(obj, x, y, z) {
 	let geometry2 = new THREE.BoxGeometry(podiumTopLen,podiumStepHeight, podiumTopLen);
 	material = new THREE.MeshLambertMaterial( { map: glass_texture } );
 	mesh = new THREE.Mesh(geometry, material);
-	mesh.position.set(0, -podiumStepHeight/2+y, 0);
+	mesh.position.set(0, -podiumStepHeight/2, 0);
 	mesh2 = new THREE.Mesh(geometry2, material);
-	mesh2.position.set(0, podiumStepHeight/2+y, 0);
+	mesh2.position.set(0, podiumStepHeight/2, 0);
 	podiumObj.add(mesh);
 	podiumObj.add(mesh2);
 	podiumObj.position.set(x,y,z);
@@ -186,33 +186,27 @@ function render2()
 }
 
 function onResize() {
-
-	renderer.setSize(window.innerWidth, window.innerHeight);
-	
 	if (window.innerWidth > 0 &&  window.innerHeight > 0){
-		if (camera[currentCamera] === OrtogonalCamera) {
-			var i;
-			var val = 2;
-			aspectRatio = window.innerWidth / window.innerHeight;
-			renderer.setSize(window.innerWidth, window.innerHeight);
-			for (i = 0; i < 1; i++) { // Ortographic Cameras
-				camera[currentCamera].left = -viewSize * aspectRatio / val;
-				camera[currentCamera].right = viewSize * aspectRatio / val;
-				camera[currentCamera].top = viewSize / val;
-				camera[currentCamera].bottom = viewSize / -val;
-				camera[currentCamera].updateProjectionMatrix();
-			}
+		var i;
+		var val = 2;
+		aspectRatio = window.innerWidth / window.innerHeight;
+		renderer.setSize(window.innerWidth, window.innerHeight);
+		var nrCameras = camera.length; 
+		var nrPerspectiveCameras = 1;
+		for (i=0; i < nrPerspectiveCameras; i++) { // perspective camera
+				camera[i].aspect = window.innerWidth / window.innerHeight;
+				camera[i].updateProjectionMatrix();
+				camera[i].updateProjectionMatrix();
 		}
-		else	
-		{
-			if((window.innerWidth / window.innerHeight) < 1.6) {
-				camera[indexCamera].aspect = window.innerWidth / window.innerHeight;
-				camera[indexCamera].updateProjectionMatrix();
-				camera[indexCamera].lookAt(scene.position);
-			}
+		for (i =nrPerspectiveCameras; i< nrCameras; i++) { // ortographic cameras
+			if (i==2)
+				continue;
+			camera[i].left = -viewSize * aspectRatio / val;
+			camera[i].right = viewSize * aspectRatio / val;
+			camera[i].top = viewSize / val;
+			camera[i].bottom = viewSize / -val;
+			camera[i].updateProjectionMatrix();
 		}
-		
-		camera[currentCamera].updateProjectionMatrix();
 	}
 }
 
@@ -557,6 +551,8 @@ function init() {
 	camera[1] = createOrtographicCamera(podiumTopLen/4*defaultScale, podiumStepHeight*defaultScale,0*defaultScale);
 	camera[2] = new THREE.StereoCamera();
 	camera[3] = createOrtographicCamera(podiumTopLen*defaultScale, podiumStepHeight*defaultScale,0); // for orbit controls
+	camera[4] = OrtogonalCamera;
+	camera[5] = OrtogonalCamera2;
 	controls = new THREE.OrbitControls(camera[3], renderer.domElement);
 	animate();
 	createPauseMessage();
