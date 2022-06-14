@@ -114,6 +114,8 @@ function addMesh(obj,name,type,posx,posy,posz,rotX,rotY,rotZ,mat)
 	var shape_mat;
 	if(mat == 1)
 		shape_mat = new THREE.MeshBasicMaterial({color: 0xff0000, wireframe: true});
+
+		shape_mat = new THREE.MeshLambertMaterial({map: glass_texture, side: THREE.DoubleSide});
 	geometry.computeVertexNormals();
 	console.log(geometry);
 	mesh = new THREE.Mesh(geometry,shape_mat);
