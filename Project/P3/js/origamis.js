@@ -7,14 +7,14 @@
 /*global THREE*/
 
 var camera = [];
-var val = 4;
+var val = 2;
+var val2 = 2;
 var scene= [];
 var renderer, currentCamera = 0;
-let cameraRatio = 10;
 
 var defaultScale = 1;
 var viewSize = 50;
-var aspectRatio;
+var aspectRatio = window.innerWidth/window.innerHeight;
 var podiumStepHeight = 0.5;
 var podiumBottomLen = 20;
 var podiumTopLen = 0.75*podiumBottomLen;
@@ -34,6 +34,7 @@ var fig1;
 var fig2;
 var wood_texture = new THREE.TextureLoader().load("./media/wood.jpg");
 var glass_texture = new THREE.TextureLoader().load("./media/glass.jpg");
+var earth_texture = new THREE.TextureLoader().load("./media/earth.jpg");
 var dirLightObj;
 var directionalLight;
 var spotlights = [];
@@ -230,10 +231,10 @@ function onResize() {
 		for (i =nrPerspectiveCameras; i< nrCameras; i++) { // ortographic cameras
 			if (i==2)
 				continue;
-			camera[i].left = -viewSize * aspectRatio / val;
-			camera[i].right = viewSize * aspectRatio / val;
-			camera[i].top = viewSize / val;
-			camera[i].bottom = viewSize / -val;
+			camera[i].left = -viewSize * aspectRatio / val/ val2;
+			camera[i].right = viewSize * aspectRatio / val/ val2;
+			camera[i].top = viewSize / val / val2;
+			camera[i].bottom = viewSize / -val / val2;
 			camera[i].updateProjectionMatrix();
 		}
 	}
@@ -404,8 +405,8 @@ function createPauseMessage() {
 		map: spriteMap
 	});
 	let message = new THREE.Sprite(spriteMaterial);
-	let scaleRatio = 100 * window.innerWidth / window.innerHeight;
-	message.scale.set(scaleRatio, scaleRatio, 0);
+	let scaleRatio = 50* window.innerWidth / window.innerHeight;
+	message.scale.set(scaleRatio, scaleRatio, scaleRatio);
 	message.visible = true;
 	message.position.set(0, 0, 20);
   
@@ -542,7 +543,7 @@ function onKeyUp(e) {
 
 function resetState()
 {
-	if (pause && rKey && isRCapitalized) {
+	if (pause && rKey) {
 			isMaterialLambert = true;
 			isMaterialLightSensitive = false;
 			changeMaterial(isMaterialLambert, isMaterialLightSensitive);
@@ -577,9 +578,8 @@ function createPerspectiveCamera(x, y, z) {
 function createOrtographicCamera(x, y, z) {
 	// Adjusts camera ratio so the scene is totally visible 
 	// OrthographicCamera( left, right, top, bottom, near, far )
-	var camera = new THREE.OrthographicCamera(window.innerWidth / -(val * cameraRatio),
-		window.innerWidth / (val * cameraRatio), window.innerHeight / (val * cameraRatio),
-		window.innerHeight / -(val * cameraRatio), 0, 1000);
+	var camera = new THREE.OrthographicCamera(-viewSize * aspectRatio / val / val2,
+	viewSize * aspectRatio / val / val2, viewSize / val / val2, viewSize / -val / val2, 0, 1000);
 
 	camera.position.x = x;
 	camera.position.y = y;
@@ -599,10 +599,10 @@ function VRinit()
 }
 
 function createAllCameras() {
-	OrtogonalPauseCamera = createOrtographicCamera(0, 100, 20);
+	OrtogonalPauseCamera = createOrtographicCamera(0, 20, 20);
 	OrtogonalPauseCamera2 = createOrtographicCamera(0, 10, 10);
 	camera[0] = createPerspectiveCamera(viewSize/2*defaultScale,viewSize/2*defaultScale,viewSize/2*defaultScale);
-	camera[1] = createOrtographicCamera(podiumTopLen/4*defaultScale, podiumStepHeight*defaultScale,0*defaultScale);
+	camera[1] = createOrtographicCamera(podiumTopLen*defaultScale, podiumStepHeight*defaultScale,0*defaultScale);
 	camera[2] = new THREE.StereoCamera();
 	camera[3] = createOrtographicCamera(podiumTopLen*defaultScale, podiumStepHeight*defaultScale,0); // for orbit controls
 	camera[4] = OrtogonalPauseCamera;
