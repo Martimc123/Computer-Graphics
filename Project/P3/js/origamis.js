@@ -36,9 +36,15 @@ var wood_texture = new THREE.TextureLoader().load("./media/wood.jpg");
 var glass_texture = new THREE.TextureLoader().load("./media/glass.jpg");
 var dirLightObj;
 var directionalLight;
+var spotLight1, spotLight2, spotLight3;
 var dirLightIntensity = 0.5;
+var allObj = [];
+var allColors = [];
 var figures = [];
+var materials = [];
+var currentMaterial = 0;
 var isMaterialLambert = true;
+var isMaterialLightSensitive = false;
 var qKey,wKey,eKey,rKey,tKey,yKey;
 let pause = false;
 var OrtogonalPauseCamera;
@@ -62,17 +68,23 @@ function addObjPart(obj, geometry, mater, hex, x, y, z, rotX, rotY, rotZ,tag = "
 
 function addFloor(obj, x, y, z) {
 	geometry = new THREE.BoxGeometry(viewSize*2,0.1, viewSize*2);
-	material = new THREE.MeshPhongMaterial( { map: wood_texture } );
+	material = materials[1];
+	var color = 0x222222;
+	material.color = color;
 	mesh = new THREE.Mesh(geometry, material);
 	mesh.position.set(x, y, z);
 	obj.add(mesh);
+	allObj.push(mesh);
+	allColors.push(color);
 }
 
 function addPodium(obj, x, y, z) {
 	var podiumObj = new THREE.Object3D();
 	geometry = new THREE.BoxGeometry(podiumBottomLen,podiumStepHeight, podiumBottomLen);
 	let geometry2 = new THREE.BoxGeometry(podiumTopLen,podiumStepHeight, podiumTopLen);
-	material = new THREE.MeshLambertMaterial( { map: glass_texture } );
+	material = materials[0];
+	var color = 0x979aaa;
+	material.color = color;
 	mesh = new THREE.Mesh(geometry, material);
 	mesh.position.set(0, -podiumStepHeight/2, 0);
 	mesh2 = new THREE.Mesh(geometry2, material);
@@ -81,6 +93,9 @@ function addPodium(obj, x, y, z) {
 	podiumObj.add(mesh2);
 	podiumObj.position.set(x,y,z);
 	obj.add(podiumObj);
+	allObj.push(mesh);
+	allObj.push(mesh2);
+	allColors.push(color);
 	return podiumObj;
 }
 
@@ -105,7 +120,7 @@ function addMesh(obj,name,type,posx,posy,posz,rotX,rotY,rotZ,mat)
 	if (type == 2)
 		geometry = new THREE.ShapeBufferGeometry(shape);
 
-	var shape_mat = new THREE.MeshLambertMaterial({map: glass_texture, side: THREE.DoubleSide});
+	var shape_mat = materials[1];
 	geometry.computeVertexNormals();
 	console.log(geometry);
 	mesh = new THREE.Mesh(geometry,shape_mat);
@@ -116,6 +131,7 @@ function addMesh(obj,name,type,posx,posy,posz,rotX,rotY,rotZ,mat)
 	mesh.position.set(posx,posy,posz);
 	mesh.name="teste";
 	obj.add(mesh);
+	allObj.push(mesh);
 }
 
 function render() {
@@ -240,20 +256,25 @@ function changeLightning(intensity) {
 	universe.getObjectByName("directional").getObjectByName("light").intensity = intensity;
 }
 
-function changeMaterial(isMaterialLambert) {
-	for (i = 0; i < figures.length; i++)
+function changeMaterial(isMaterialLambert, isMaterialLightSensitive) {
+	for (i = 0; i < allObj.length; i++)
 	{
-		if (isMaterialLambert)
-			figures[i].material = new THREE.MeshLambertMaterial( {color: 0xff0000} )
+		if (isMaterialLightSensitive) {
+			allObj[i].material = materials[0];
+		}
+		else if (isMaterialLambert)
+			allObj[i].material = materials[1];
 		else
-			figures[i].material = new THREE.MeshPhongMaterial( {color: 0xffffff} )
+			allObj[i].material = materials[2];
+		
+		allObj[i].material.color = allColors[i];
 	}
 }
 
 function display() {
 	resetState();
 	changeLightning(dirLightIntensity);
-	changeMaterial(isMaterialLambert);
+	changeMaterial(isMaterialLambert, isMaterialLightSensitive);
 	requestAnimationFrame(animate);
 	render();
 	VRinit();
@@ -267,11 +288,13 @@ function animate() {
 function addCube(obj,x,y,z)
 {
 	const geometry = new THREE.BoxGeometry( 2, 2, 2 );
-	const material = new THREE.MeshPhongMaterial( {color: 0xff0000} );
+	const material = materials[0];
 	const cube = new THREE.Mesh( geometry, material );
 	cube.position.set(x,y,z);
 	obj.add(cube);
 	figures.push(cube);
+	allObj.push(cube);
+	allColors.push()
 }
 
 function addFig1(obj,x,y,z)
@@ -407,6 +430,11 @@ function onKeyDown(e) {
 			isMaterialLambert = !isMaterialLambert;
 			break;
 
+		case 83://S
+		case 115://s
+			isMaterialLightSensitive = !isMaterialLightSensitive;
+			break;
+
 		case 52://4
 			wires = !wires;
 			break;
@@ -453,12 +481,13 @@ function resetState()
 {
 	if (pause && rKey) {
 			isMaterialLambert = true;
-			changeMaterial(isMaterialLambert);
+			changeMaterial(isMaterialLambert, isMaterialLightSensitive);
 			for(i=0;i<figures.length;i++)
 				figures[i].rotation.y = 0;
 			dirLightIntensity=0.5;
 			changeLightning(dirLightIntensity);
 			rKey=false;
+			currentCamera = 0;
 	}
 }
 
@@ -501,15 +530,7 @@ function VRinit()
 	}
 }
 
-function init() {
-		
-	renderer = new THREE.WebGLRenderer({antialias: true});
-	renderer.setSize(window.innerWidth, window.innerHeight);
-	document.body.appendChild(renderer.domElement);
-	document.body.appendChild( VRButton.createButton( renderer ) );
-	renderer.xr.enabled = true;
-	
-	createScene();
+function createAllCameras() {
 	OrtogonalPauseCamera = createOrtographicCamera(0, 100, 20);
 	OrtogonalPauseCamera2 = createOrtographicCamera(0, 10, 10);
 	camera[0] = createPerspectiveCamera(viewSize/4*defaultScale,viewSize/4*defaultScale,viewSize/4*defaultScale);
@@ -519,6 +540,25 @@ function init() {
 	camera[4] = OrtogonalPauseCamera;
 	camera[5] = OrtogonalPauseCamera2;
 	controls = new THREE.OrbitControls(camera[3], renderer.domElement);
+}
+
+function createAllMaterials() {
+	materials[0] = new THREE.MeshBasicMaterial( {color: 0x555555, map: glass_texture} );
+	materials[1] = new THREE.MeshLambertMaterial( {color: 0xff0000, map: glass_texture, side: THREE.FrontSide}, {color: 0xffffff, map: wood_texture, side: THREE.BackSide} );
+	materials[2] = new THREE.MeshPhongMaterial( {color: 0xffffff, map: wood_texture, side: THREE.FrontSide}, {color: 0xffffff, map: glass_texture, side: THREE.BackSide});	
+}
+
+function init() {
+		
+	renderer = new THREE.WebGLRenderer({antialias: true});
+	renderer.setSize(window.innerWidth, window.innerHeight);
+	document.body.appendChild(renderer.domElement);
+	document.body.appendChild( VRButton.createButton( renderer ) );
+	renderer.xr.enabled = true;
+	
+	createAllMaterials();
+	createScene();
+	createAllCameras();
 	animate();
 	createPauseMessage();
 
