@@ -7,6 +7,7 @@
 /*global THREE*/
 
 var camera = [];
+var val = 4;
 var scene= [];
 var renderer, currentCamera = 0;
 let cameraRatio = 10;
@@ -217,7 +218,6 @@ function render2()
 function onResize() {
 	if (window.innerWidth > 0 &&  window.innerHeight > 0){
 		var i;
-		var val = 2;
 		aspectRatio = window.innerWidth / window.innerHeight;
 		renderer.setSize(window.innerWidth, window.innerHeight);
 		var nrCameras = camera.length; 
@@ -354,7 +354,7 @@ function addFig1(obj,x,y,z)
 function addDirectionalLight(obj)
 {
 	directionalLight = new THREE.DirectionalLight(0xffffff, 0.6);
-	directionalLight.position.set(0, 45, 45);
+	directionalLight.position.set(viewSize/2, viewSize/2, 0);
   	let lightHelper = new THREE.DirectionalLightHelper(directionalLight);
 	directionalLight.name="light";
 	obj.add( directionalLight );
@@ -565,9 +565,9 @@ function createPerspectiveCamera(x, y, z) {
 function createOrtographicCamera(x, y, z) {
 	// Adjusts camera ratio so the scene is totally visible 
 	// OrthographicCamera( left, right, top, bottom, near, far )
-	var camera = new THREE.OrthographicCamera(window.innerWidth / -(2 * cameraRatio),
-		window.innerWidth / (2 * cameraRatio), window.innerHeight / (2 * cameraRatio),
-		window.innerHeight / -(2 * cameraRatio), 0, 1000);
+	var camera = new THREE.OrthographicCamera(window.innerWidth / -(val * cameraRatio),
+		window.innerWidth / (val * cameraRatio), window.innerHeight / (val * cameraRatio),
+		window.innerHeight / -(val * cameraRatio), 0, 1000);
 
 	camera.position.x = x;
 	camera.position.y = y;
