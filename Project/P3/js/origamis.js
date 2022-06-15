@@ -24,7 +24,6 @@ var geometry, material, mesh;
 var wiredObjects = [];
 var wires = true;
 
-var leftArrow, rightArrow, upArrow, downArrow;
 var clock = new THREE.Clock();
 
 var universe;
@@ -50,6 +49,35 @@ let pause = false;
 var OrtogonalPauseCamera;
 
 'use strict';
+
+function addSpotlightHost(obj, xLoc, yLoc, zLoc) {
+	material = materials[1];
+	var color = 0x333333;
+	material.color = color;
+
+	geometry = new THREE.SphereGeometry(origamiLen/2);
+	var sphere = new THREE.Mesh(geometry, material);
+	allObj.push(sphere);
+	allColors.push(color);
+
+	geometry = new THREE.CylinderGeometry(0, origamiLen/2, origamiLen);
+	var cone = new THREE.Mesh(geometry, material);
+	allObj.push(cone);
+	allColors.push(color);
+
+	sphere.position.set(xLoc, yLoc, zLoc);
+	cone.position.set(xLoc, yLoc, zLoc);
+	obj.add(sphere);
+	obj.add(cone);
+}
+
+function addSpotlight(obj, toLookObj, lightObj, x, y, z) {
+	lightObj = new THREE.SpotLight(0xffffff, 0.5);
+	lightObj.position.set(x, y, z);
+	obj.add(lightObj);
+	lightObj.target = toLookObj;
+	addSpotlightHost(obj, location, vecLookAt);
+}
 
 function addObjPart(obj, geometry, mater, hex, x, y, z, rotX, rotY, rotZ,tag = "") {
 	material = (mater != null)? mater : new THREE.MeshBasicMaterial({wireframe: wires});
@@ -122,7 +150,7 @@ function addMesh(obj,name,type,posx,posy,posz,rotX,rotY,rotZ,mat)
 
 	var shape_mat = materials[1];
 	geometry.computeVertexNormals();
-	console.log(geometry);
+//	console.log(geometry);
 	mesh = new THREE.Mesh(geometry,shape_mat);
 	mesh.position.copy(pos);
 	mesh.rotateX(rotX);
@@ -287,14 +315,16 @@ function animate() {
 
 function addCube(obj,x,y,z)
 {
-	const geometry = new THREE.BoxGeometry( 2, 2, 2 );
-	const material = materials[0];
+	const geometry = new THREE.BoxGeometry(origamiLen, origamiLen, origamiLen);
+	const material = materials[1];
 	const cube = new THREE.Mesh( geometry, material );
 	cube.position.set(x,y,z);
 	obj.add(cube);
 	figures.push(cube);
 	allObj.push(cube);
-	allColors.push()
+	allColors.push();
+	addSpotlightHost(universe, x, y*4, z, x,y,z);
+	return cube;
 }
 
 function addFig1(obj,x,y,z)
@@ -336,7 +366,6 @@ function createScene() {
 	podium = addPodium(universe, 0, podiumStepHeight, 0);
 	directionalLight.target = podium;
 	addFloor(universe,0,0,0);
-
 	addCube(universe,0,podiumStepHeight*2+origamiLen,origamiDist);
 	addCube(universe,0,podiumStepHeight*2+origamiLen,0);
 	addCube(universe,0,podiumStepHeight*2+origamiLen,-origamiDist);
@@ -533,7 +562,7 @@ function VRinit()
 function createAllCameras() {
 	OrtogonalPauseCamera = createOrtographicCamera(0, 100, 20);
 	OrtogonalPauseCamera2 = createOrtographicCamera(0, 10, 10);
-	camera[0] = createPerspectiveCamera(viewSize/4*defaultScale,viewSize/4*defaultScale,viewSize/4*defaultScale);
+	camera[0] = createPerspectiveCamera(viewSize/2*defaultScale,viewSize/2*defaultScale,viewSize/2*defaultScale);
 	camera[1] = createOrtographicCamera(podiumTopLen*defaultScale, podiumStepHeight*defaultScale,0*defaultScale);
 	camera[2] = new THREE.StereoCamera();
 	camera[3] = createOrtographicCamera(podiumTopLen*defaultScale, podiumStepHeight*defaultScale,0); // for orbit controls
