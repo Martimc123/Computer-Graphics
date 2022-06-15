@@ -386,7 +386,7 @@ function createScene() {
 //	universe.add( light );
 
 	fig1 = new THREE.Object3D();
-	addFig1(fig1,-10,10,-10);
+	//addFig1(fig1,-10,10,-10);
 
 	fig2 = new THREE.Object3D();
 	//addFig1(fig2,20,1,1);
@@ -534,6 +534,7 @@ function resetState()
 {
 	if (pause && rKey) {
 			isMaterialLambert = true;
+			isMaterialLightSensitive = false;
 			changeMaterial(isMaterialLambert, isMaterialLightSensitive);
 			for(i=0;i<figures.length;i++)
 				figures[i].rotation.y = 0;
