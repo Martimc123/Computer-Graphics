@@ -48,6 +48,7 @@ var qKey,wKey,eKey,rKey,tKey,yKey;
 var zKey, xKey, cKey;
 let pause = false;
 var OrtogonalPauseCamera;
+var isRCapitalized;
 
 'use strict';
 
@@ -150,7 +151,6 @@ function addMesh(obj,name,type,posx,posy,posz,rotX,rotY,rotZ,mat)
 
 	var shape_mat = materials[1];
 	geometry.computeVertexNormals();
-//	console.log(geometry);
 	mesh = new THREE.Mesh(geometry,shape_mat);
 	mesh.position.copy(pos);
 	mesh.rotateX(rotX);
@@ -372,7 +372,6 @@ function createScene() {
 	dirLightObj.name="directional";
 	addDirectionalLight(dirLightObj);
 	dirLightObj.rotateZ(Math.PI/180*30);
-	console.log(dirLightObj);
 	universe.add(dirLightObj);
 	
 	podium = addPodium(universe, 0, podiumStepHeight, 0);
@@ -418,7 +417,6 @@ function onKeyDown(e) {
 	switch (keyName) {
 		case 32: // [SPACE], Pause
 			pause = !pause;
-			console.log("Pause=" + pause);
 			break;
 
 		case 49://1
@@ -436,56 +434,68 @@ function onKeyDown(e) {
 
 		case 81: //Q
 		case 113: //q
-			qKey = true;
+			if(!pause)
+				qKey = true;
 			break;
 		case 87: //W
 		case 119: //w
-			wKey = true;
-			break;			
-		
+			if(!pause)	
+				wKey = true;
+			break;				
 		case 69: //E
 		case 101: //e
-			eKey = true;
+			if(!pause)
+				eKey = true;
 			break;
 		case 82: //R, reset
+			if (pause && e.key == 'R')
+				isRCapitalized = true;
 		case 114: //r, reset
 			rKey = true;
 			break;		
 			
 		case 84: //T
 		case 116: //t
-			tKey = true;
+			if(!pause)
+				tKey = true;
 			break;
 		case 89: //Y
 		case 121: //y
-			yKey = true;
+			if(!pause)
+				yKey = true;
 			break;		
 		
 		case 68:  //D
 		case 100: //d
-			dirLightIntensity = (dirLightIntensity == 0 ? 0.5 : 0);
+			if(!pause)
+				dirLightIntensity = (dirLightIntensity == 0 ? 0.5 : 0);
 			break;
 		case 83://S
 		case 115://s
-			isMaterialLightSensitive = !isMaterialLightSensitive;
+			if(!pause)
+				isMaterialLightSensitive = !isMaterialLightSensitive;
 			break;
 		
 		case 90:// Z
 		case 122://z
-			zKey = !zKey;
+			if(!pause)
+				zKey = !zKey;
 			break;
 		case 88://X
 		case 120://x
-			xKey = !xKey;
+			if(!pause)
+				xKey = !xKey;
 			break;
 		case 67://C
 		case 99://c
-			cKey = !cKey;
+			if(!pause)
+				cKey = !cKey;
 			break;
 
 		case 65://A
 		case 97://a
-			isMaterialLambert = !isMaterialLambert;
+			if(!pause)
+				isMaterialLambert = !isMaterialLambert;
 			break;
 
 		case 52://4
@@ -532,7 +542,7 @@ function onKeyUp(e) {
 
 function resetState()
 {
-	if (pause && rKey) {
+	if (pause && rKey && isRCapitalized) {
 			isMaterialLambert = true;
 			isMaterialLightSensitive = false;
 			changeMaterial(isMaterialLambert, isMaterialLightSensitive);
@@ -545,6 +555,7 @@ function resetState()
 				spotlights[i].visible = true;
 			rKey=false;
 			currentCamera = 0;
+			isRCapitalized = false;
 	}
 }
 
