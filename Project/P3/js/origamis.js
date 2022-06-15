@@ -35,7 +35,7 @@ var wood_texture = new THREE.TextureLoader().load("./media/wood.jpg");
 var glass_texture = new THREE.TextureLoader().load("./media/glass.jpg");
 var dirLightObj;
 var directionalLight;
-var spotLight1, spotLight2, spotLight3;
+var spotlights = [];
 var dirLightIntensity = 0.5;
 var allObj = [];
 var allColors = [];
@@ -45,6 +45,7 @@ var currentMaterial = 0;
 var isMaterialLambert = true;
 var isMaterialLightSensitive = false;
 var qKey,wKey,eKey,rKey,tKey,yKey;
+var zKey, xKey, cKey;
 let pause = false;
 var OrtogonalPauseCamera;
 
@@ -71,12 +72,11 @@ function addSpotlightHost(obj, xLoc, yLoc, zLoc) {
 	obj.add(cone);
 }
 
-function addSpotlight(obj, toLookObj, lightObj, x, y, z) {
-	lightObj = new THREE.SpotLight(0xffffff, 0.5);
-	lightObj.position.set(x, y, z);
-	obj.add(lightObj);
-	lightObj.target = toLookObj;
-	addSpotlightHost(obj, location, vecLookAt);
+function addSpotlight(obj, toLookObj, spotlight, x, y, z) {
+	spotlight.position.set(x, y, z);
+	obj.add(spotlight);
+	spotlight.target = toLookObj;
+	addSpotlightHost(obj, x, y, z);
 }
 
 function addObjPart(obj, geometry, mater, hex, x, y, z, rotX, rotY, rotZ,tag = "") {
@@ -282,6 +282,18 @@ function update()
 
 function changeLightning(intensity) {
 	universe.getObjectByName("directional").getObjectByName("light").intensity = intensity;
+	if (zKey) {
+		spotlights[0].visible = !spotlights[0].visible;
+		zKey = false;
+	}
+	if (xKey) {
+		spotlights[1].visible = !spotlights[1].visible;
+		xKey = false;
+	}
+	if (cKey) {
+		spotlights[2].visible = !spotlights[2].visible;
+		cKey = false;
+	}
 }
 
 function changeMaterial(isMaterialLambert, isMaterialLightSensitive) {
@@ -313,7 +325,7 @@ function animate() {
 	display();
 }
 
-function addCube(obj,x,y,z)
+function addCube(obj, spotlight, x,y,z)
 {
 	const geometry = new THREE.BoxGeometry(origamiLen, origamiLen, origamiLen);
 	const material = materials[1];
@@ -323,7 +335,7 @@ function addCube(obj,x,y,z)
 	figures.push(cube);
 	allObj.push(cube);
 	allColors.push();
-	addSpotlightHost(universe, x, y*4, z, x,y,z);
+	addSpotlight(obj, cube, spotlight, x, y*4, z);
 	return cube;
 }
 
@@ -366,12 +378,12 @@ function createScene() {
 	podium = addPodium(universe, 0, podiumStepHeight, 0);
 	directionalLight.target = podium;
 	addFloor(universe,0,0,0);
-	addCube(universe,0,podiumStepHeight*2+origamiLen,origamiDist);
-	addCube(universe,0,podiumStepHeight*2+origamiLen,0);
-	addCube(universe,0,podiumStepHeight*2+origamiLen,-origamiDist);
+	addCube(universe, spotlights[0], 0, podiumStepHeight*2+origamiLen,origamiDist);
+	addCube(universe, spotlights[1], 0, podiumStepHeight*2+origamiLen,0);
+	addCube(universe, spotlights[2], 0, podiumStepHeight*2+origamiLen,-origamiDist);
 
 	const light = new THREE.AmbientLight( 0x404040 ); // soft white light
-	universe.add( light );
+//	universe.add( light );
 
 	fig1 = new THREE.Object3D();
 	addFig1(fig1,-10,10,-10);
@@ -453,15 +465,27 @@ function onKeyDown(e) {
 		case 100: //d
 			dirLightIntensity = (dirLightIntensity == 0 ? 0.5 : 0);
 			break;
-		
-		case 65://A
-		case 97://a
-			isMaterialLambert = !isMaterialLambert;
-			break;
-
 		case 83://S
 		case 115://s
 			isMaterialLightSensitive = !isMaterialLightSensitive;
+			break;
+		
+		case 90:// Z
+		case 122://z
+			zKey = !zKey;
+			break;
+		case 88://X
+		case 120://x
+			xKey = !xKey;
+			break;
+		case 67://C
+		case 99://c
+			cKey = !cKey;
+			break;
+
+		case 65://A
+		case 97://a
+			isMaterialLambert = !isMaterialLambert;
 			break;
 
 		case 52://4
@@ -515,6 +539,9 @@ function resetState()
 				figures[i].rotation.y = 0;
 			dirLightIntensity=0.5;
 			changeLightning(dirLightIntensity);
+			var nrSpotLights = spotlights.length;
+			for (var i = 0; i < nrSpotLights; i++)
+				spotlights[i].visible = true;
 			rKey=false;
 			currentCamera = 0;
 	}
@@ -563,7 +590,7 @@ function createAllCameras() {
 	OrtogonalPauseCamera = createOrtographicCamera(0, 100, 20);
 	OrtogonalPauseCamera2 = createOrtographicCamera(0, 10, 10);
 	camera[0] = createPerspectiveCamera(viewSize/2*defaultScale,viewSize/2*defaultScale,viewSize/2*defaultScale);
-	camera[1] = createOrtographicCamera(podiumTopLen*defaultScale, podiumStepHeight*defaultScale,0*defaultScale);
+	camera[1] = createOrtographicCamera(podiumTopLen/4*defaultScale, podiumStepHeight*defaultScale,0*defaultScale);
 	camera[2] = new THREE.StereoCamera();
 	camera[3] = createOrtographicCamera(podiumTopLen*defaultScale, podiumStepHeight*defaultScale,0); // for orbit controls
 	camera[4] = OrtogonalPauseCamera;
@@ -577,6 +604,12 @@ function createAllMaterials() {
 	materials[2] = new THREE.MeshPhongMaterial( {color: 0xffffff, map: wood_texture, side: THREE.FrontSide}, {color: 0xffffff, map: glass_texture, side: THREE.BackSide});	
 }
 
+function createAllSpotLights() {
+	spotlights[0] = new THREE.SpotLight(0xffffff, 0.3);
+	spotlights[1] = new THREE.SpotLight(0xffffff, 0.3);
+	spotlights[2] = new THREE.SpotLight(0xffffff, 0.3);
+}
+
 function init() {
 		
 	renderer = new THREE.WebGLRenderer({antialias: true});
@@ -586,6 +619,7 @@ function init() {
 	renderer.xr.enabled = true;
 	
 	createAllMaterials();
+	createAllSpotLights();
 	createScene();
 	createAllCameras();
 	animate();
