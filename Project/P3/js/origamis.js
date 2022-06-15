@@ -121,7 +121,6 @@ function addMesh(obj,name,type,posx,posy,posz,rotX,rotY,rotZ,mat)
 function render() {
 	renderer.autoClear = false;
 	renderer.clear();
-	renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
 	renderer.render(scene[0], camera[currentCamera]);
 	if (pause) {
 		if (currentCamera == 1)
