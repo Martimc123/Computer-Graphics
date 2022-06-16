@@ -26,26 +26,66 @@ class OrigamiCraneC extends THREE.Mesh {
 		var normalNumComponents = 3;
 		var uvNumComponents = 2;
 		const vertices = new Float32Array (
-			[ // left side
+			[ 
+				// left side - up
 				0.5, 2.0, 2.0, 
 				0.0, 0.0, 0.0,
 				0.5, 4.0, 0.0,
 				
-				// right side
-				0.5, 2.0, -2.0, 
+				// right side - up
+				0.5, 2.0, -2.0,
+				0.5, 4.0, 0.0,
+				0.0, 0.0, 0.0,
+
+				// left side - middle
+				0.5, 2.0, 2.0, 
 				0.0, 0.0, 0.0,
 				0.5, 4.0, 0.0,
+				
+				// right side - middle
+				0.5, 2.0, -2.0,
+				0.5, 4.0, 0.0,
+				0.0, 0.0, 0.0,
 
+				// left side - down
+				0.5, 2.0, 2.0, 
+				0.0, 0.0, 0.0,
+				0.5, 4.0, 0.0,
+				
+				// right side - down
+				0.5, 2.0, -2.0,
+				0.5, 4.0, 0.0,
+				0.0, 0.0, 0.0
 			]
 		);
 		const uvs = new Float32Array (
 			[ 
-				// left side
+				// left side - up
 				0, 0,
 				1, 0,
 				0, 1,
 
-				// right side
+				// right side - up
+				0, 0,
+				1, 0,
+				0, 1,
+
+				// left side - middle
+				0, 0,
+				1, 0,
+				0, 1,
+
+				// right side - middle
+				0, 0,
+				1, 0,
+				0, 1,
+
+				// left side - down
+				0, 0,
+				1, 0,
+				0, 1,
+
+				// right side - down
 				0, 0,
 				1, 0,
 				0, 1
@@ -55,12 +95,32 @@ class OrigamiCraneC extends THREE.Mesh {
 		var fullNormal1 = this.calculateNormal(
 			[0.5, 2.0, 2.0],
 			[0.0, 0.0, 0.0],
-			[0.5, 2.0, 0.0]
+			[0.5, 4.0, 0.0]
 		);
 		var fullNormal2 = this.calculateNormal(
 			[0.5, 2.0, -2.0], 
+			[0.5, 4.0, 0.0],
+			[0.0, 0.0, 0.0]
+		);
+		var fullNormal3 = this.calculateNormal(
+			[0.5, 2.0, 2.0],
 			[0.0, 0.0, 0.0],
 			[0.5, 4.0, 0.0]
+		);
+		var fullNormal4 = this.calculateNormal(
+			[0.5, 2.0, -2.0], 
+			[0.5, 4.0, 0.0],
+			[0.0, 0.0, 0.0]
+		);
+		var fullNormal5 = this.calculateNormal(
+			[0.5, 2.0, -2.0], 
+			[0.5, 4.0, 0.0],
+			[0.0, 0.0, 0.0]
+		);
+		var fullNormal6 = this.calculateNormal(
+			[0.5, 2.0, -2.0], 
+			[0.5, 4.0, 0.0],
+			[0.0, 0.0, 0.0]
 		);
 
 		const norms = new Float32Array (
@@ -71,6 +131,18 @@ class OrigamiCraneC extends THREE.Mesh {
 			fullNormal2[0], fullNormal2[1], fullNormal2[2],
 			fullNormal2[0], fullNormal2[1], fullNormal2[2],
 			fullNormal2[0], fullNormal2[1], fullNormal2[2],
+			fullNormal3[0], fullNormal3[1], fullNormal3[2],
+			fullNormal3[0], fullNormal3[1], fullNormal3[2],
+			fullNormal3[0], fullNormal3[1], fullNormal3[2],
+			fullNormal4[0], fullNormal4[1], fullNormal4[2],
+			fullNormal4[0], fullNormal4[1], fullNormal4[2],
+			fullNormal4[0], fullNormal4[1], fullNormal4[2],
+			fullNormal5[0], fullNormal5[1], fullNormal5[2],
+			fullNormal5[0], fullNormal5[1], fullNormal5[2],
+			fullNormal5[0], fullNormal5[1], fullNormal5[2],
+			fullNormal6[0], fullNormal6[1], fullNormal6[2],
+			fullNormal6[0], fullNormal6[1], fullNormal6[2],
+			fullNormal6[0], fullNormal6[1], fullNormal6[2]
 			]
 		);
 
@@ -78,15 +150,16 @@ class OrigamiCraneC extends THREE.Mesh {
 			'position',
 			new THREE.BufferAttribute(vertices, positionNumComponents));
 
-	//	origamiGeometry.setAttribute(
-	//		'normal',
-	//		new THREE.BufferAttribute(norms,normalNumComponents));
+		origamiGeometry.setAttribute(
+			'normal',
+			new THREE.BufferAttribute(norms,normalNumComponents));
 
-	origamiGeometry.setAttribute(
+		origamiGeometry.computeVertexNormals();
+
+		origamiGeometry.setAttribute(
 		'uvs',
 		new THREE.BufferAttribute(uvs, uvNumComponents));
 
-		origamiGeometry.computeVertexNormals();
 		this.geometry = origamiGeometry;
 	}
 }
