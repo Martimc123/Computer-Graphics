@@ -16,7 +16,7 @@ var defaultScale = 1;
 var viewSize = 50;
 var aspectRatio = window.innerWidth/window.innerHeight;
 var podiumStepHeight = 0.5;
-var podiumBottomLen = 20;
+var podiumBottomLen = 40;
 var podiumTopLen = 0.75*podiumBottomLen;
 var origamiLen = 2;
 var origamiDist = 1/3*podiumTopLen;
@@ -42,6 +42,7 @@ var dirLightIntensity = 0.5;
 var allObj = [];
 var allColors = [];
 var figures = [];
+var origamis = [];
 var materials = [];
 var currentMaterial = 0;
 var isMaterialLambert = true;
@@ -340,6 +341,35 @@ function addCube(obj, spotlight, x,y,z)
 	return cube;
 }
 
+function calculateNormal(posOG, pos1, pos2) {
+	var vec1 = [pos1[0]-posOG[0], pos1[1]-posOG[1], pos1[2]-posOG[2]];
+	var vec2 = [pos2[0]-posOG[0], pos2[1]-posOG[1], pos2[2]-posOG[2]];
+	var normX = (vec1[1]-vec2[2])*(vec1[2]-vec2[1]);
+	var normY = (vec1[2]-vec2[0])*(vec1[0]-vec2[2]);
+	var normZ = (vec1[0]-vec2[1])*(vec1[1]-vec2[0]);
+	var crossProduct = (normX**2 + normY**2 + normZ**2)**0.5;
+	var fullNormal = [normX/crossProduct, normY/crossProduct, normZ/crossProduct];
+	return fullNormal;
+}
+
+function addOrigami(type, obj, spotlight, x,y,z) {
+	var origami;
+	if (type == 'A')
+		origami = new OrigamiCraneA(materials[1]);
+	else if (type == 'B')
+		origami = new OrigamiCraneB(materials[1]);
+	else if (type == 'C')
+		origami = new OrigamiCraneC(materials[1]);
+	origami.rotation.z= Math.PI/6;
+	origami.position.set(x,y,z);
+	obj.add(origami);
+	allObj.push(origami);
+	allColors.push(origami.material.color);
+	figures.push(origami);
+	addSpotlight(obj, origami, spotlight, x, y*4, z);
+}
+
+
 function addFig1(obj,x,y,z)
 {
 	//adds 1st figure
@@ -378,7 +408,8 @@ function createScene() {
 	podium = addPodium(universe, 0, podiumStepHeight, 0);
 	directionalLight.target = podium;
 	addFloor(universe,0,0,0);
-	addCube(universe, spotlights[0], 0, podiumStepHeight*2+origamiLen,origamiDist);
+	addOrigami('A', universe, spotlights[0], 0, podiumStepHeight*2+origamiLen,origamiDist);
+	//addCube(universe, spotlights[0], 0, podiumStepHeight*2+origamiLen,origamiDist);
 	addCube(universe, spotlights[1], 0, podiumStepHeight*2+origamiLen,0);
 	addCube(universe, spotlights[2], 0, podiumStepHeight*2+origamiLen,-origamiDist);
 
@@ -611,15 +642,29 @@ function createAllCameras() {
 }
 
 function createAllMaterials() {
-	materials[0] = new THREE.MeshBasicMaterial( {color: 0x555555, map: glass_texture} );
-	materials[1] = new THREE.MeshLambertMaterial( {color: 0xff0000, map: glass_texture, side: THREE.FrontSide}, {color: 0xffffff, map: wood_texture, side: THREE.BackSide} );
-	materials[2] = new THREE.MeshPhongMaterial( {color: 0xffffff, map: wood_texture, side: THREE.FrontSide}, {color: 0xffffff, map: glass_texture, side: THREE.BackSide});	
+	materials[0] = new THREE.MeshBasicMaterial( {color: 0x555555, map: wood_texture, side: THREE.DoubleSide} );
+	materials[1] = new THREE.MeshLambertMaterial( {color: 0x777777, map: wood_texture, side: THREE.DoubleSide} );
+	materials[2] = new THREE.MeshPhongMaterial( {color: 0xffffff, map: wood_texture, side: THREE.DoubleSide});
+/*
+		materials[0] = [
+		new THREE.MeshBasicMaterial( {color: 0x555555, map: wood_texture, side: THREE.FrontSide}),
+		new THREE.MeshBasicMaterial( {color: 0xffffff, side: THREE.BackSide})
+	];
+	materials[1] = [
+		new THREE.MeshLambertMaterial( {color: 0x555555, map: wood_texture, side: THREE.FrontSide}),
+		new THREE.MeshLambertMaterial( {color: 0xffffff, side: THREE.BackSide})
+	];
+	materials[2] = [
+		new THREE.MeshPhongMaterial( {color: 0x555555, map: wood_texture, side: THREE.FrontSide}),
+		new THREE.MeshPhongMaterial( {color: 0xffffff, side: THREE.BackSide})
+	];
+*/
 }
 
 function createAllSpotLights() {
-	spotlights[0] = new THREE.SpotLight(0xffffff, 0.3);
-	spotlights[1] = new THREE.SpotLight(0xffffff, 0.3);
-	spotlights[2] = new THREE.SpotLight(0xffffff, 0.3);
+	spotlights[0] = new THREE.SpotLight(0xffffff, 0.5);
+	spotlights[1] = new THREE.SpotLight(0xffffff, 0.5);
+	spotlights[2] = new THREE.SpotLight(0xffffff, 0.5);
 }
 
 function init() {
