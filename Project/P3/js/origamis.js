@@ -7,10 +7,11 @@
 /*global THREE*/
 
 var camera = [];
-var val = 2;
-var val2 = 2;
 var scene= [];
 var renderer, currentCamera = 0;
+
+var val = 2;
+var val2 = 2;
 
 var defaultScale = 1;
 var viewSize = 50;
@@ -34,7 +35,7 @@ var fig1;
 var fig2;
 var wood_texture = new THREE.TextureLoader().load("./media/wood.jpg");
 var glass_texture = new THREE.TextureLoader().load("./media/glass.jpg");
-var earth_texture = new THREE.TextureLoader().load("./media/earth.jpg");
+var gold_texture = new THREE.TextureLoader().load("./media/gold.jpg");
 var dirLightObj;
 var directionalLight;
 var spotlights = [];
@@ -42,7 +43,6 @@ var dirLightIntensity = 0.5;
 var allObj = [];
 var allColors = [];
 var figures = [];
-var origamis = [];
 var materials = [];
 var currentMaterial = 0;
 var isMaterialLambert = true;
@@ -51,7 +51,7 @@ var qKey,wKey,eKey,rKey,tKey,yKey;
 var zKey, xKey, cKey;
 let pause = false;
 var OrtogonalPauseCamera;
-var isRCapitalized;
+var reset = false;
 
 'use strict';
 
@@ -196,27 +196,6 @@ function render3() {
 	}
 }
 
-function render2()
-{
-	renderer.render(scene[0], camera[currentCamera]);
-    camera[currentCamera].updateWorldMatrix();
-    camera[2].update(camera[currentCamera]);
-    const size = new THREE.Vector2();
-    renderer.getSize(size);
-
-    renderer.setScissorTest(true);
-
-    renderer.setScissor(0, 0, size.width / 2, size.height);
-    renderer.setViewport(0, 0, size.width / 2, size.height);
-    renderer.render(scene[0], camera[2].cameraL);
-
-    renderer.setScissor(size.width, 0, size.width / 2, size.height);
-    renderer.setViewport(size.width / 2, 0, size.width / 2, size.height);
-    renderer.render(scene[0], camera[2].cameraR);
-
-    renderer.setScissorTest(false);
-}
-
 function onResize() {
 	if (window.innerWidth > 0 &&  window.innerHeight > 0){
 		var i;
@@ -317,9 +296,11 @@ function display() {
 	resetState();
 	changeLightning(dirLightIntensity);
 	changeMaterial(isMaterialLambert, isMaterialLightSensitive);
-	requestAnimationFrame(animate);
+	if (renderer.xr.getSession())
+		renderer.setAnimationLoop(animate);
+	else
+		requestAnimationFrame(animate);
 	render();
-	VRinit();
 }
 
 function animate() {
@@ -409,12 +390,11 @@ function createScene() {
 	directionalLight.target = podium;
 	addFloor(universe,0,0,0);
 	addOrigami('A', universe, spotlights[0], 0, podiumStepHeight*2+origamiLen,origamiDist);
-	//addCube(universe, spotlights[0], 0, podiumStepHeight*2+origamiLen,origamiDist);
 	addCube(universe, spotlights[1], 0, podiumStepHeight*2+origamiLen,0);
 	addCube(universe, spotlights[2], 0, podiumStepHeight*2+origamiLen,-origamiDist);
 
 	const light = new THREE.AmbientLight( 0x404040 ); // soft white light
-//	universe.add( light );
+	//universe.add( light );
 
 	fig1 = new THREE.Object3D();
 	//addFig1(fig1,-10,10,-10);
@@ -450,6 +430,9 @@ function onKeyDown(e) {
 		case 32: // [SPACE], Pause
 			pause = !pause;
 			break;
+		case 51://3
+			reset = !reset;
+		break;
 
 		case 49://1
 			if(!pause)
@@ -459,7 +442,7 @@ function onKeyDown(e) {
 			if(!pause)
 				currentCamera = 1;
 			break;
-		case 51://3
+		case 53://5
 			if(!pause)
 				currentCamera = 3;
 			break;
@@ -479,10 +462,8 @@ function onKeyDown(e) {
 			if(!pause)
 				eKey = true;
 			break;
-		case 82: //R, reset
-			if (pause && e.key == 'R')
-				isRCapitalized = true;
-		case 114: //r, reset
+		case 82: //R
+		case 114: //r
 			rKey = true;
 			break;		
 			
@@ -574,20 +555,21 @@ function onKeyUp(e) {
 
 function resetState()
 {
-	if (pause && rKey) {
-			isMaterialLambert = true;
-			isMaterialLightSensitive = false;
-			changeMaterial(isMaterialLambert, isMaterialLightSensitive);
-			for(i=0;i<figures.length;i++)
-				figures[i].rotation.y = 0;
-			dirLightIntensity=0.5;
-			changeLightning(dirLightIntensity);
-			var nrSpotLights = spotlights.length;
-			for (var i = 0; i < nrSpotLights; i++)
-				spotlights[i].visible = true;
-			rKey=false;
-			currentCamera = 0;
-			isRCapitalized = false;
+	if (reset){
+		if (pause) {
+				isMaterialLambert = true;
+				isMaterialLightSensitive = false;
+				changeMaterial(isMaterialLambert, isMaterialLightSensitive);
+				for(i=0;i<figures.length;i++)
+					figures[i].rotation.y = 0;
+				dirLightIntensity=0.5;
+				changeLightning(dirLightIntensity);
+				var nrSpotLights = spotlights.length;
+				for (var i = 0; i < nrSpotLights; i++)
+					spotlights[i].visible = true;
+				currentCamera = 0;
+		}
+		reset = false;
 	}
 }
 
@@ -619,33 +601,35 @@ function createOrtographicCamera(x, y, z) {
 	return camera;
 }
 
-function VRinit()
-{
-	if (renderer.xr.getSession())
-	{
-		renderer.setAnimationLoop( function () {
-			renderer.render( scene[0], camera[currentCamera] );
-		} );
-	}
-}
 
 function createAllCameras() {
-	OrtogonalPauseCamera = createOrtographicCamera(0, 20, 20);
+	OrtogonalPauseCamera = createOrtographicCamera(0, 100, 20);
 	OrtogonalPauseCamera2 = createOrtographicCamera(0, 10, 10);
 	camera[0] = createPerspectiveCamera(viewSize/2*defaultScale,viewSize/2*defaultScale,viewSize/2*defaultScale);
 	camera[1] = createOrtographicCamera(podiumTopLen*defaultScale, podiumStepHeight*defaultScale,0*defaultScale);
 	camera[2] = new THREE.StereoCamera();
-	camera[3] = createOrtographicCamera(podiumTopLen*defaultScale, podiumStepHeight*defaultScale,0); // for orbit controls
+	camera[3] = createPerspectiveCamera(viewSize/2*defaultScale,viewSize/2*defaultScale,viewSize/2*defaultScale); // for orbit controls
 	camera[4] = OrtogonalPauseCamera;
 	camera[5] = OrtogonalPauseCamera2;
 	controls = new THREE.OrbitControls(camera[3], renderer.domElement);
 }
 
 function createAllMaterials() {
+	materials[0] = new THREE.MeshBasicMaterial( {color: 0x555555, map: gold_texture, side: THREE.DoubleSide} );
+	materials[1] = new THREE.MeshLambertMaterial( {color: 0xff0000, map: gold_texture, side: THREE.DoubleSide} );
+	materials[2] = new THREE.MeshPhongMaterial( {color: 0xffffff, map: gold_texture, side: THREE.DoubleSide});	
+
+	/*
+	materials[0] = new THREE.MeshBasicMaterial( {color: 0x555555, map: gold_texture, side: THREE.DoubleSide} );
+	materials[1] = new THREE.MeshLambertMaterial( {color: 0xff0000, map: gold_texture, side: THREE.FrontSide}, {color: 0xffffff, map: wood_texture, side: THREE.BackSide} );
+	materials[2] = new THREE.MeshPhongMaterial( {color: 0xffffff, map: gold_texture, side: THREE.FrontSide}, {color: 0xffffff, map: glass_texture, side: THREE.BackSide});	
+*/
+	/*	
 	materials[0] = new THREE.MeshBasicMaterial( {color: 0x555555, map: wood_texture, side: THREE.DoubleSide} );
 	materials[1] = new THREE.MeshLambertMaterial( {color: 0x777777, map: wood_texture, side: THREE.DoubleSide} );
 	materials[2] = new THREE.MeshPhongMaterial( {color: 0xffffff, map: wood_texture, side: THREE.DoubleSide});
-/*
+*/
+	/*
 		materials[0] = [
 		new THREE.MeshBasicMaterial( {color: 0x555555, map: wood_texture, side: THREE.FrontSide}),
 		new THREE.MeshBasicMaterial( {color: 0xffffff, side: THREE.BackSide})
@@ -670,15 +654,17 @@ function createAllSpotLights() {
 function init() {
 		
 	renderer = new THREE.WebGLRenderer({antialias: true});
+	renderer.setPixelRatio( window.devicePixelRatio );
 	renderer.setSize(window.innerWidth, window.innerHeight);
+	renderer.outputEncoding = THREE.sRGBEncoding;
+	renderer.xr.enabled = true;  //
 	document.body.appendChild(renderer.domElement);
-	document.body.appendChild( VRButton.createButton( renderer ) );
-	renderer.xr.enabled = true;
 	
 	createAllMaterials();
 	createAllSpotLights();
 	createScene();
 	createAllCameras();
+	document.body.appendChild( VRButton.createButton( renderer ) );
 	animate();
 	createPauseMessage();
 
