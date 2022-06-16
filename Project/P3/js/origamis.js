@@ -7,10 +7,12 @@
 /*global THREE*/
 
 var camera = [];
-var val = 2;
-var val2 = 2;
 var scene= [];
 var renderer, currentCamera = 0;
+let cameraRatio = 10;
+
+var val = 2;
+var val2 = 2;
 
 var defaultScale = 1;
 var viewSize = 50;
@@ -34,7 +36,7 @@ var fig1;
 var fig2;
 var wood_texture = new THREE.TextureLoader().load("./media/wood.jpg");
 var glass_texture = new THREE.TextureLoader().load("./media/glass.jpg");
-var earth_texture = new THREE.TextureLoader().load("./media/earth.jpg");
+var gold_texture = new THREE.TextureLoader().load("./media/gold.jpg");
 var dirLightObj;
 var directionalLight;
 var spotlights = [];
@@ -195,30 +197,10 @@ function render3() {
 	}
 }
 
-function render2()
-{
-	renderer.render(scene[0], camera[currentCamera]);
-    camera[currentCamera].updateWorldMatrix();
-    camera[2].update(camera[currentCamera]);
-    const size = new THREE.Vector2();
-    renderer.getSize(size);
-
-    renderer.setScissorTest(true);
-
-    renderer.setScissor(0, 0, size.width / 2, size.height);
-    renderer.setViewport(0, 0, size.width / 2, size.height);
-    renderer.render(scene[0], camera[2].cameraL);
-
-    renderer.setScissor(size.width, 0, size.width / 2, size.height);
-    renderer.setViewport(size.width / 2, 0, size.width / 2, size.height);
-    renderer.render(scene[0], camera[2].cameraR);
-
-    renderer.setScissorTest(false);
-}
-
 function onResize() {
 	if (window.innerWidth > 0 &&  window.innerHeight > 0){
 		var i;
+		var val = 2;
 		aspectRatio = window.innerWidth / window.innerHeight;
 		renderer.setSize(window.innerWidth, window.innerHeight);
 		var nrCameras = camera.length; 
@@ -231,10 +213,10 @@ function onResize() {
 		for (i =nrPerspectiveCameras; i< nrCameras; i++) { // ortographic cameras
 			if (i==2)
 				continue;
-			camera[i].left = -viewSize * aspectRatio / val/ val2;
-			camera[i].right = viewSize * aspectRatio / val/ val2;
-			camera[i].top = viewSize / val / val2;
-			camera[i].bottom = viewSize / -val / val2;
+            camera[i].left = -viewSize * aspectRatio / val/ val2;
+            camera[i].right = viewSize * aspectRatio / val/ val2;
+            camera[i].top = viewSize / val / val2;
+            camera[i].bottom = viewSize / -val / val2;
 			camera[i].updateProjectionMatrix();
 		}
 	}
@@ -316,9 +298,11 @@ function display() {
 	resetState();
 	changeLightning(dirLightIntensity);
 	changeMaterial(isMaterialLambert, isMaterialLightSensitive);
-	requestAnimationFrame(animate);
+	if (renderer.xr.getSession())
+		renderer.setAnimationLoop(animate);
+	else
+		requestAnimationFrame(animate);
 	render();
-	VRinit();
 }
 
 function animate() {
@@ -383,7 +367,7 @@ function createScene() {
 	addCube(universe, spotlights[2], 0, podiumStepHeight*2+origamiLen,-origamiDist);
 
 	const light = new THREE.AmbientLight( 0x404040 ); // soft white light
-//	universe.add( light );
+	//universe.add( light );
 
 	fig1 = new THREE.Object3D();
 	//addFig1(fig1,-10,10,-10);
@@ -543,7 +527,7 @@ function onKeyUp(e) {
 
 function resetState()
 {
-	if (pause && rKey) {
+	if (pause && rKey && isRCapitalized) {
 			isMaterialLambert = true;
 			isMaterialLightSensitive = false;
 			changeMaterial(isMaterialLambert, isMaterialLightSensitive);
@@ -588,32 +572,23 @@ function createOrtographicCamera(x, y, z) {
 	return camera;
 }
 
-function VRinit()
-{
-	if (renderer.xr.getSession())
-	{
-		renderer.setAnimationLoop( function () {
-			renderer.render( scene[0], camera[currentCamera] );
-		} );
-	}
-}
 
 function createAllCameras() {
-	OrtogonalPauseCamera = createOrtographicCamera(0, 20, 20);
+	OrtogonalPauseCamera = createOrtographicCamera(0, 100, 20);
 	OrtogonalPauseCamera2 = createOrtographicCamera(0, 10, 10);
 	camera[0] = createPerspectiveCamera(viewSize/2*defaultScale,viewSize/2*defaultScale,viewSize/2*defaultScale);
-	camera[1] = createOrtographicCamera(podiumTopLen*defaultScale, podiumStepHeight*defaultScale,0*defaultScale);
+	camera[1] = createOrtographicCamera(podiumTopLen/4*defaultScale, podiumStepHeight*defaultScale,0*defaultScale);
 	camera[2] = new THREE.StereoCamera();
 	camera[3] = createOrtographicCamera(podiumTopLen*defaultScale, podiumStepHeight*defaultScale,0); // for orbit controls
 	camera[4] = OrtogonalPauseCamera;
 	camera[5] = OrtogonalPauseCamera2;
-	controls = new THREE.OrbitControls(camera[3], renderer.domElement);
+	controls = new THREE.OrbitControls(camera[0], renderer.domElement);
 }
 
 function createAllMaterials() {
-	materials[0] = new THREE.MeshBasicMaterial( {color: 0x555555, map: glass_texture} );
-	materials[1] = new THREE.MeshLambertMaterial( {color: 0xff0000, map: glass_texture, side: THREE.FrontSide}, {color: 0xffffff, map: wood_texture, side: THREE.BackSide} );
-	materials[2] = new THREE.MeshPhongMaterial( {color: 0xffffff, map: wood_texture, side: THREE.FrontSide}, {color: 0xffffff, map: glass_texture, side: THREE.BackSide});	
+	materials[0] = new THREE.MeshBasicMaterial( {color: 0x555555, map: gold_texture} );
+	materials[1] = new THREE.MeshLambertMaterial( {color: 0xff0000, map: gold_texture, side: THREE.FrontSide}, {color: 0xffffff, map: wood_texture, side: THREE.BackSide} );
+	materials[2] = new THREE.MeshPhongMaterial( {color: 0xffffff, map: gold_texture, side: THREE.FrontSide}, {color: 0xffffff, map: glass_texture, side: THREE.BackSide});	
 }
 
 function createAllSpotLights() {
@@ -625,15 +600,17 @@ function createAllSpotLights() {
 function init() {
 		
 	renderer = new THREE.WebGLRenderer({antialias: true});
+	renderer.setPixelRatio( window.devicePixelRatio );
 	renderer.setSize(window.innerWidth, window.innerHeight);
+	renderer.outputEncoding = THREE.sRGBEncoding;
+	renderer.xr.enabled = true;  //
 	document.body.appendChild(renderer.domElement);
-	document.body.appendChild( VRButton.createButton( renderer ) );
-	renderer.xr.enabled = true;
 	
 	createAllMaterials();
 	createAllSpotLights();
 	createScene();
 	createAllCameras();
+	document.body.appendChild( VRButton.createButton( renderer ) );
 	animate();
 	createPauseMessage();
 
