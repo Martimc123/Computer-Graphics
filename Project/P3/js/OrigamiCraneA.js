@@ -27,13 +27,13 @@ class OrigamiCraneA extends THREE.Mesh {
 		var uvNumComponents = 2;
 		const vertices = new Float32Array (
 			[ // left side
-				0.5, 2.0, 2.0, 
+				1.0, 2.0, 2.0, 
 				0.0, 0.0, 0.0,
-				0.5, 4.0, 0.0,
+				1.0, 4.0, 0.0,
 				
 				// right side 
-				0.5, 2.0, -2.0,
-				0.5, 4.0, 0.0,
+				1.0, 2.0, -2.0,
+				1.0, 4.0, 0.0,
 				0.0, 0.0, 0.0
 			]
 		);
@@ -52,13 +52,13 @@ class OrigamiCraneA extends THREE.Mesh {
 		);
 
 		var fullNormal1 = this.calculateNormal(
-			[0.5, 2.0, 2.0],
+			[1.0, 2.0, 2.0],
 			[0.0, 0.0, 0.0],
-			[0.5, 4.0, 0.0]
+			[1.0, 4.0, 0.0]
 		);
 		var fullNormal2 = this.calculateNormal(
-			[0.5, 2.0, -2.0], 
-			[0.5, 4.0, 0.0],
+			[1.0, 2.0, -2.0], 
+			[1.0, 4.0, 0.0],
 			[0.0, 0.0, 0.0]
 		);
 
