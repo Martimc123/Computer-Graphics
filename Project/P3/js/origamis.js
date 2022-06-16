@@ -615,15 +615,16 @@ function createAllCameras() {
 }
 
 function createAllMaterials() {
+	/*
 	materials[0] = new THREE.MeshBasicMaterial( {color: 0x555555, map: gold_texture, side: THREE.DoubleSide} );
 	materials[1] = new THREE.MeshLambertMaterial( {color: 0xff0000, map: gold_texture, side: THREE.DoubleSide} );
 	materials[2] = new THREE.MeshPhongMaterial( {color: 0xffffff, map: gold_texture, side: THREE.DoubleSide});	
-
-	/*
-	materials[0] = new THREE.MeshBasicMaterial( {color: 0x555555, map: gold_texture, side: THREE.DoubleSide} );
+*/
+	
+	materials[0] = new THREE.MeshBasicMaterial( {color: 0x555555, map: gold_texture, side: THREE.FrontSide}, {color: 0xffffff, map: wood_texture, side: THREE.BackSide});
 	materials[1] = new THREE.MeshLambertMaterial( {color: 0xff0000, map: gold_texture, side: THREE.FrontSide}, {color: 0xffffff, map: wood_texture, side: THREE.BackSide} );
 	materials[2] = new THREE.MeshPhongMaterial( {color: 0xffffff, map: gold_texture, side: THREE.FrontSide}, {color: 0xffffff, map: glass_texture, side: THREE.BackSide});	
-*/
+
 	/*	
 	materials[0] = new THREE.MeshBasicMaterial( {color: 0x555555, map: wood_texture, side: THREE.DoubleSide} );
 	materials[1] = new THREE.MeshLambertMaterial( {color: 0x777777, map: wood_texture, side: THREE.DoubleSide} );
