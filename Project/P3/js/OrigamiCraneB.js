@@ -23,6 +23,7 @@ class OrigamiCraneB extends THREE.Mesh {
 		var origamiGeometry = new THREE.BufferGeometry();
 		var vertexNumComponents = 3;
 		var normalNumComponents = 3;
+		var uvNumComponents = 2;
 		const vertices = new Float32Array (
 			[ 
 				// left side - up

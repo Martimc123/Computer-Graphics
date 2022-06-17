@@ -5,7 +5,7 @@ class OrigamiCraneC extends THREE.Mesh {
 		super();
 		this.material = mat;
 		this.create();
-		console.log("C1");
+		console.log("C4");
 	}
 
 	calculateNormal(posOG, pos1, pos2) {
@@ -23,87 +23,73 @@ class OrigamiCraneC extends THREE.Mesh {
 		var origamiGeometry = new THREE.BufferGeometry();
 		var vertexNumComponents = 3;
 		var normalNumComponents = 3;
+		var uvNumComponents = 2;
 		const vertices = new Float32Array (
 			[ 
-				// left side - up
-				0.0, 3.0, 0.0, 
-				0.0, 4.0, 0.0,
-				1.0, 3.0, 1.0,
+				// tail
+				0.0, 1.5, 0.0,
+				0.0, 1.5, 2,
+				0.0, 0.0, 1.0,
 				
-				// right side - up
-				0.0, 3.0, 0.0, 
-				0.0, 0.0, 4.0,
-				1.0, 3.0, -1.0,
+				// tummy
+				0.0, 1.5, 0.0,
+				0.0, 0.0, -0.5, 
+				0.0, 0.0, 1.0,
 
-				// left side - middle1
-				0.0, 3.0, 0.0, 
-				1.0, 3.0, 1.0,
-				0.0, 2.0, 0.0,
+				// lungs
+				0.0, 1.5, 0.0,
+				0.0, 1.5, -1.0,
+				0.0, 0.0, -0.5,
 				
-				// right side - middle1
-				0.0, 3.0, 0.0, 
-				1.0, 3.0, -1.0,
-				0.0, 2.0, 0.0,
+				// neck - bottom
+				0.0, 1.5, -1.0,
+				0.0, 1.5, -1.5,
+				0.0, 0.0, -0.5,
 
-				// left side - middle2
-				0.0, 3.0, 0.0, 
-				1.0, 3.0, 1.0,
-				0.0, 2.0, 0.0,
+				// neck - top
+				0.0, 1.5, -1.0, 
+				0.0, 1.5, -1.5,
+				0.0, 4.0, -1.0,
 				
-				// right side - middle2
-				0.0, 3.0, 0.0, 
-				1.0, 3.0, -1.0,
-				0.0, 2.0, 0.0,
-				
-				// left side - down
-				0.5, 2.0, 2.0, 
-				0.0, 0.0, 0.0,
-				0.5, 4.0, 0.0,
-				
-				// right side - down
-				0.5, 2.0, -2.0,
-				0.5, 4.0, 0.0,
-				0.0, 0.0, 0.0
+				// head
+				0.0, 4.0, -1.5, 
+				0.0, 3.5, -2.0,
+				0.0, 4.0, -1.0,
 			]
 		);
 		const uvs = new Float32Array (
 			[ 
-				// left side - up
+				// tail
 				0, 0,
 				1, 0,
 				0, 1,
 
-				// right side - up
+				// tummy
 				0, 0,
 				1, 0,
 				0, 1,
 
-				// left side - middle1
+				// lungs
 				0, 0,
 				1, 0,
 				0, 1,
 
-				// right side - middle1
+				// neck - bottom1
 				0, 0,
 				1, 0,
 				0, 1,
 
-				// left side - middle2
+				// neck - bottom2
 				0, 0,
 				1, 0,
 				0, 1,
 
-				// right side - middle2
+				// neck - top
 				0, 0,
 				1, 0,
 				0, 1,
 
-				// left side - down
-				0, 0,
-				1, 0,
-				0, 1,
-
-				// right side - down
+				// head
 				0, 0,
 				1, 0,
 				0, 1
@@ -111,78 +97,62 @@ class OrigamiCraneC extends THREE.Mesh {
 		);
 
 		var fullNormal1 = this.calculateNormal(
-			[0.0, 3.0, 0.0], 
-				[0.0, 4.0, 0.0],
-				[1.0, 3.0, 1.0]
+			[0.0, 1.5, 0.0],
+			[0.0, 1.5, -2.0],
+			[0.0, 0.0, -1.0]
 		);
 		var fullNormal2 = this.calculateNormal(
-			[0.0, 3.0, 0.0], 
-				[0.0, 0.0, 4.0],
-				[1.0, 3.0, -1.0]
+			[0.0, 1.5, 0.0], 
+			[0.0, 0.0, -0.5],
+			[0.0, 0.0, 1.0]
 		);
 		var fullNormal3 = this.calculateNormal(
-			[0.0, 3.0, 0.0], 
-				[1.0, 3.0, 1.0],
-				[0.0, 2.0, 0.0]
+			[0.0, 1.5, 0.0],
+			[0.0, 1.5, -1.0],
+			[0.0, 0.0, -0.5]
 		);
 		var fullNormal4 = this.calculateNormal(
-			[0.0, 3.0, 0.0], 
-				[1.0, 3.0, -1.0],
-				[0.0, 2.0, 0.0]
+			[0.0, 1.5, -1.0],
+			[0.0, 1.5, -1.5],
+			[0.0, 0.0, -0.5]
 		);
 		var fullNormal5 = this.calculateNormal(
-			[0.5, 2.0, -2.0], 
-			[0.5, 4.0, 0.0],
-			[0.0, 0.0, 0.0]
+			[0.0, 1.5, -1.0],
+			[0.0, 1.5, -1.5],
+			[0.0, 4.0, -1.0]
 		);
 		var fullNormal6 = this.calculateNormal(
-			[0.5, 2.0, -2.0], 
-			[0.5, 4.0, 0.0],
-			[0.0, 0.0, 0.0]
-		);
-		var fullNormal7 = this.calculateNormal(
-			[0.5, 2.0, -2.0], 
-			[0.5, 4.0, 0.0],
-			[0.0, 0.0, 0.0]
-		);
-		var fullNormal8 = this.calculateNormal(
-			[0.5, 2.0, -2.0], 
-			[0.5, 4.0, 0.0],
-			[0.0, 0.0, 0.0]
+			[0.0, 4.0, -1.5], 
+			[0.0, 3.5, -2.0],
+			[0.0, 4.0, -1.0]
 		);
 
 		const norms = new Float32Array (
 			[
-			fullNormal1[0], fullNormal1[1], fullNormal1[2],
-			fullNormal1[0], fullNormal1[1], fullNormal1[2],
-			fullNormal1[0], fullNormal1[1], fullNormal1[2],
-			fullNormal2[0], fullNormal2[1], fullNormal2[2],
-			fullNormal2[0], fullNormal2[1], fullNormal2[2],
-			fullNormal2[0], fullNormal2[1], fullNormal2[2],
-			fullNormal3[0], fullNormal3[1], fullNormal3[2],
-			fullNormal3[0], fullNormal3[1], fullNormal3[2],
-			fullNormal3[0], fullNormal3[1], fullNormal3[2],
-			fullNormal4[0], fullNormal4[1], fullNormal4[2],
-			fullNormal4[0], fullNormal4[1], fullNormal4[2],
-			fullNormal4[0], fullNormal4[1], fullNormal4[2],
-			fullNormal5[0], fullNormal5[1], fullNormal5[2],
-			fullNormal5[0], fullNormal5[1], fullNormal5[2],
-			fullNormal5[0], fullNormal5[1], fullNormal5[2],
-			fullNormal6[0], fullNormal6[1], fullNormal6[2],
-			fullNormal6[0], fullNormal6[1], fullNormal6[2],
-			fullNormal6[0], fullNormal6[1], fullNormal6[2],
-			fullNormal7[0], fullNormal7[1], fullNormal7[2],
-			fullNormal7[0], fullNormal7[1], fullNormal7[2],
-			fullNormal7[0], fullNormal7[1], fullNormal7[2],
-			fullNormal8[0], fullNormal8[1], fullNormal8[2],
-			fullNormal8[0], fullNormal8[1], fullNormal8[2],
-			fullNormal8[0], fullNormal8[1], fullNormal8[2]
+			fullNormal1[0], fullNormal1[1], fullNormal1[2]
+			,fullNormal1[0], fullNormal1[1], fullNormal1[2]
+			,fullNormal1[0], fullNormal1[1], fullNormal1[2]
+			,fullNormal2[0], fullNormal2[1], fullNormal2[2]
+			,fullNormal2[0], fullNormal2[1], fullNormal2[2]
+			,fullNormal2[0], fullNormal2[1], fullNormal2[2]
+			,fullNormal3[0], fullNormal3[1], fullNormal3[2]
+			,fullNormal3[0], fullNormal3[1], fullNormal3[2]
+			,fullNormal3[0], fullNormal3[1], fullNormal3[2]
+			,fullNormal4[0], fullNormal4[1], fullNormal4[2]
+			,fullNormal4[0], fullNormal4[1], fullNormal4[2]
+			,fullNormal4[0], fullNormal4[1], fullNormal4[2]
+			,fullNormal5[0], fullNormal5[1], fullNormal5[2]
+			,fullNormal5[0], fullNormal5[1], fullNormal5[2]
+			,fullNormal5[0], fullNormal5[1], fullNormal5[2]
+			,fullNormal6[0], fullNormal6[1], fullNormal6[2]
+			,fullNormal6[0], fullNormal6[1], fullNormal6[2]
+			,fullNormal6[0], fullNormal6[1], fullNormal6[2]
 			]
 		);
 
 		origamiGeometry.setAttribute(
 			'position',
-			new THREE.BufferAttribute(vertices, positionNumComponents));
+			new THREE.BufferAttribute(vertices, vertexNumComponents));
 
 		origamiGeometry.setAttribute(
 			'normal',

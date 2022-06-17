@@ -36,6 +36,7 @@ var fig2;
 var wood_texture = new THREE.TextureLoader().load("./media/wood.jpg");
 var glass_texture = new THREE.TextureLoader().load("./media/glass.jpg");
 var gold_texture = new THREE.TextureLoader().load("./media/gold.jpg");
+var pretty_texture = new THREE.TextureLoader().load("./media/pretty.jpg");
 var dirLightObj;
 var directionalLight;
 var spotlights = [];
@@ -394,8 +395,9 @@ function createScene() {
 	addFloor(universe,0,0,0);
 	addOrigami('A', universe, spotlights[0], 0, podiumStepHeight*2+origamiLen,origamiDist);
 	addOrigami('B', universe, spotlights[1], 0, podiumStepHeight*2+origamiLen,0);
-//	addCube(universe, spotlights[1], 0, podiumStepHeight*2+origamiLen,0);
-	addCube(universe, spotlights[2], 0, podiumStepHeight*2+origamiLen,-origamiDist);
+	addOrigami('C', universe, spotlights[2], 0, podiumStepHeight*2+origamiLen,-origamiDist);
+	//	addCube(universe, spotlights[1], 0, podiumStepHeight*2+origamiLen,0);
+	//addCube(universe, spotlights[2], 0, podiumStepHeight*2+origamiLen,-origamiDist);
 
 	const light = new THREE.AmbientLight( 0x404040 ); // soft white light
 	//universe.add( light );
@@ -620,9 +622,9 @@ function createAllCameras() {
 
 function createAllMaterials() {
 	
-	materials[0] = new THREE.MeshBasicMaterial( {color: 0x555555, map: gold_texture, side: THREE.DoubleSide} );
-	materials[1] = new THREE.MeshLambertMaterial( {color: 0xff0000, map: gold_texture, side: THREE.DoubleSide} );
-	materials[2] = new THREE.MeshPhongMaterial( {color: 0xffffff, map: gold_texture, shininess: 15, side: THREE.DoubleSide});	
+	materials[0] = new THREE.MeshBasicMaterial( {color: 0x555555, map: pretty_texture, side: THREE.DoubleSide} );
+	materials[1] = new THREE.MeshLambertMaterial( {color: 0xff0000, map: pretty_texture, side: THREE.DoubleSide} );
+	materials[2] = new THREE.MeshPhongMaterial( {color: 0xffffff, map: pretty_texture, shininess: 15, side: THREE.DoubleSide});	
 /*
 	
 	materials[0] = new THREE.MeshBasicMaterial( {color: 0x555555, map: gold_texture, side: THREE.FrontSide}, {color: 0xffffff, map: wood_texture, side: THREE.BackSide});
