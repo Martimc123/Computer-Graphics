@@ -9,14 +9,14 @@ class OrigamiCraneC extends THREE.Mesh {
 	}
 
 	calculateNormal(posOG, pos1, pos2) {
-		var vec1 = [pos1[0]-posOG[0], pos1[1]-posOG[1], pos1[2]-posOG[2]];
-		var vec2 = [pos2[0]-posOG[0], pos2[1]-posOG[1], pos2[2]-posOG[2]];
-		var normX = (vec1[1]-vec2[2])*(vec1[2]-vec2[1]);
-		var normY = (vec1[2]-vec2[0])*(vec1[0]-vec2[2]);
-		var normZ = (vec1[0]-vec2[1])*(vec1[1]-vec2[0]);
-		var crossProduct = (normX**2 + normY**2 + normZ**2)**0.5;
-		var fullNormal = [normX/crossProduct, normY/crossProduct, normZ/crossProduct];
-		return fullNormal;
+		var p0 = new THREE.Vector3(posOG[0], posOG[1], posOG[2]);
+		var p1 = new THREE.Vector3(pos1[0], pos1[1], pos1[2]);
+		var p2 = new THREE.Vector3(pos2[0], pos2[1], pos2[2]);
+		var v1 = p1-p0;
+		var v2 = p2-p0;
+		var norm = p0.crossVectors(v1, v2);
+		norm.normalize();
+		return [norm.x, norm.y, norm.z];
 	}
 
 	create() {
@@ -27,8 +27,8 @@ class OrigamiCraneC extends THREE.Mesh {
 		const vertices = new Float32Array (
 			[ 
 				// tail
+				-1.0, 1.5, 2.0, 
 				0.0, 1.5, 0.0,
-				1.0, 1.5, 2.0,
 				0.0, 0.0, 1.0,
 				
 				// tummy
@@ -38,17 +38,17 @@ class OrigamiCraneC extends THREE.Mesh {
 
 				// lungs
 				0.0, 1.5, 0.0,
-				0.0, 1.5, -1.0,
+				-1.0, 1.5, -1.0,
 				0.0, 0.0, -0.5,
 				
 				// neck - bottom
-				0.0, 1.5, -1.0,
-				1.0, 1.5, -1.5,
+				-1.0, 1.5, -1.0,
+				0.0, 1.5, -1.5,
 				0.0, 0.0, -0.5,
 
 				// neck - top
-				0.0, 1.5, -1.0, 
-				1.0, 1.5, -1.5,
+				-1.0, 1.5, -1.0, 
+				0.0, 1.5, -1.5,
 				0.0, 4.0, -1.0,
 				
 				// head
@@ -97,8 +97,8 @@ class OrigamiCraneC extends THREE.Mesh {
 		);
 
 		var fullNormal1 = this.calculateNormal(
+			[-1.0, 1.5, 2.0],
 			[0.0, 1.5, 0.0],
-			[1.0, 1.5, 2.0],
 			[0.0, 0.0, 1.0]
 		);
 		var fullNormal2 = this.calculateNormal(
@@ -108,17 +108,17 @@ class OrigamiCraneC extends THREE.Mesh {
 		);
 		var fullNormal3 = this.calculateNormal(
 			[0.0, 1.5, 0.0],
-			[0.0, 1.5, -1.0],
+			[-1.0, 1.5, -1.0],
 			[0.0, 0.0, -0.5]
 		);
 		var fullNormal4 = this.calculateNormal(
-			[0.0, 1.5, -1.0],
-			[1.0, 1.5, -1.5],
+			[-1.0, 1.5, -1.0],
+			[0.0, 1.5, -1.5],
 			[0.0, 0.0, -0.5]
 		);
 		var fullNormal5 = this.calculateNormal(
-			[0.0, 1.5, -1.0],
-			[1.0, 1.5, -1.5],
+			[-1.0, 1.5, -1.0],
+			[0.0, 1.5, -1.5],
 			[0.0, 4.0, -1.0]
 		);
 		var fullNormal6 = this.calculateNormal(

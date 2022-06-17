@@ -19,17 +19,6 @@ class OrigamiCraneA extends THREE.Mesh {
 		return [norm.x, norm.y, norm.z];
 	}
 
-	calculateNormal2(posOG, pos1, pos2) {
-		var vec1 = [pos1[0]-posOG[0], pos1[1]-posOG[1], pos1[2]-posOG[2]];
-		var vec2 = [pos2[0]-posOG[0], pos2[1]-posOG[1], pos2[2]-posOG[2]];
-		var normX = (vec1[1]-vec2[2])*(vec1[2]-vec2[1]);
-		var normY = (vec1[2]-vec2[0])*(vec1[0]-vec2[2]);
-		var normZ = (vec1[0]-vec2[1])*(vec1[1]-vec2[0]);
-		var crossProduct = (normX**2 + normY**2 + normZ**2)**0.5;
-		var fullNormal = [normX/crossProduct, normY/crossProduct, normZ/crossProduct];
-		return fullNormal;
-	}
-
 	create() {
 		var origamiGeometry = new THREE.BufferGeometry();
 		var vertexNumComponents = 3;
