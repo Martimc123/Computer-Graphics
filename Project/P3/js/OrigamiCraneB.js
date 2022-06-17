@@ -28,25 +28,35 @@ class OrigamiCraneB extends THREE.Mesh {
 		const vertices = new Float32Array (
 			[ 
 				// left side - up
-				0.5, 2.0, 2.0, 
-				0.0, 0.0, 0.0,
-				0.5, 4.0, 0.0,
+				0.0, 3.0, 0.0, 
+				0.0, 4.0, 0.0,
+				1.0, 3.0, 1.0,
 				
 				// right side - up
-				0.5, 2.0, -2.0,
-				0.5, 4.0, 0.0,
-				0.0, 0.0, 0.0,
+				0.0, 3.0, 0.0, 
+				0.0, 0.0, 4.0,
+				1.0, 3.0, -1.0,
 
-				// left side - middle
-				0.5, 2.0, 2.0, 
-				0.0, 0.0, 0.0,
-				0.5, 4.0, 0.0,
+				// left side - middle1
+				0.0, 3.0, 0.0, 
+				1.0, 3.0, 1.0,
+				0.0, 2.0, 0.0,
 				
-				// right side - middle
-				0.5, 2.0, -2.0,
-				0.5, 4.0, 0.0,
-				0.0, 0.0, 0.0,
+				// right side - middle1
+				0.0, 3.0, 0.0, 
+				1.0, 3.0, -1.0,
+				0.0, 2.0, 0.0,
 
+				// left side - middle2
+				0.0, 3.0, 0.0, 
+				1.0, 3.0, 1.0,
+				0.0, 2.0, 0.0,
+				
+				// right side - middle2
+				0.0, 3.0, 0.0, 
+				1.0, 3.0, -1.0,
+				0.0, 2.0, 0.0,
+				
 				// left side - down
 				0.5, 2.0, 2.0, 
 				0.0, 0.0, 0.0,
@@ -70,12 +80,22 @@ class OrigamiCraneB extends THREE.Mesh {
 				1, 0,
 				0, 1,
 
-				// left side - middle
+				// left side - middle1
 				0, 0,
 				1, 0,
 				0, 1,
 
-				// right side - middle
+				// right side - middle1
+				0, 0,
+				1, 0,
+				0, 1,
+
+				// left side - middle2
+				0, 0,
+				1, 0,
+				0, 1,
+
+				// right side - middle2
 				0, 0,
 				1, 0,
 				0, 1,
@@ -93,24 +113,24 @@ class OrigamiCraneB extends THREE.Mesh {
 		);
 
 		var fullNormal1 = this.calculateNormal(
-			[0.5, 2.0, 2.0],
-			[0.0, 0.0, 0.0],
-			[0.5, 4.0, 0.0]
+			[0.0, 3.0, 0.0], 
+				[0.0, 4.0, 0.0],
+				[1.0, 3.0, 1.0]
 		);
 		var fullNormal2 = this.calculateNormal(
-			[0.5, 2.0, -2.0], 
-			[0.5, 4.0, 0.0],
-			[0.0, 0.0, 0.0]
+			[0.0, 3.0, 0.0], 
+				[0.0, 0.0, 4.0],
+				[1.0, 3.0, -1.0]
 		);
 		var fullNormal3 = this.calculateNormal(
-			[0.5, 2.0, 2.0],
-			[0.0, 0.0, 0.0],
-			[0.5, 4.0, 0.0]
+			[0.0, 3.0, 0.0], 
+				[1.0, 3.0, 1.0],
+				[0.0, 2.0, 0.0]
 		);
 		var fullNormal4 = this.calculateNormal(
-			[0.5, 2.0, -2.0], 
-			[0.5, 4.0, 0.0],
-			[0.0, 0.0, 0.0]
+			[0.0, 3.0, 0.0], 
+				[1.0, 3.0, -1.0],
+				[0.0, 2.0, 0.0]
 		);
 		var fullNormal5 = this.calculateNormal(
 			[0.5, 2.0, -2.0], 
@@ -118,6 +138,16 @@ class OrigamiCraneB extends THREE.Mesh {
 			[0.0, 0.0, 0.0]
 		);
 		var fullNormal6 = this.calculateNormal(
+			[0.5, 2.0, -2.0], 
+			[0.5, 4.0, 0.0],
+			[0.0, 0.0, 0.0]
+		);
+		var fullNormal7 = this.calculateNormal(
+			[0.5, 2.0, -2.0], 
+			[0.5, 4.0, 0.0],
+			[0.0, 0.0, 0.0]
+		);
+		var fullNormal8 = this.calculateNormal(
 			[0.5, 2.0, -2.0], 
 			[0.5, 4.0, 0.0],
 			[0.0, 0.0, 0.0]
@@ -142,7 +172,13 @@ class OrigamiCraneB extends THREE.Mesh {
 			fullNormal5[0], fullNormal5[1], fullNormal5[2],
 			fullNormal6[0], fullNormal6[1], fullNormal6[2],
 			fullNormal6[0], fullNormal6[1], fullNormal6[2],
-			fullNormal6[0], fullNormal6[1], fullNormal6[2]
+			fullNormal6[0], fullNormal6[1], fullNormal6[2],
+			fullNormal7[0], fullNormal7[1], fullNormal7[2],
+			fullNormal7[0], fullNormal7[1], fullNormal7[2],
+			fullNormal7[0], fullNormal7[1], fullNormal7[2],
+			fullNormal8[0], fullNormal8[1], fullNormal8[2],
+			fullNormal8[0], fullNormal8[1], fullNormal8[2],
+			fullNormal8[0], fullNormal8[1], fullNormal8[2]
 			]
 		);
 

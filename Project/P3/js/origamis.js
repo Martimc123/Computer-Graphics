@@ -390,7 +390,8 @@ function createScene() {
 	directionalLight.target = podium;
 	addFloor(universe,0,0,0);
 	addOrigami('A', universe, spotlights[0], 0, podiumStepHeight*2+origamiLen,origamiDist);
-	addCube(universe, spotlights[1], 0, podiumStepHeight*2+origamiLen,0);
+	addOrigami('B', universe, spotlights[1], 0, podiumStepHeight*2+origamiLen,0);
+//	addCube(universe, spotlights[1], 0, podiumStepHeight*2+origamiLen,0);
 	addCube(universe, spotlights[2], 0, podiumStepHeight*2+origamiLen,-origamiDist);
 
 	const light = new THREE.AmbientLight( 0x404040 ); // soft white light
