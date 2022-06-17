@@ -5,7 +5,7 @@ class OrigamiCraneC extends THREE.Mesh {
 		super();
 		this.material = mat;
 		this.create();
-		console.log("C4");
+		console.log("C1");
 	}
 
 	calculateNormal(posOG, pos1, pos2) {
@@ -28,7 +28,7 @@ class OrigamiCraneC extends THREE.Mesh {
 			[ 
 				// tail
 				0.0, 1.5, 0.0,
-				0.0, 1.5, 2,
+				1.0, 1.5, 2.0,
 				0.0, 0.0, 1.0,
 				
 				// tummy
@@ -43,12 +43,12 @@ class OrigamiCraneC extends THREE.Mesh {
 				
 				// neck - bottom
 				0.0, 1.5, -1.0,
-				0.0, 1.5, -1.5,
+				1.0, 1.5, -1.5,
 				0.0, 0.0, -0.5,
 
 				// neck - top
 				0.0, 1.5, -1.0, 
-				0.0, 1.5, -1.5,
+				1.0, 1.5, -1.5,
 				0.0, 4.0, -1.0,
 				
 				// head
@@ -98,8 +98,8 @@ class OrigamiCraneC extends THREE.Mesh {
 
 		var fullNormal1 = this.calculateNormal(
 			[0.0, 1.5, 0.0],
-			[0.0, 1.5, -2.0],
-			[0.0, 0.0, -1.0]
+			[1.0, 1.5, 2.0],
+			[0.0, 0.0, 1.0]
 		);
 		var fullNormal2 = this.calculateNormal(
 			[0.0, 1.5, 0.0], 
@@ -113,12 +113,12 @@ class OrigamiCraneC extends THREE.Mesh {
 		);
 		var fullNormal4 = this.calculateNormal(
 			[0.0, 1.5, -1.0],
-			[0.0, 1.5, -1.5],
+			[1.0, 1.5, -1.5],
 			[0.0, 0.0, -0.5]
 		);
 		var fullNormal5 = this.calculateNormal(
 			[0.0, 1.5, -1.0],
-			[0.0, 1.5, -1.5],
+			[1.0, 1.5, -1.5],
 			[0.0, 4.0, -1.0]
 		);
 		var fullNormal6 = this.calculateNormal(
