@@ -174,6 +174,11 @@ function render() {
 	renderer.clear();
 	renderer.render(scene[0], camera[currentCamera]);
 	if (pause) {
+		renderer.clearDepth();
+		if (renderer.xr.getSession())
+		{
+			renderer.render(scene[1],camera[2].cameraL,camera[2].cameraR);
+		}
 		if (currentCamera == 1)
 			renderer.render(scene[1], OrtogonalPauseCamera2);
 		else
