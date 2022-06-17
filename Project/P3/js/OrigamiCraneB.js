@@ -49,11 +49,11 @@ class OrigamiCraneB extends THREE.Mesh {
 				// left side - down
 				0.5, 2.5, 0.0, 
 				0.0, 0.0, 0.0,
-				0.0, 2.1, 0.7,
+				0.0, 1.875, 0.625,
 				
 				// right side - down
 				0.5, 2.5, 0.0, 
-				0.0, 2.1, -0.7,
+				0.0, 1.875, -0.625,
 				0.0, 0.0, 0.0
 			]
 		);
@@ -124,11 +124,11 @@ class OrigamiCraneB extends THREE.Mesh {
 		var fullNormal5 = this.calculateNormal(
 			[0.5, 2.5, 0.0], 
 			[0.0, 0.0, 0.0],
-			[0.0, 2.1, 0.7]
+			[0.0, 1.875, 0.625]
 		);
 		var fullNormal6 = this.calculateNormal(
 			[0.5, 2.5, 0.0], 
-			[0.0, 2.1, -0.7],
+			[0.0, 1.875, -0.625],
 			[0.0, 0.0, 0.0]
 		);
 

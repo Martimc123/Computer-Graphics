@@ -344,7 +344,6 @@ function addOrigami(type, obj, spotlight, x,y,z) {
 		origami = new OrigamiCraneB(materials[1]);
 	else if (type == 'C')
 		origami = new OrigamiCraneC(materials[1]);
-	origami.rotation.z= Math.PI/6;
 	origami.position.set(x,y,z);
 	obj.add(origami);
 	allObj.push(origami);
