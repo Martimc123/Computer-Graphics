@@ -53,6 +53,7 @@ var zKey, xKey, cKey;
 let pause = false;
 var OrtogonalPauseCamera;
 var reset = false;
+var oldWidth = window.innerWidth;
 
 'use strict';
 
@@ -213,8 +214,9 @@ function onResize() {
 		var nrCameras = camera.length; 
 		var nrPerspectiveCameras = 1;
 		for (i=0; i < nrPerspectiveCameras; i++) { // perspective camera
-				camera[i].aspect = window.innerWidth / window.innerHeight;
-				camera[i].updateProjectionMatrix();
+			camera[i].aspect = window.innerWidth / window.innerHeight;
+			camera[i].fov = camera[i].fov * window.innerWidth/oldWidth;
+			camera[i].updateProjectionMatrix();
 		}
 		for (i =nrPerspectiveCameras; i< nrCameras; i++) { // ortographic cameras
 			if (i==2)
@@ -225,6 +227,7 @@ function onResize() {
 			camera[i].bottom = viewSize / -val / val2;
 			camera[i].updateProjectionMatrix();
 		}
+		oldWidth = window.innerWidth;
 	}
 }
 
