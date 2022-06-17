@@ -80,12 +80,12 @@ class OrigamiCraneA extends THREE.Mesh {
 		origamiGeometry.setAttribute(
 			'normal',
 			new THREE.BufferAttribute(norms,normalNumComponents));
-
+			
 		origamiGeometry.computeVertexNormals();
 
 		origamiGeometry.setAttribute(
 		'uvs',
-		new THREE.BufferAttribute(uvs, uvNumComponents));
+		new THREE.BufferAttribute(vertices, positionNumComponents));
 
 		this.geometry = origamiGeometry;
 	}

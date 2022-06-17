@@ -77,9 +77,12 @@ function addSpotlightHost(obj, xLoc, yLoc, zLoc) {
 }
 
 function addSpotlight(obj, toLookObj, spotlight, x, y, z) {
+	spotlight.target = toLookObj;
 	spotlight.position.set(x, y, z);
 	obj.add(spotlight);
-	spotlight.target = toLookObj;
+	console.log(toLookObj.position);
+	let lightHelper = new THREE.SpotLightHelper(spotlight);
+	obj.add(lightHelper);
 	addSpotlightHost(obj, x, y, z);
 }
 
@@ -121,6 +124,8 @@ function addPodium(obj, x, y, z) {
 	mesh.position.set(0, -podiumStepHeight/2, 0);
 	mesh2 = new THREE.Mesh(geometry2, material);
 	mesh2.position.set(0, podiumStepHeight/2, 0);
+	mesh.receiveShadow = true;
+	mesh2.receiveShadow = true;
 	podiumObj.add(mesh);
 	podiumObj.add(mesh2);
 	podiumObj.position.set(x,y,z);
@@ -205,7 +210,6 @@ function onResize() {
 		var nrPerspectiveCameras = 1;
 		for (i=0; i < nrPerspectiveCameras; i++) { // perspective camera
 				camera[i].aspect = window.innerWidth / window.innerHeight;
-				camera[i].updateProjectionMatrix();
 				camera[i].updateProjectionMatrix();
 		}
 		for (i =nrPerspectiveCameras; i< nrCameras; i++) { // ortographic cameras
@@ -313,6 +317,7 @@ function addCube(obj, spotlight, x,y,z)
 	const geometry = new THREE.BoxGeometry(origamiLen, origamiLen, origamiLen);
 	const material = materials[1];
 	const cube = new THREE.Mesh( geometry, material );
+	cube.castShadow = true;
 	cube.position.set(x,y,z);
 	obj.add(cube);
 	figures.push(cube);
@@ -348,6 +353,7 @@ function addOrigami(type, obj, spotlight, x,y,z) {
 	allColors.push(origami.material.color);
 	figures.push(origami);
 	addSpotlight(obj, origami, spotlight, x, y*4, z);
+	origami.castShadow = true;
 }
 
 
@@ -609,23 +615,23 @@ function createAllCameras() {
 	camera[0] = createPerspectiveCamera(viewSize/2*defaultScale,viewSize/2*defaultScale,viewSize/2*defaultScale);
 	camera[1] = createOrtographicCamera(podiumTopLen*defaultScale, podiumStepHeight*defaultScale,0*defaultScale);
 	camera[2] = new THREE.StereoCamera();
-	camera[3] = createPerspectiveCamera(viewSize/2*defaultScale,viewSize/2*defaultScale,viewSize/2*defaultScale); // for orbit controls
+	camera[3] = createOrtographicCamera(viewSize/2*defaultScale,viewSize/2*defaultScale,viewSize/2*defaultScale); // for orbit controls
 	camera[4] = OrtogonalPauseCamera;
 	camera[5] = OrtogonalPauseCamera2;
 	controls = new THREE.OrbitControls(camera[3], renderer.domElement);
 }
 
 function createAllMaterials() {
-	/*
+	
 	materials[0] = new THREE.MeshBasicMaterial( {color: 0x555555, map: gold_texture, side: THREE.DoubleSide} );
 	materials[1] = new THREE.MeshLambertMaterial( {color: 0xff0000, map: gold_texture, side: THREE.DoubleSide} );
-	materials[2] = new THREE.MeshPhongMaterial( {color: 0xffffff, map: gold_texture, side: THREE.DoubleSide});	
-*/
+	materials[2] = new THREE.MeshPhongMaterial( {color: 0xffffff, map: gold_texture, shininess: 15, side: THREE.DoubleSide});	
+/*
 	
 	materials[0] = new THREE.MeshBasicMaterial( {color: 0x555555, map: gold_texture, side: THREE.FrontSide}, {color: 0xffffff, map: wood_texture, side: THREE.BackSide});
 	materials[1] = new THREE.MeshLambertMaterial( {color: 0xff0000, map: gold_texture, side: THREE.FrontSide}, {color: 0xffffff, map: wood_texture, side: THREE.BackSide} );
 	materials[2] = new THREE.MeshPhongMaterial( {color: 0xffffff, map: gold_texture, side: THREE.FrontSide}, {color: 0xffffff, map: glass_texture, side: THREE.BackSide});	
-
+*/
 	/*	
 	materials[0] = new THREE.MeshBasicMaterial( {color: 0x555555, map: wood_texture, side: THREE.DoubleSide} );
 	materials[1] = new THREE.MeshLambertMaterial( {color: 0x777777, map: wood_texture, side: THREE.DoubleSide} );
@@ -648,9 +654,11 @@ function createAllMaterials() {
 }
 
 function createAllSpotLights() {
-	spotlights[0] = new THREE.SpotLight(0xffffff, 0.5);
-	spotlights[1] = new THREE.SpotLight(0xffffff, 0.5);
-	spotlights[2] = new THREE.SpotLight(0xffffff, 0.5);
+	spotlights[0] = new THREE.SpotLight(0xffffff, 0.7, 0, Math.PI/12);
+	spotlights[1] = new THREE.SpotLight(0xffffff, 0.7, 0, Math.PI/12);
+	spotlights[2] = new THREE.SpotLight(0xffffff, 0.7, 0, Math.PI/12);
+	for (i=0; i < spotlights.length; i++)
+		spotlights[i].castShadow = true;
 }
 
 function init() {
