@@ -215,7 +215,7 @@ function onResize() {
 		var nrPerspectiveCameras = 1;
 		for (i=0; i < nrPerspectiveCameras; i++) { // perspective camera
 			camera[i].aspect = window.innerWidth / window.innerHeight;
-			camera[i].fov = camera[i].fov * window.innerWidth/oldWidth;
+			camera[i].fov = camera[i].fov * oldWidth/window.innerWidth;
 			camera[i].updateProjectionMatrix();
 		}
 		for (i =nrPerspectiveCameras; i< nrCameras; i++) { // ortographic cameras
