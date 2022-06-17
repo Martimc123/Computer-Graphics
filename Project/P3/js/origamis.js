@@ -80,7 +80,6 @@ function addSpotlight(obj, toLookObj, spotlight, x, y, z) {
 	spotlight.target = toLookObj;
 	spotlight.position.set(x, y, z);
 	obj.add(spotlight);
-	console.log(toLookObj.position);
 	let lightHelper = new THREE.SpotLightHelper(spotlight);
 	obj.add(lightHelper);
 	addSpotlightHost(obj, x, y, z);
@@ -654,9 +653,9 @@ function createAllMaterials() {
 }
 
 function createAllSpotLights() {
-	spotlights[0] = new THREE.SpotLight(0xffffff, 0.7, 0, Math.PI/12);
-	spotlights[1] = new THREE.SpotLight(0xffffff, 0.7, 0, Math.PI/12);
-	spotlights[2] = new THREE.SpotLight(0xffffff, 0.7, 0, Math.PI/12);
+	spotlights[0] = new THREE.SpotLight(0xffffff, 0.7, 0, Math.PI/6);
+	spotlights[1] = new THREE.SpotLight(0xffffff, 0.7, 0, Math.PI/6);
+	spotlights[2] = new THREE.SpotLight(0xffffff, 0.7, 0, Math.PI/6);
 	for (i=0; i < spotlights.length; i++)
 		spotlights[i].castShadow = true;
 }
