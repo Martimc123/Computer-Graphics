@@ -17,7 +17,7 @@ var defaultScale = 1;
 var viewSize = 50;
 var aspectRatio = window.innerWidth/window.innerHeight;
 var podiumStepHeight = 0.5;
-var podiumBottomLen = 40;
+var podiumBottomLen = 20;
 var podiumTopLen = 0.75*podiumBottomLen;
 var origamiLen = 2;
 var origamiDist = 1/3*podiumTopLen;
@@ -100,12 +100,13 @@ function addObjPart(obj, geometry, mater, hex, x, y, z, rotX, rotY, rotZ,tag = "
 }
 
 function addFloor(obj, x, y, z) {
-	geometry = new THREE.BoxGeometry(viewSize*2,0.1, viewSize*2);
+	geometry = new THREE.PlaneGeometry(viewSize*2,viewSize*2);
 	material = materials[1];
 	var color = 0x222222;
 	material.color = color;
 	mesh = new THREE.Mesh(geometry, material);
 	mesh.position.set(x, y, z);
+	mesh.rotation.x= Math.PI/2;
 	obj.add(mesh);
 	allObj.push(mesh);
 	allColors.push(color);
