@@ -80,8 +80,6 @@ function addSpotlight(obj, toLookObj, spotlight, x, y, z) {
 	spotlight.target = toLookObj;
 	spotlight.position.set(x, y, z);
 	obj.add(spotlight);
-	let lightHelper = new THREE.SpotLightHelper(spotlight);
-	obj.add(lightHelper);
 	addSpotlightHost(obj, x, y, z);
 }
 

@@ -5,8 +5,7 @@ class OrigamiCraneA extends THREE.Mesh {
 		super();
 		this.material = mat;
 		this.create();
-		console.log(this.material);
-		console.log(this.geometry);
+		console.log("A1");
 	}
 
 	calculateNormal(posOG, pos1, pos2) {
@@ -22,9 +21,8 @@ class OrigamiCraneA extends THREE.Mesh {
 
 	create() {
 		var origamiGeometry = new THREE.BufferGeometry();
-		var positionNumComponents = 3;
+		var vertexNumComponents = 3;
 		var normalNumComponents = 3;
-		var uvNumComponents = 2;
 		const vertices = new Float32Array (
 			[ // left side
 				1.0, 2.0, 2.0, 
@@ -75,7 +73,7 @@ class OrigamiCraneA extends THREE.Mesh {
 
 		origamiGeometry.setAttribute(
 			'position',
-			new THREE.BufferAttribute(vertices, positionNumComponents));
+			new THREE.BufferAttribute(vertices, vertexNumComponents));
 
 		origamiGeometry.setAttribute(
 			'normal',
@@ -85,7 +83,7 @@ class OrigamiCraneA extends THREE.Mesh {
 
 		origamiGeometry.setAttribute(
 		'uvs',
-		new THREE.BufferAttribute(vertices, positionNumComponents));
+		new THREE.BufferAttribute(vertices, vertexNumComponents));
 
 		this.geometry = origamiGeometry;
 	}

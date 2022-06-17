@@ -5,8 +5,7 @@ class OrigamiCraneB extends THREE.Mesh {
 		super();
 		this.material = mat;
 		this.create();
-		console.log(this.material);
-		console.log(this.geometry);
+		console.log("B2");
 	}
 
 	calculateNormal(posOG, pos1, pos2) {
@@ -22,49 +21,38 @@ class OrigamiCraneB extends THREE.Mesh {
 
 	create() {
 		var origamiGeometry = new THREE.BufferGeometry();
-		var positionNumComponents = 3;
+		var vertexNumComponents = 3;
 		var normalNumComponents = 3;
-		var uvNumComponents = 2;
 		const vertices = new Float32Array (
 			[ 
 				// left side - up
-				0.0, 3.0, 0.0, 
+				0.0, 3.0, 1.0,
+				0.0, 0.0, 0.0,
 				0.0, 4.0, 0.0,
-				1.0, 3.0, 1.0,
 				
 				// right side - up
-				0.0, 3.0, 0.0, 
-				0.0, 0.0, 4.0,
-				1.0, 3.0, -1.0,
+				0.0, 3.0, -1.0,
+				0.0, 0, 0.0, 
+				0.0, 4.0, 0.0,
 
-				// left side - middle1
-				0.0, 3.0, 0.0, 
-				1.0, 3.0, 1.0,
-				0.0, 2.0, 0.0,
-				
-				// right side - middle1
-				0.0, 3.0, 0.0, 
-				1.0, 3.0, -1.0,
-				0.0, 2.0, 0.0,
-
-				// left side - middle2
-				0.0, 3.0, 0.0, 
-				1.0, 3.0, 1.0,
-				0.0, 2.0, 0.0,
-				
-				// right side - middle2
-				0.0, 3.0, 0.0, 
-				1.0, 3.0, -1.0,
-				0.0, 2.0, 0.0,
-				
-				// left side - down
-				0.5, 2.0, 2.0, 
+				// left side - middle
+				0.4, 2.5, 0.0, 
+				0.0, 3.0, 1.0,
 				0.0, 0.0, 0.0,
-				0.5, 4.0, 0.0,
+				
+				// right side - middle
+				0.4, 2.5, 0.0, 
+				0.0, 0.0, 0.0,
+				0.0, 3.0, -1.0,
+
+				// left side - down
+				0.5, 2.5, 0.0, 
+				0.0, 0.0, 0.0,
+				0.0, 2.1, 0.7,
 				
 				// right side - down
-				0.5, 2.0, -2.0,
-				0.5, 4.0, 0.0,
+				0.5, 2.5, 0.0, 
+				0.0, 2.1, -0.7,
 				0.0, 0.0, 0.0
 			]
 		);
@@ -113,78 +101,62 @@ class OrigamiCraneB extends THREE.Mesh {
 		);
 
 		var fullNormal1 = this.calculateNormal(
-			[0.0, 3.0, 0.0], 
-				[0.0, 4.0, 0.0],
-				[1.0, 3.0, 1.0]
+			[0.0, 3.0, 1.0],
+			[0.0, 0.0, 0.0],
+			[0.0, 4.0, 0.0]
 		);
 		var fullNormal2 = this.calculateNormal(
-			[0.0, 3.0, 0.0], 
-				[0.0, 0.0, 4.0],
-				[1.0, 3.0, -1.0]
+			[0.0, 3.0, -1.0], 
+			[0.0, 0, 0.0],
+			[0.0, 4.0, 0.0]
 		);
 		var fullNormal3 = this.calculateNormal(
-			[0.0, 3.0, 0.0], 
-				[1.0, 3.0, 1.0],
-				[0.0, 2.0, 0.0]
+			[0.4, 2.5, 0.0],
+			[0.0, 3.0, 1.0],
+			[0.0, 0.0, 0.0]
 		);
 		var fullNormal4 = this.calculateNormal(
-			[0.0, 3.0, 0.0], 
-				[1.0, 3.0, -1.0],
-				[0.0, 2.0, 0.0]
+			[0.4, 2.5, 0.0],
+			[0.0, 0.0, 0.0],
+			[0.0, 3.0, -1.0]
 		);
 		var fullNormal5 = this.calculateNormal(
-			[0.5, 2.0, -2.0], 
-			[0.5, 4.0, 0.0],
-			[0.0, 0.0, 0.0]
+			[0.5, 2.5, 0.0], 
+			[0.0, 0.0, 0.0],
+			[0.0, 2.1, 0.7]
 		);
 		var fullNormal6 = this.calculateNormal(
-			[0.5, 2.0, -2.0], 
-			[0.5, 4.0, 0.0],
-			[0.0, 0.0, 0.0]
-		);
-		var fullNormal7 = this.calculateNormal(
-			[0.5, 2.0, -2.0], 
-			[0.5, 4.0, 0.0],
-			[0.0, 0.0, 0.0]
-		);
-		var fullNormal8 = this.calculateNormal(
-			[0.5, 2.0, -2.0], 
-			[0.5, 4.0, 0.0],
+			[0.5, 2.5, 0.0], 
+			[0.0, 2.1, -0.7],
 			[0.0, 0.0, 0.0]
 		);
 
 		const norms = new Float32Array (
 			[
-			fullNormal1[0], fullNormal1[1], fullNormal1[2],
-			fullNormal1[0], fullNormal1[1], fullNormal1[2],
-			fullNormal1[0], fullNormal1[1], fullNormal1[2],
-			fullNormal2[0], fullNormal2[1], fullNormal2[2],
-			fullNormal2[0], fullNormal2[1], fullNormal2[2],
-			fullNormal2[0], fullNormal2[1], fullNormal2[2],
-			fullNormal3[0], fullNormal3[1], fullNormal3[2],
-			fullNormal3[0], fullNormal3[1], fullNormal3[2],
-			fullNormal3[0], fullNormal3[1], fullNormal3[2],
-			fullNormal4[0], fullNormal4[1], fullNormal4[2],
-			fullNormal4[0], fullNormal4[1], fullNormal4[2],
-			fullNormal4[0], fullNormal4[1], fullNormal4[2],
-			fullNormal5[0], fullNormal5[1], fullNormal5[2],
-			fullNormal5[0], fullNormal5[1], fullNormal5[2],
-			fullNormal5[0], fullNormal5[1], fullNormal5[2],
-			fullNormal6[0], fullNormal6[1], fullNormal6[2],
-			fullNormal6[0], fullNormal6[1], fullNormal6[2],
-			fullNormal6[0], fullNormal6[1], fullNormal6[2],
-			fullNormal7[0], fullNormal7[1], fullNormal7[2],
-			fullNormal7[0], fullNormal7[1], fullNormal7[2],
-			fullNormal7[0], fullNormal7[1], fullNormal7[2],
-			fullNormal8[0], fullNormal8[1], fullNormal8[2],
-			fullNormal8[0], fullNormal8[1], fullNormal8[2],
-			fullNormal8[0], fullNormal8[1], fullNormal8[2]
+			fullNormal1[0], fullNormal1[1], fullNormal1[2]
+			,fullNormal1[0], fullNormal1[1], fullNormal1[2]
+			,fullNormal1[0], fullNormal1[1], fullNormal1[2]
+			,fullNormal2[0], fullNormal2[1], fullNormal2[2]
+			,fullNormal2[0], fullNormal2[1], fullNormal2[2]
+			,fullNormal2[0], fullNormal2[1], fullNormal2[2]
+			,fullNormal3[0], fullNormal3[1], fullNormal3[2]
+			,fullNormal3[0], fullNormal3[1], fullNormal3[2]
+			,fullNormal3[0], fullNormal3[1], fullNormal3[2]
+			,fullNormal4[0], fullNormal4[1], fullNormal4[2]
+			,fullNormal4[0], fullNormal4[1], fullNormal4[2]
+			,fullNormal4[0], fullNormal4[1], fullNormal4[2]
+			,fullNormal5[0], fullNormal5[1], fullNormal5[2]
+			,fullNormal5[0], fullNormal5[1], fullNormal5[2]
+			,fullNormal5[0], fullNormal5[1], fullNormal5[2]
+			,fullNormal6[0], fullNormal6[1], fullNormal6[2]
+			,fullNormal6[0], fullNormal6[1], fullNormal6[2]
+			,fullNormal6[0], fullNormal6[1], fullNormal6[2]
 			]
 		);
 
 		origamiGeometry.setAttribute(
 			'position',
-			new THREE.BufferAttribute(vertices, positionNumComponents));
+			new THREE.BufferAttribute(vertices, vertexNumComponents));
 
 		origamiGeometry.setAttribute(
 			'normal',
@@ -194,7 +166,7 @@ class OrigamiCraneB extends THREE.Mesh {
 
 		origamiGeometry.setAttribute(
 		'uvs',
-		new THREE.BufferAttribute(uvs, uvNumComponents));
+		new THREE.BufferAttribute(vertices, vertexNumComponents));
 
 		this.geometry = origamiGeometry;
 	}
